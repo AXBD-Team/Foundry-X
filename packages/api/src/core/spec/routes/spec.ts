@@ -153,7 +153,7 @@ specRoute.openapi(resolveConflictRoute, async (c) => {
     .bind(resolution, conflictId)
     .run();
 
-  return c.json({ ok: true });
+  return c.json({ ok: true }, 200);
 });
 
 // ─── GET /spec/existing (F54) ───

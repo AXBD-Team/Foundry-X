@@ -57,7 +57,7 @@ eventStatusRoute.openapi(getStatusRoute, async (c) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bus = new D1EventBus(c.env.DB as any);
   const status = await bus.getStatus();
-  return c.json(status);
+  return c.json(status, 200);
 });
 
 // ── GET /api/events/dlq ──
@@ -90,7 +90,7 @@ eventStatusRoute.openapi(getDLQRoute, async (c) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bus = new D1EventBus(c.env.DB as any);
   const events = await bus.getDLQ(limit);
-  return c.json({ events });
+  return c.json({ events }, 200);
 });
 
 // ── GET /api/events/:id ──
@@ -160,5 +160,5 @@ eventStatusRoute.openapi(reprocessRoute, async (c) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bus = new D1EventBus(c.env.DB as any);
   await bus.reprocess(id);
-  return c.json({ ok: true });
+  return c.json({ ok: true }, 200);
 });

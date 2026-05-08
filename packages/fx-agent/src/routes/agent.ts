@@ -387,7 +387,7 @@ agentRoute.openapi(executeAgentTask, async (c) => {
     runner,
   );
 
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 const getRunners = createRoute({
@@ -445,7 +445,7 @@ const getTaskResult = createRoute({
         "application/json": {
           schema: z.object({
             task: AgentTaskSchema,
-            result: z.unknown().nullable(),
+            result: z.any().nullable(),
           }),
         },
       },
@@ -470,7 +470,7 @@ agentRoute.openapi(getTaskResult, async (c) => {
     return c.json({ error: "Task not found", errorCode: "RESOURCE_001" }, 404);
   }
 
-  return c.json(taskResult);
+  return c.json(taskResult, 200);
 });
 
 // ─── Sprint 13: Agent PR Pipeline Endpoints (F65) ───
@@ -527,7 +527,7 @@ agentRoute.openapi(createAgentPr, async (c) => {
 
   try {
     const result = await pipeline.createAgentPr(agentId, taskId, taskResult);
-    return c.json(result);
+    return c.json(result, 200);
   } catch (err) {
     return c.json({ error: err instanceof Error ? err.message : "Pipeline failed" }, 400);
   }
@@ -564,7 +564,7 @@ agentRoute.openapi(getAgentPr, async (c) => {
     return c.json({ error: "PR not found" } as const, 404);
   }
 
-  return c.json(row as Record<string, unknown> as z.infer<typeof AgentPrRecordSchema>);
+  return c.json(row as Record<string, unknown> as z.infer<typeof AgentPrRecordSchema>, 200);
 });
 
 const reviewAgentPr = createRoute({
@@ -610,7 +610,7 @@ agentRoute.openapi(reviewAgentPr, async (c) => {
     prNumber: row.pr_number,
   });
 
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 const mergeAgentPr = createRoute({
@@ -671,7 +671,7 @@ agentRoute.openapi(mergeAgentPr, async (c) => {
   const pipeline = createPrPipeline(c.env, sseManager);
   const result = await pipeline.checkAndMerge(id, row.pr_number, reviewResult);
 
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 // ─── Sprint 14: Parallel Execution + Merge Queue Endpoints (F68) ───
@@ -719,11 +719,11 @@ agentRoute.openapi(executeParallel, async (c) => {
     const mergeQueue = createMergeQueue(c.env, sseManager);
     orchestrator.setMergeQueue(mergeQueue);
     const result = await orchestrator.executeParallelWithPr(tasks, runner);
-    return c.json(result);
+    return c.json(result, 200);
   }
 
   const result = await orchestrator.executeParallel(tasks, runner);
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 const getParallelExecution = createRoute({
@@ -794,7 +794,7 @@ agentRoute.openapi(getParallelExecution, async (c) => {
     durationMs: row.duration_ms,
     createdAt: row.created_at,
     completedAt: row.completed_at,
-  });
+  }, 200);
 });
 
 const getQueueStatus = createRoute({
@@ -1031,7 +1031,7 @@ const architectAnalyze = createRoute({
     body: { content: { "application/json": { schema: ArchitectAnalyzeRequestSchema } } },
   },
   responses: {
-    200: { content: { "application/json": { schema: z.object({ impactSummary: z.string(), designScore: z.number(), tokensUsed: z.number(), model: z.string(), duration: z.number() }).passthrough() } }, description: "분석 결과" },
+    200: { content: { "application/json": { schema: z.object({ impactSummary: z.string(), designScore: z.number(), tokensUsed: z.number(), model: z.string(), duration: z.number() }) } }, description: "분석 결과" },
     400: { content: { "application/json": { schema: z.object({ error: z.string() }) } }, description: "잘못된 요청" },
   },
 });
@@ -1059,7 +1059,7 @@ agentRoute.openapi(architectAnalyze, async (c) => {
   };
 
   const result = await agent.analyzeArchitecture(request);
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 const architectReviewDesign = createRoute({
@@ -1071,7 +1071,7 @@ const architectReviewDesign = createRoute({
     body: { content: { "application/json": { schema: DesignReviewRequestSchema } } },
   },
   responses: {
-    200: { content: { "application/json": { schema: z.object({ completenessScore: z.number(), consistencyScore: z.number(), feasibilityScore: z.number(), overallScore: z.number() }).passthrough() } }, description: "리뷰 결과" },
+    200: { content: { "application/json": { schema: z.object({ completenessScore: z.number(), consistencyScore: z.number(), feasibilityScore: z.number(), overallScore: z.number() }) } }, description: "리뷰 결과" },
   },
 });
 
@@ -1083,7 +1083,7 @@ agentRoute.openapi(architectReviewDesign, async (c) => {
   });
 
   const result = await agent.reviewDesignDoc(document, title);
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 // ─── Sprint 36: Evaluator-Optimizer (F137) ───
@@ -1213,7 +1213,7 @@ agentRoute.openapi(testGenerate, async (c) => {
   };
 
   const result = await agent.generateTests(request);
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 const testCoverageGaps = createRoute({
@@ -1757,7 +1757,7 @@ agentRoute.openapi(getCustomRole, async (c) => {
   if (!role) {
     return c.json({ error: "Role not found" }, 404);
   }
-  return c.json(role);
+  return c.json(role, 200);
 });
 
 const updateCustomRole = createRoute({
@@ -1782,7 +1782,7 @@ agentRoute.openapi(updateCustomRole, async (c) => {
   const mgr = new CustomRoleManager(c.env.DB);
   try {
     const role = await mgr.updateRole(id, body);
-    return c.json(role);
+    return c.json(role, 200);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("builtin")) {
@@ -1874,7 +1874,7 @@ agentRoute.openapi(ensembleExecute, async (c) => {
   };
 
   const result = await ensemble.executeEnsemble(request, body.config);
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 const ensembleStrategies = createRoute({
@@ -1915,6 +1915,10 @@ const publishMarketplaceItem = createRoute({
       content: { "application/json": { schema: z.object({ error: z.string() }) } },
       description: "중복 게시",
     },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "잘못된 요청",
+    },
   },
 });
 
@@ -1924,7 +1928,7 @@ agentRoute.openapi(publishMarketplaceItem, async (c) => {
   const marketplace = new AgentMarketplace(c.env.DB);
   try {
     const item = await marketplace.publishItem(body, orgId as string);
-    return c.json({ item });
+    return c.json({ item }, 200);
   } catch (e: unknown) {
     const msg = (e as Error).message;
     if (msg.includes("CONFLICT")) return c.json({ error: msg }, 409);
@@ -1983,6 +1987,10 @@ const installMarketplaceItem = createRoute({
       content: { "application/json": { schema: z.object({ error: z.string() }) } },
       description: "이미 설치됨",
     },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "잘못된 요청",
+    },
   },
 });
 
@@ -1992,7 +2000,7 @@ agentRoute.openapi(installMarketplaceItem, async (c) => {
   const marketplace = new AgentMarketplace(c.env.DB);
   try {
     const install = await marketplace.installItem(id, orgId as string);
-    return c.json({ install });
+    return c.json({ install }, 200);
   } catch (e: unknown) {
     const msg = (e as Error).message;
     if (msg.includes("NOT_FOUND")) return c.json({ error: msg }, 404);
@@ -2019,6 +2027,10 @@ const rateMarketplaceItem = createRoute({
       content: { "application/json": { schema: z.object({ error: z.string() }) } },
       description: "항목 없음",
     },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "잘못된 요청",
+    },
   },
 });
 
@@ -2031,7 +2043,7 @@ agentRoute.openapi(rateMarketplaceItem, async (c) => {
   const marketplace = new AgentMarketplace(c.env.DB);
   try {
     const rating = await marketplace.rateItem(id, userId, orgId as string | null, body.score, body.reviewText);
-    return c.json({ rating });
+    return c.json({ rating }, 200);
   } catch (e: unknown) {
     const msg = (e as Error).message;
     if (msg.includes("NOT_FOUND")) return c.json({ error: msg }, 404);
@@ -2060,6 +2072,10 @@ const deleteMarketplaceItem = createRoute({
       content: { "application/json": { schema: z.object({ error: z.string() }) } },
       description: "항목 없음",
     },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "잘못된 요청",
+    },
   },
 });
 
@@ -2069,7 +2085,7 @@ agentRoute.openapi(deleteMarketplaceItem, async (c) => {
   const marketplace = new AgentMarketplace(c.env.DB);
   try {
     const result = await marketplace.deleteItem(id, orgId as string);
-    return c.json(result);
+    return c.json(result, 200);
   } catch (e: unknown) {
     const msg = (e as Error).message;
     if (msg.includes("FORBIDDEN")) return c.json({ error: msg }, 403);
