@@ -56,7 +56,7 @@ githubRoute.openapi(reviewPrRoute, async (c) => {
 
   try {
     const result = await reviewSvc.reviewPr(prNumber);
-    return c.json(result, 200);
+    return c.json(result);
   } catch (err) {
     if (err instanceof ReviewCooldownError) {
       return c.json({ error: err.message }, 429);
@@ -112,5 +112,5 @@ githubRoute.openapi(getReviewRoute, async (c) => {
   if (!result) {
     return c.json({ error: "No review found for this PR" }, 404);
   }
-  return c.json(result, 200);
+  return c.json(result);
 });

@@ -120,7 +120,7 @@ expansionPackRoute.openapi(getPack, async (c) => {
 
   const pack = await svc.getById(id);
   if (!pack) return c.json({ error: "Pack not found" }, 404);
-  return c.json(pack, 200);
+  return c.json(pack);
 });
 
 // ─── PUT /api/expansion-packs/:id ───
@@ -153,7 +153,7 @@ expansionPackRoute.openapi(updatePack, async (c) => {
 
   const pack = await svc.update(id, body);
   if (!pack) return c.json({ error: "Pack not found" }, 404);
-  return c.json(pack, 200);
+  return c.json(pack);
 });
 
 // ─── PATCH /api/expansion-packs/:id/publish ───

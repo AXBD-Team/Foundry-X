@@ -207,5 +207,5 @@ governanceRoute.openapi(updateRule, async (c) => {
     updatedAt: updated!.updated_at,
   };
 
-  return c.json({ updated: true, rule }, 200);
+  return c.json({ updated: true, rule });
 });
