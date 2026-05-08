@@ -96,7 +96,7 @@ partySessionRoute.openapi(getSession, async (c) => {
 
   const session = await svc.getSession(id);
   if (!session) return c.json({ error: "Session not found" }, 404);
-  return c.json(session);
+  return c.json(session, 200);
 });
 
 // ─── POST /api/party-sessions/:id/join ───

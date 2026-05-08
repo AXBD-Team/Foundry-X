@@ -181,7 +181,7 @@ authRoute.openapi(login, async (c) => {
   return c.json({
     user: { id: user.id, email: user.email, name: user.name, role: user.role },
     ...tokens,
-  });
+  }, 200);
 });
 
 // ─── POST /auth/refresh ───
@@ -262,7 +262,7 @@ authRoute.openapi(refresh, async (c) => {
     expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
   });
 
-  return c.json(tokens);
+  return c.json(tokens, 200);
 });
 
 // ─── POST /auth/switch-org ───
@@ -277,6 +277,7 @@ const switchOrg = createRoute({
   },
   responses: {
     200: { content: { "application/json": { schema: TokenPairSchema } }, description: "New token pair for switched org" },
+    401: { content: { "application/json": { schema: ErrorSchema } }, description: "Unauthorized" },
     403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a member" },
   },
 });
@@ -320,7 +321,7 @@ authRoute.openapi(switchOrg, async (c) => {
     expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
   });
 
-  return c.json(tokens);
+  return c.json(tokens, 200);
 });
 
 // ─── POST /auth/invitations/:token/accept ───
@@ -373,7 +374,7 @@ authRoute.openapi(acceptInvitation, async (c) => {
       expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
     });
 
-    return c.json(tokens);
+    return c.json(tokens, 200);
   } catch (e) {
     if (e instanceof OrgError) return c.json({ error: e.message }, e.status as any);
     throw e;
@@ -406,7 +407,7 @@ authRoute.openapi(invitationInfo, async (c) => {
     return c.json(info, statusMap[info.reason!] as any);
   }
 
-  return c.json(info);
+  return c.json(info, 200);
 });
 
 // ─── POST /auth/setup-password ───
@@ -645,7 +646,7 @@ authRoute.openapi(googleAuth, async (c) => {
   return c.json({
     user: { id: userId, email: googleUser.email, name: userName, role: userRole },
     ...tokens,
-  });
+  }, 200);
 });
 
 // ─── Sprint 67: F210 Password Reset ───
@@ -715,7 +716,7 @@ authRoute.openapi(validateResetToken, async (c) => {
   if (!result.valid) {
     return c.json({ valid: false, reason: result.reason }, 410);
   }
-  return c.json({ valid: true });
+  return c.json({ valid: true }, 200);
 });
 
 // POST /auth/reset-password
@@ -739,7 +740,7 @@ authRoute.openapi(resetPassword, async (c) => {
 
   try {
     await resetService.resetPassword(token, newPassword);
-    return c.json({ message: "Password has been reset successfully. Please login with your new password." });
+    return c.json({ message: "Password has been reset successfully. Please login with your new password." }, 200);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
     return c.json({ error: `Invalid or expired token: ${msg}`, errorCode: "AUTH_007" }, 400);
@@ -757,6 +758,10 @@ const cleanupTokens = createRoute({
     200: {
       content: { "application/json": { schema: z.object({ deleted: z.number() }) } },
       description: "Number of deleted tokens",
+    },
+    401: {
+      content: { "application/json": { schema: ErrorSchema } },
+      description: "Unauthorized",
     },
     403: {
       content: { "application/json": { schema: ErrorSchema } },
@@ -786,5 +791,5 @@ authRoute.openapi(cleanupTokens, async (c) => {
     "DELETE FROM refresh_tokens WHERE expires_at < datetime('now') OR revoked_at IS NOT NULL"
   ).run();
 
-  return c.json({ deleted: result.meta?.changes ?? 0 });
+  return c.json({ deleted: result.meta?.changes ?? 0 }, 200);
 });

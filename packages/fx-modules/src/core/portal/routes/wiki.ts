@@ -110,7 +110,7 @@ wikiRoute.openapi(getWikiPage, async (c) => {
     filePath: page.filePath ?? "",
     lastModified: page.updatedAt,
     author: page.updatedBy ?? "system",
-  });
+  }, 200);
 });
 
 // ─── PUT /wiki/:slug ───
@@ -172,7 +172,7 @@ wikiRoute.openapi(updateWikiPage, async (c) => {
     );
   }
 
-  return c.json({ ok: true as const, slug, filePath: existing.filePath ?? "" });
+  return c.json({ ok: true as const, slug, filePath: existing.filePath ?? "" }, 200);
 });
 
 // ─── POST /wiki ───
@@ -269,5 +269,5 @@ wikiRoute.openapi(deleteWikiPage, async (c) => {
 
   await db.delete(wikiPages).where(eq(wikiPages.slug, slug));
 
-  return c.json({ ok: true as const, slug, filePath: existing.filePath ?? "" });
+  return c.json({ ok: true as const, slug, filePath: existing.filePath ?? "" }, 200);
 });
