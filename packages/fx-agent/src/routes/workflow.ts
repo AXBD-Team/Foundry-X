@@ -31,7 +31,7 @@ const listRoute = createRoute({
   summary: "List workflows",
   request: { params: OrgIdParam },
   responses: {
-    200: { content: { "application/json": { schema: z.object({ workflows: z.array(z.record(z.string(), z.unknown())), templates: z.array(z.record(z.string(), z.unknown())) }) } }, description: "Workflow list" },
+    200: { content: { "application/json": { schema: z.object({ workflows: z.array(z.any()), templates: z.array(z.any()) }) } }, description: "Workflow list" },
   },
 });
 

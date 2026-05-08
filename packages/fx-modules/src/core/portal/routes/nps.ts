@@ -98,5 +98,5 @@ npsRoute.openapi(getOrgNpsSummary, async (c) => {
   const service = new NpsService(c.env.DB);
 
   const summary = await service.getOrgSummary(orgId);
-  return c.json(summary, 200);
+  return c.json(summary);
 });

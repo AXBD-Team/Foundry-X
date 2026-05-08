@@ -88,7 +88,7 @@ onboardingRoute.openapi(completeStep, async (c) => {
       });
     }
 
-    return c.json(result, 200);
+    return c.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return c.json({ error: message }, 400);

@@ -92,7 +92,7 @@ workRoute.openapi(classifyWork, async (c) => {
   const { text } = c.req.valid("json");
   const svc = new WorkService(c.env);
   const result = await svc.classify(text);
-  return c.json(result, 200);
+  return c.json(result);
 });
 
 // ─── GET /api/work/sessions (F510 M4) ───────────────────────────────────────
@@ -142,7 +142,7 @@ workRoute.openapi(syncSessions, async (c) => {
   const body = c.req.valid("json");
   const svc = new WorkService(c.env);
   const result = await svc.syncSessions(body);
-  return c.json(result, 200);
+  return c.json(result);
 });
 
 // ─── GET /api/work/velocity (F513 B-1) ────────────────────────────────────────
@@ -316,7 +316,7 @@ workRoute.openapi(getTrace, async (c) => {
   const svc = new TraceabilityService(c.env);
   const chain = await svc.getTraceChain(id);
   if (!chain) return c.json({ error: `Not found: ${id}` }, 404);
-  return c.json(chain, 200);
+  return c.json(chain);
 });
 
 const postTraceSync = createRoute({

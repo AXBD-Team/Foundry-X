@@ -144,7 +144,7 @@ specLibraryRoute.openapi(getSpec, async (c) => {
 
   const spec = await svc.getById(id);
   if (!spec) return c.json({ error: "Spec not found" }, 404);
-  return c.json(spec, 200);
+  return c.json(spec);
 });
 
 // ─── PUT /api/spec-library/:id ───
@@ -177,7 +177,7 @@ specLibraryRoute.openapi(updateSpec, async (c) => {
 
   const spec = await svc.update(id, body);
   if (!spec) return c.json({ error: "Spec not found" }, 404);
-  return c.json(spec, 200);
+  return c.json(spec);
 });
 
 // ─── DELETE /api/spec-library/:id ───

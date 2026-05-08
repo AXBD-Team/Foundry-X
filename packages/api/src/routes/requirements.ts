@@ -132,7 +132,7 @@ requirementsRoute.openapi(updateRequirement, (c) => {
 
   // Return the updated item (override is ephemeral — Workers isolate scope only)
   const updated: RequirementItem = { ...item, status };
-  return c.json(updated, 200);
+  return c.json(updated);
 });
 
 

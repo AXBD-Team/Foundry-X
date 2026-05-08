@@ -298,5 +298,5 @@ kpiRoute.openapi(getWeeklySummary, async (c) => {
     topPages: (topPagesResult.results ?? [])
       .filter((r) => r.path)
       .map((r) => ({ path: r.path!, views: r.views })),
-  }, 200);
+  });
 });

@@ -150,7 +150,7 @@ app.openapi(deleteServer, async (c) => {
     return c.json({ error: "Server not found" }, 404);
   }
   const deleted = await registry.deleteServer(id);
-  return c.json({ deleted }, 200);
+  return c.json({ deleted });
 });
 
 // ─── POST /mcp/servers/:id/test ───
@@ -194,14 +194,14 @@ app.openapi(testConnection, async (c) => {
       status: "connected" as const,
       tools,
       toolCount: tools.length,
-    }, 200);
+    });
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     await registry.updateStatus(id, "error", errorMessage);
     return c.json({
       status: "error" as const,
       error: errorMessage,
-    }, 200);
+    });
   }
 });
 
@@ -252,7 +252,7 @@ app.openapi(getServerTools, async (c) => {
     if (now - cachedAt < TOOLS_CACHE_TTL_MS) {
       try {
         const tools = JSON.parse(server.toolsCache);
-        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt }, 200);
+        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt });
       } catch {
         // parse fail — fall through to live fetch
       }
@@ -264,18 +264,18 @@ app.openapi(getServerTools, async (c) => {
     const runner = createRunnerFromServer(server, registry);
     const tools = await runner.listTools();
     await registry.cacheTools(id, tools);
-    return c.json({ tools, cached: false, cachedAt: new Date().toISOString() }, 200);
+    return c.json({ tools, cached: false, cachedAt: new Date().toISOString() });
   } catch {
     // Fallback to stale cache
     if (server.toolsCache) {
       try {
         const tools = JSON.parse(server.toolsCache);
-        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt }, 200);
+        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt });
       } catch {
         // no valid cache at all
       }
     }
-    return c.json({ tools: [], cached: false, cachedAt: null }, 200);
+    return c.json({ tools: [], cached: false, cachedAt: null });
   }
 });
 
@@ -316,9 +316,9 @@ app.openapi(listPrompts, async (c) => {
   try {
     const runner = createRunnerFromServer(server, registry);
     const prompts = await runner.listPrompts();
-    return c.json({ prompts }, 200);
+    return c.json({ prompts });
   } catch (err) {
-    return c.json({ prompts: [] }, 200);
+    return c.json({ prompts: [] });
   }
 });
 
@@ -374,7 +374,7 @@ app.openapi(getPrompt, async (c) => {
     const body = await c.req.json().catch(() => ({})) as { arguments?: Record<string, string> };
     const runner = createRunnerFromServer(server, registry);
     const messages = await runner.getPrompt(name, body.arguments);
-    return c.json({ messages }, 200);
+    return c.json({ messages });
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     return c.json({ error: errorMessage }, 500);
@@ -413,10 +413,6 @@ const handleSampling = createRoute({
       content: { "application/json": { schema: z.object({ error: z.string() }) } },
       description: "요청 제한 초과",
     },
-    500: {
-      content: { "application/json": { schema: z.object({ error: z.string() }) } },
-      description: "서버 오류",
-    },
   },
 });
 
@@ -434,7 +430,7 @@ app.openapi(handleSampling, async (c) => {
 
   try {
     const result = await handler.handleSamplingRequest(id, body);
-    return c.json(result, 200);
+    return c.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     if (message.includes("Rate limit")) {
@@ -549,7 +545,7 @@ app.openapi(listResources, async (c) => {
 
   const client = new McpResourcesClient(registry);
   const resources = await client.listResources(id);
-  return c.json({ resources }, 200);
+  return c.json({ resources });
 });
 
 // ─── GET /mcp/servers/:id/resources/templates ─── (Sprint 14 F67)
@@ -588,7 +584,7 @@ app.openapi(listResourceTemplates, async (c) => {
 
   const client = new McpResourcesClient(registry);
   const resourceTemplates = await client.listResourceTemplates(id);
-  return c.json({ resourceTemplates }, 200);
+  return c.json({ resourceTemplates });
 });
 
 // ─── POST /mcp/servers/:id/resources/read ─── (Sprint 14 F67)
@@ -636,7 +632,7 @@ app.openapi(readResource, async (c) => {
   const client = new McpResourcesClient(registry);
   try {
     const contents = await client.readResource(id, body.uri);
-    return c.json({ contents }, 200);
+    return c.json({ contents });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return c.json({ error: message }, 500);
@@ -689,7 +685,7 @@ app.openapi(subscribeResource, async (c) => {
   const client = new McpResourcesClient(registry, sse);
   try {
     await client.subscribeResource(id, body.uri);
-    return c.json({ subscribed: true, uri: body.uri }, 200);
+    return c.json({ subscribed: true, uri: body.uri });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return c.json({ error: message }, 500);

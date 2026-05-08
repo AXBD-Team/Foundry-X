@@ -56,7 +56,7 @@ reconciliationRoute.openapi(postRun, async (c) => {
   const service = new ReconciliationService(c.env.DB, github, specParser);
 
   const result = await service.run(tenantId ?? "default", "manual", strategy);
-  return c.json(result, 200);
+  return c.json(result);
 });
 
 // ─── GET /api/reconciliation/status ───
