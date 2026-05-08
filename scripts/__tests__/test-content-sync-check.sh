@@ -235,6 +235,43 @@ fi
 rm -rf "$TMPDIR_D"
 
 # ────────────────────────────────────────────────
+# Scenario E: ✅ row + 📋 row(description에 ✅ 참조 있음)
+#   → expected = ✅ row의 SPRINT만, false positive 회피
+# ────────────────────────────────────────────────
+echo ""
+echo "Scenario E: 📋 row description에 ✅ 참조 있음 → false positive 회피"
+TMPDIR_E=$(make_fixture_dir)
+
+make_spec "$TMPDIR_E" <<'SPEC_EOF'
+# SPEC
+
+> **마지막 실측** (Sprint 313, 2026-04-21): ~11 routes — Phase 45 달성.
+
+## §5 F-items
+
+| FN | 설명 | Sprint | 상태 | 비고 |
+|----|------|--------|------|------|
+| F562 | shared-contracts (FX-REQ-605, P0) | Sprint 313 | ✅ | PR #656 MERGED |
+| F634 | follow-up of F633(Sprint 368 ✅, packages/eslint-config 신설) | Sprint 369 | 📋(plan) | plan 작성 완료 |
+SPEC_EOF
+
+make_hero "$TMPDIR_E" "313" "45"
+make_landing "$TMPDIR_E" "313" "45"
+make_footer "$TMPDIR_E" "313" "45"
+make_readme "$TMPDIR_E" "313" "45"
+
+ACTUAL_EXIT_E=$(run_check_exit "$TMPDIR_E" || true)
+
+if [ "$ACTUAL_EXIT_E" = "0" ]; then
+  pass "Scenario E: false positive 회피 (📋 row description ✅ 참조 무시)"
+else
+  OUTPUT_E=$(run_check "$TMPDIR_E" || true)
+  fail "Scenario E: exit $ACTUAL_EXIT_E (expected 0). output: $OUTPUT_E"
+fi
+
+rm -rf "$TMPDIR_E"
+
+# ────────────────────────────────────────────────
 # 결과 요약
 # ────────────────────────────────────────────────
 echo ""

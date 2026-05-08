@@ -30,13 +30,13 @@ fi
 
 # Sprint 번호: SPEC §5 테이블의 ✅(완료) row만 필터링한 최고 Sprint 번호 (SSOT)
 # PLANNED(📋) row 포함 시 미래 Sprint 번호가 expected로 잡혀 false positive 발생
-SPRINT=$(grep -E '^\| F[0-9]' "$SPEC" | grep '✅' | grep -oP 'Sprint \K\d+' | sort -n | tail -1)
+SPRINT=$(awk -F'|' '/^\| F[0-9]/ && $5 ~ /✅/' "$SPEC" | grep -oP 'Sprint \K\d+' | sort -n | tail -1)
 
 # Phase: "마지막 실측" 행에서 추출 (SSOT — F-item 설명에는 Phase 번호가 없는 row가 많음)
 # fallback: ✅ F-item row 설명에서 Phase 번호 추출
 PHASE_NUM=$(echo "$SPEC_LINE" | grep -oP 'Phase \K\d+' | head -1 || true)
 if [ -z "$PHASE_NUM" ]; then
-  PHASE_NUM=$(grep -E '^\| F[0-9]' "$SPEC" | grep '✅' | grep -oP 'Phase \K\d+' | sort -n | tail -1)
+  PHASE_NUM=$(awk -F'|' '/^\| F[0-9]/ && $5 ~ /✅/' "$SPEC" | grep -oP 'Phase \K\d+' | sort -n | tail -1)
 fi
 PHASE_TITLE=""
 # Phase title은 CLAUDE.md에서 추출 (있으면)
