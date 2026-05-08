@@ -177,4 +177,53 @@ describe("auth routes (D1)", () => {
     );
     expect(res.status).toBe(401);
   });
+
+  // F637: input coverage — 0.18.4 codemod regression
+  describe("POST /api/auth/login — F637 input coverage", () => {
+    it("plain POST no body → 4xx (never 5xx)", async () => {
+      const res = await app.request("/api/auth/login", { method: "POST" }, env);
+      expect(res.status).toBeGreaterThanOrEqual(400);
+      expect(res.status).toBeLessThan(500);
+    });
+
+    it("empty JSON body → 400", async () => {
+      const res = await app.request(
+        "/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        },
+        env,
+      );
+      expect(res.status).toBe(400);
+    });
+
+    it("partial body email only → 400", async () => {
+      const res = await app.request(
+        "/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: "x" }),
+        },
+        env,
+      );
+      expect(res.status).toBe(400);
+    });
+
+    it("malformed JSON → 4xx", async () => {
+      const res = await app.request(
+        "/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{invalid json",
+        },
+        env,
+      );
+      expect(res.status).toBeGreaterThanOrEqual(400);
+      expect(res.status).toBeLessThan(500);
+    });
+  });
 });
