@@ -41,6 +41,9 @@ const bulkSignup = createRoute({
 
 adminRoute.openapi(bulkSignup, async (c) => {
   const { orgId, accounts, defaultPassword } = c.req.valid("json");
+  if (!orgId || !accounts || !defaultPassword) {
+    return c.json({ error: "orgId, accounts and defaultPassword are required", errorCode: "VALIDATION_001" }, 400);
+  }
   const service = new AdminService(c.env.DB);
 
   const result = await service.bulkSignup({ orgId, accounts, defaultPassword });

@@ -46,6 +46,9 @@ const issueHubToken = createRoute({
 
 ssoRoute.openapi(issueHubToken, async (c) => {
   const { orgId } = c.req.valid("json");
+  if (!orgId) {
+    return c.json({ error: "orgId is required", errorCode: "VALIDATION_001" }, 400);
+  }
 
   // Manual JWT verification (this path is under /api/auth/ which skips authMiddleware)
   const authHeader = c.req.header("Authorization");
@@ -95,6 +98,9 @@ const verifyHubToken = createRoute({
 
 ssoRoute.openapi(verifyHubToken, async (c) => {
   const { token } = c.req.valid("json");
+  if (!token) {
+    return c.json({ error: "token is required", errorCode: "VALIDATION_001" }, 400);
+  }
   const result = await ssoService.verifyHubToken(token, c.env.JWT_SECRET);
   return c.json(result, 200);
 });
@@ -150,6 +156,9 @@ const updateOrgService = createRoute({
 ssoRoute.openapi(updateOrgService, async (c) => {
   const { orgId, serviceId } = c.req.valid("param");
   const { enabled, config } = c.req.valid("json");
+  if (enabled === undefined) {
+    return c.json({ error: "enabled is required", errorCode: "VALIDATION_001" }, 400);
+  }
   const result = await ssoService.updateOrgService(orgId, serviceId, enabled, config, c.env.DB);
   return c.json(result, 200);
 });

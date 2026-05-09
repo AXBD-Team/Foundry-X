@@ -64,6 +64,9 @@ const dismissSurvey = createRoute({
 
 npsRoute.openapi(dismissSurvey, async (c) => {
   const { surveyId } = c.req.valid("json");
+  if (!surveyId) {
+    return c.json({ error: "surveyId is required", errorCode: "VALIDATION_001" }, 400);
+  }
   const service = new NpsService(c.env.DB);
 
   await service.dismissSurvey(surveyId);
