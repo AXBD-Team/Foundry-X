@@ -146,6 +146,9 @@ const login = createRoute({
 
 authRoute.openapi(login, async (c) => {
   const { email, password } = c.req.valid("json");
+  if (!email || !password) {
+    return c.json({ error: "email and password are required", errorCode: "VALIDATION_001" }, 400);
+  }
   const db = getDb(c.env.DB);
 
   const [user] = await db.select().from(users).where(eq(users.email, email));
