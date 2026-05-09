@@ -49,10 +49,6 @@ const trackEvent = createRoute({
       content: { "application/json": { schema: KpiTrackResponseSchema } },
       description: "이벤트 기록 결과",
     },
-    400: {
-      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
-      description: "잘못된 요청",
-    },
   },
 });
 

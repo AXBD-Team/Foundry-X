@@ -1,4 +1,4 @@
-import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import {
   FeedbackSubmitRequestSchema,
   FeedbackSubmitResponseSchema,
@@ -31,10 +31,6 @@ const submitFeedback = createRoute({
     200: {
       content: { "application/json": { schema: FeedbackSubmitResponseSchema } },
       description: "피드백 제출 결과",
-    },
-    400: {
-      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
-      description: "잘못된 요청",
     },
   },
 });
