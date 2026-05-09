@@ -71,9 +71,6 @@ const completeStep = createRoute({
 
 onboardingRoute.openapi(completeStep, async (c) => {
   const { stepId } = c.req.valid("json");
-  if (!stepId) {
-    return c.json({ error: "stepId is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const payload = getPayload(c);
   const service = new OnboardingProgressService(c.env.DB);
 

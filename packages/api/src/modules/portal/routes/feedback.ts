@@ -1,4 +1,4 @@
-import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import {
   FeedbackSubmitRequestSchema,
   FeedbackSubmitResponseSchema,
@@ -32,18 +32,11 @@ const submitFeedback = createRoute({
       content: { "application/json": { schema: FeedbackSubmitResponseSchema } },
       description: "피드백 제출 결과",
     },
-    400: {
-      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
-      description: "잘못된 요청",
-    },
   },
 });
 
 feedbackRoute.openapi(submitFeedback, async (c) => {
   const { npsScore, comment, pagePath, sessionSeconds, feedbackType, surveyId } = c.req.valid("json");
-  if (npsScore === undefined) {
-    return c.json({ error: "npsScore is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const payload = getPayload(c);
   const service = new FeedbackService(c.env.DB);
 

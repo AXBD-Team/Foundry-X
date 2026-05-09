@@ -46,9 +46,6 @@ const issueHubToken = createRoute({
 
 ssoRoute.openapi(issueHubToken, async (c) => {
   const { orgId } = c.req.valid("json");
-  if (!orgId) {
-    return c.json({ error: "orgId is required", errorCode: "VALIDATION_001" }, 400);
-  }
 
   // Manual JWT verification (this path is under /api/auth/ which skips authMiddleware)
   const authHeader = c.req.header("Authorization");
@@ -93,18 +90,11 @@ const verifyHubToken = createRoute({
       content: { "application/json": { schema: VerifyResponseSchema } },
       description: "Token verification result",
     },
-    400: {
-      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
-      description: "잘못된 요청",
-    },
   },
 });
 
 ssoRoute.openapi(verifyHubToken, async (c) => {
   const { token } = c.req.valid("json");
-  if (!token) {
-    return c.json({ error: "token is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const result = await ssoService.verifyHubToken(token, c.env.JWT_SECRET);
   return c.json(result, 200);
 });
@@ -154,19 +144,12 @@ const updateOrgService = createRoute({
       content: { "application/json": { schema: OrgServiceSchema } },
       description: "Service updated",
     },
-    400: {
-      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
-      description: "잘못된 요청",
-    },
   },
 });
 
 ssoRoute.openapi(updateOrgService, async (c) => {
   const { orgId, serviceId } = c.req.valid("param");
   const { enabled, config } = c.req.valid("json");
-  if (enabled === undefined) {
-    return c.json({ error: "enabled is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const result = await ssoService.updateOrgService(orgId, serviceId, enabled, config, c.env.DB);
   return c.json(result, 200);
 });

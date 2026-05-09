@@ -51,9 +51,6 @@ reconciliationRoute.openapi(postRun, async (c) => {
   }
 
   const { strategy } = c.req.valid("json");
-  if (!strategy) {
-    return c.json({ error: "strategy is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const github = new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO);
   const specParser = { parseContent: parseSpecRequirements };
   const service = new ReconciliationService(c.env.DB, github, specParser);

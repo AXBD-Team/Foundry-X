@@ -59,18 +59,11 @@ const dismissSurvey = createRoute({
       content: { "application/json": { schema: z.object({ success: z.boolean() }).openapi("NpsDismissResponse") } },
       description: "닫기 결과",
     },
-    400: {
-      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
-      description: "잘못된 요청",
-    },
   },
 });
 
 npsRoute.openapi(dismissSurvey, async (c) => {
   const { surveyId } = c.req.valid("json");
-  if (!surveyId) {
-    return c.json({ error: "surveyId is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const service = new NpsService(c.env.DB);
 
   await service.dismissSurvey(surveyId);

@@ -62,9 +62,6 @@ const signup = createRoute({
 
 authRoute.openapi(signup, async (c) => {
   const { email, name, password } = c.req.valid("json");
-  if (!email || !name || !password) {
-    return c.json({ error: "email, name and password are required", errorCode: "VALIDATION_001" }, 400);
-  }
   const db = getDb(c.env.DB);
 
   const [existing] = await db.select().from(users).where(eq(users.email, email));
@@ -216,9 +213,6 @@ const refresh = createRoute({
 
 authRoute.openapi(refresh, async (c) => {
   const { refreshToken } = c.req.valid("json");
-  if (!refreshToken) {
-    return c.json({ error: "refreshToken is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const secret = c.env.JWT_SECRET ?? "dev-secret";
 
   let payload: JwtPayload;
@@ -292,9 +286,6 @@ const switchOrg = createRoute({
 
 authRoute.openapi(switchOrg, async (c) => {
   const { orgId } = c.req.valid("json");
-  if (!orgId) {
-    return c.json({ error: "orgId is required", errorCode: "VALIDATION_001" }, 400);
-  }
 
   // Verify JWT manually (this is a public route but requires auth)
   const authHeader = c.req.header("Authorization");

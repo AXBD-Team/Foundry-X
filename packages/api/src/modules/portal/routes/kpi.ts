@@ -49,18 +49,11 @@ const trackEvent = createRoute({
       content: { "application/json": { schema: KpiTrackResponseSchema } },
       description: "이벤트 기록 결과",
     },
-    400: {
-      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
-      description: "잘못된 요청",
-    },
   },
 });
 
 kpiRoute.openapi(trackEvent, async (c) => {
   const { eventType, metadata } = c.req.valid("json");
-  if (!eventType) {
-    return c.json({ error: "eventType is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const logger = new KpiLogger(c.env.DB);
   const tenantId = getTenantId(c);
   const userId = getUserId(c);

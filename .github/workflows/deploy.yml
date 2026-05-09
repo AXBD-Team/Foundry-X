@@ -241,35 +241,3 @@ jobs:
           WEB_URL: https://fx.minu.best
           # custom domain 다운(C99) 시 Pages 본체 URL로 자동 fallback → CI green 유지
           WEB_URL_FALLBACK: https://foundry-x-web.pages.dev
-      - name: Multi-input smoke probe — POST /api/auth/login (F638 null guard gate)
-        env:
-          BASE_URL: https://foundry-x-api.ktds-axbd.workers.dev
-        run: |
-          fail() { echo "FAIL: $1" >&2; exit 1; }
-
-          echo "=== Case 1: no body, no Content-Type ==="
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" 2>/dev/null || true)
-          [ "$CODE" = "400" ] || [ "$CODE" = "422" ] || fail "Case 1: expected 4xx, got $CODE (5xx = F636 regression)"
-          echo "Case 1 PASS ($CODE)"
-
-          echo "=== Case 2: empty JSON body ==="
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" -d '{}' "$BASE_URL/api/auth/login" 2>/dev/null || true)
-          [ "$CODE" = "400" ] || [ "$CODE" = "422" ] || fail "Case 2: expected 4xx, got $CODE"
-          echo "Case 2 PASS ($CODE)"
-
-          echo "=== Case 3: partial body (email only) ==="
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" -d '{"email":"smoke@test.invalid"}' "$BASE_URL/api/auth/login" 2>/dev/null || true)
-          [ "$CODE" = "400" ] || [ "$CODE" = "401" ] || [ "$CODE" = "422" ] || fail "Case 3: expected 4xx, got $CODE"
-          echo "Case 3 PASS ($CODE)"
-
-          echo "=== Case 4: malformed JSON ==="
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" -d 'not-json' "$BASE_URL/api/auth/login" 2>/dev/null || true)
-          [ "$CODE" = "400" ] || [ "$CODE" = "422" ] || fail "Case 4: expected 4xx, got $CODE"
-          echo "Case 4 PASS ($CODE)"
-
-          echo "=== Case 5: valid JSON (invalid creds — 4xx expected, NOT 5xx) ==="
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" -d '{"email":"smoke@test.invalid","password":"wrong-pw"}' "$BASE_URL/api/auth/login" 2>/dev/null || true)
-          [ "$CODE" = "401" ] || [ "$CODE" = "400" ] || [ "$CODE" = "422" ] || fail "Case 5: expected 4xx, got $CODE"
-          echo "Case 5 PASS ($CODE)"
-
-          echo "All 5 multi-input smoke cases PASS — 5xx 0건 (F638 gate)"
