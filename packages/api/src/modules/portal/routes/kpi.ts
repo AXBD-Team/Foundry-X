@@ -54,9 +54,6 @@ const trackEvent = createRoute({
 
 kpiRoute.openapi(trackEvent, async (c) => {
   const { eventType, metadata } = c.req.valid("json");
-  if (!eventType) {
-    return c.json({ error: "eventType is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const logger = new KpiLogger(c.env.DB);
   const tenantId = getTenantId(c);
   const userId = getUserId(c);

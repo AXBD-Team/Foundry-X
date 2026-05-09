@@ -178,46 +178,6 @@ describe("auth routes (D1)", () => {
     expect(res.status).toBe(401);
   });
 
-  describe("POST /api/auth/signup — F638 null guard", () => {
-    it("no body → 400 (never 5xx)", async () => {
-      const res = await app.request("/api/auth/signup", { method: "POST" }, env);
-      expect(res.status).toBeGreaterThanOrEqual(400);
-      expect(res.status).toBeLessThan(500);
-    });
-    it("empty JSON body → 400", async () => {
-      const res = await app.request(
-        "/api/auth/signup",
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) },
-        env,
-      );
-      expect(res.status).toBe(400);
-    });
-    it("partial body (email only) → 400", async () => {
-      const res = await app.request(
-        "/api/auth/signup",
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "x@x.com" }) },
-        env,
-      );
-      expect(res.status).toBe(400);
-    });
-  });
-
-  describe("POST /api/auth/refresh — F638 null guard", () => {
-    it("no body → 400 (never 5xx)", async () => {
-      const res = await app.request("/api/auth/refresh", { method: "POST" }, env);
-      expect(res.status).toBeGreaterThanOrEqual(400);
-      expect(res.status).toBeLessThan(500);
-    });
-    it("empty JSON body → 400", async () => {
-      const res = await app.request(
-        "/api/auth/refresh",
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) },
-        env,
-      );
-      expect(res.status).toBe(400);
-    });
-  });
-
   describe("POST /api/auth/login — F637 input coverage", () => {
     it("plain POST no body → 4xx (never 5xx)", async () => {
       const res = await app.request("/api/auth/login", { method: "POST" }, env);

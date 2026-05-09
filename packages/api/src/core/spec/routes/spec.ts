@@ -48,9 +48,6 @@ const generateSpecRoute = createRoute({
 
 specRoute.openapi(generateSpecRoute, async (c) => {
   const { text, context, language } = c.req.valid("json");
-  if (!text) {
-    return c.json({ error: "text is required", errorCode: "VALIDATION_001" }, 400);
-  }
 
   const llm = new LLMService(c.env.AI, c.env.ANTHROPIC_API_KEY);
 
@@ -139,9 +136,6 @@ const resolveConflictRoute = createRoute({
 
 specRoute.openapi(resolveConflictRoute, async (c) => {
   const { conflictId, resolution, modifiedValue } = c.req.valid("json");
-  if (!conflictId || !resolution) {
-    return c.json({ error: "conflictId and resolution are required", errorCode: "VALIDATION_001" }, 400);
-  }
 
   const existing = await c.env.DB
     .prepare("SELECT id FROM spec_conflicts WHERE id = ?")

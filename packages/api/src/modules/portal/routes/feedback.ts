@@ -37,9 +37,6 @@ const submitFeedback = createRoute({
 
 feedbackRoute.openapi(submitFeedback, async (c) => {
   const { npsScore, comment, pagePath, sessionSeconds, feedbackType, surveyId } = c.req.valid("json");
-  if (npsScore === undefined) {
-    return c.json({ error: "npsScore is required", errorCode: "VALIDATION_001" }, 400);
-  }
   const payload = getPayload(c);
   const service = new FeedbackService(c.env.DB);
 
