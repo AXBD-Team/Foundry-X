@@ -43,7 +43,7 @@ orgSharedRoute.openapi(getSharedBmcs, async (c) => {
   const service = new OrgSharedService(c.env.DB);
 
   const result = await service.getSharedBmcs(orgId, { page, limit });
-  return c.json(result);
+  return c.json(result, 200);
 });
 
 // ─── GET /orgs/:orgId/shared/activity ───
@@ -77,5 +77,5 @@ orgSharedRoute.openapi(getActivityFeed, async (c) => {
   const service = new OrgSharedService(c.env.DB);
 
   const items = await service.getActivityFeed(orgId, limit);
-  return c.json({ items });
+  return c.json({ items }, 200);
 });

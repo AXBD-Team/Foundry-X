@@ -53,7 +53,8 @@ const getStatusRoute = createRoute({
   },
 });
 
-eventStatusRoute.openapi(getStatusRoute, async (c) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+eventStatusRoute.openapi(getStatusRoute, async (c): Promise<any> => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bus = new D1EventBus(c.env.DB as any);
   const status = await bus.getStatus();
@@ -84,7 +85,8 @@ const getDLQRoute = createRoute({
   },
 });
 
-eventStatusRoute.openapi(getDLQRoute, async (c) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+eventStatusRoute.openapi(getDLQRoute, async (c): Promise<any> => {
   const limitParam = c.req.query("limit");
   const limit = limitParam ? Math.min(parseInt(limitParam, 10), 100) : 20;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -160,5 +162,5 @@ eventStatusRoute.openapi(reprocessRoute, async (c) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bus = new D1EventBus(c.env.DB as any);
   await bus.reprocess(id);
-  return c.json({ ok: true });
+  return c.json({ ok: true }, 200);
 });

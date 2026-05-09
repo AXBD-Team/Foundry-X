@@ -25,6 +25,24 @@ check() {
   fi
 }
 
+# Check HTTP status with JSON body (F640 multi-input probe)
+check_http_json() {
+  local name="$1"
+  local url="$2"
+  local body="$3"
+  local expected="${4:-200}"
+  local code
+  code=$(curl -sL -o /dev/null -w '%{http_code}' --max-time 10 -X POST \
+    -H "Content-Type: application/json" -d "$body" "$url" 2>/dev/null || echo "000")
+  if echo "$expected" | grep -q "$code"; then
+    echo "  ✅ $name (HTTP $code)"
+    PASS=$((PASS + 1))
+  else
+    echo "  ❌ $name (HTTP $code, expected $expected)"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
 # Check HTTP status is in expected range
 check_http() {
   local name="$1"
@@ -96,7 +114,10 @@ check_http "GET /api/docs"           "$API_URL/api/docs"       GET "200"
 
 echo ""
 echo "Auth Checks (reachable):"
-check_http "POST /api/auth/login"    "$API_URL/api/auth/login" POST "400|401|422"
+check_http "POST /api/auth/login (no body)"    "$API_URL/api/auth/login" POST "400|401|422"
+check_http_json "POST /api/auth/login (empty JSON)"   "$API_URL/api/auth/login" "{}"                                  "400"
+check_http_json "POST /api/auth/login (partial body)" "$API_URL/api/auth/login" '{"email":"test@test.com"}'           "400"
+check_http_json "POST /api/auth/login (malformed)"    "$API_URL/api/auth/login" "{invalid}"                           "400|422"
 
 echo ""
 echo "Protected API (auth required):"

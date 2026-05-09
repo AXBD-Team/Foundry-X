@@ -111,7 +111,7 @@ const getAgents = createRoute({
   },
 });
 
-agentRoute.openapi(getAgents, async (c) => {
+agentRoute.openapi(getAgents, async (c): Promise<any> => {
   // Try D1 agents table first (Sprint 9 orchestration)
   try {
     if (c.env?.DB) {
@@ -233,7 +233,7 @@ const getCapabilities = createRoute({
   },
 });
 
-agentRoute.openapi(getCapabilities, async (c) => {
+agentRoute.openapi(getCapabilities, async (c): Promise<any> => {
   const orchestrator = new AgentOrchestrator(c.env.DB);
   const capabilities = await orchestrator.listAllCapabilities();
   return c.json(capabilities);
@@ -255,7 +255,7 @@ const getAgentTasks = createRoute({
   },
 });
 
-agentRoute.openapi(getAgentTasks, async (c) => {
+agentRoute.openapi(getAgentTasks, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const orchestrator = new AgentOrchestrator(c.env.DB);
   const tasks = await orchestrator.listTasks(id);
@@ -291,7 +291,7 @@ const createAgentTask = createRoute({
   },
 });
 
-agentRoute.openapi(createAgentTask, async (c) => {
+agentRoute.openapi(createAgentTask, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const { branch } = c.req.valid("json");
 
@@ -333,7 +333,7 @@ const checkConstraint = createRoute({
   },
 });
 
-agentRoute.openapi(checkConstraint, async (c) => {
+agentRoute.openapi(checkConstraint, async (c): Promise<any> => {
   const { action } = c.req.valid("json");
   const orchestrator = new AgentOrchestrator(c.env.DB);
   const result = await orchestrator.checkConstraint(action);
@@ -369,7 +369,7 @@ const executeAgentTask = createRoute({
   },
 });
 
-agentRoute.openapi(executeAgentTask, async (c) => {
+agentRoute.openapi(executeAgentTask, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
   const sseManager = getSSEManager(c.env.DB);
@@ -407,7 +407,7 @@ const getRunners = createRoute({
   },
 });
 
-agentRoute.openapi(getRunners, async (c) => {
+agentRoute.openapi(getRunners, async (c): Promise<any> => {
   const runners: AgentRunnerInfo[] = [
     {
       type: "claude-api",
@@ -461,7 +461,7 @@ const getTaskResult = createRoute({
   },
 });
 
-agentRoute.openapi(getTaskResult, async (c) => {
+agentRoute.openapi(getTaskResult, async (c): Promise<any> => {
   const { taskId } = c.req.valid("param");
   const orchestrator = new AgentOrchestrator(c.env.DB);
   const taskResult = await orchestrator.getTaskResult(taskId);
@@ -508,7 +508,7 @@ const createAgentPr = createRoute({
   },
 });
 
-agentRoute.openapi(createAgentPr, async (c) => {
+agentRoute.openapi(createAgentPr, async (c): Promise<any> => {
   const { agentId, taskId } = c.req.valid("json");
 
   // Get task result from DB
@@ -553,7 +553,7 @@ const getAgentPr = createRoute({
   },
 });
 
-agentRoute.openapi(getAgentPr, async (c) => {
+agentRoute.openapi(getAgentPr, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const row = await c.env.DB
     .prepare("SELECT * FROM agent_prs WHERE id = ?")
@@ -587,7 +587,7 @@ const reviewAgentPr = createRoute({
   },
 });
 
-agentRoute.openapi(reviewAgentPr, async (c) => {
+agentRoute.openapi(reviewAgentPr, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const row = await c.env.DB
     .prepare("SELECT pr_number FROM agent_prs WHERE id = ?")
@@ -641,7 +641,7 @@ const mergeAgentPr = createRoute({
   },
 });
 
-agentRoute.openapi(mergeAgentPr, async (c) => {
+agentRoute.openapi(mergeAgentPr, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const row = await c.env.DB
     .prepare("SELECT pr_number, review_decision, sdd_score, quality_score, security_issues FROM agent_prs WHERE id = ?")
@@ -703,7 +703,7 @@ const executeParallel = createRoute({
   },
 });
 
-agentRoute.openapi(executeParallel, async (c) => {
+agentRoute.openapi(executeParallel, async (c): Promise<any> => {
   const { tasks, createPrs } = c.req.valid("json");
   const sseManager = getSSEManager(c.env.DB);
   const orchestrator = new AgentOrchestrator(c.env.DB, sseManager);
@@ -761,7 +761,7 @@ const getParallelExecution = createRoute({
   },
 });
 
-agentRoute.openapi(getParallelExecution, async (c) => {
+agentRoute.openapi(getParallelExecution, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const row = await c.env.DB
     .prepare("SELECT * FROM parallel_executions WHERE id = ?")
@@ -817,7 +817,7 @@ const getQueueStatus = createRoute({
   },
 });
 
-agentRoute.openapi(getQueueStatus, async (c) => {
+agentRoute.openapi(getQueueStatus, async (c): Promise<any> => {
   const sseManager = getSSEManager(c.env.DB);
   const mergeQueue = createMergeQueue(c.env, sseManager);
   const entries = await mergeQueue.getQueueStatus();
@@ -844,7 +844,7 @@ const updateQueuePriority = createRoute({
   },
 });
 
-agentRoute.openapi(updateQueuePriority, async (c) => {
+agentRoute.openapi(updateQueuePriority, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const { priority } = c.req.valid("json");
   const sseManager = getSSEManager(c.env.DB);
@@ -876,7 +876,7 @@ const processQueue = createRoute({
   },
 });
 
-agentRoute.openapi(processQueue, async (c) => {
+agentRoute.openapi(processQueue, async (c): Promise<any> => {
   const sseManager = getSSEManager(c.env.DB);
   const mergeQueue = createMergeQueue(c.env, sseManager);
   const result = await mergeQueue.processNext();
@@ -894,7 +894,7 @@ agentRoute.post("/plan", async (c) => {
   const githubSvc = c.env.GITHUB_TOKEN ? new GitHubService(c.env.GITHUB_TOKEN, c.env.GITHUB_REPO ?? "") : undefined;
   const planner = new PlannerAgent({ db: c.env.DB, sse: sseManager, apiKey: c.env.ANTHROPIC_API_KEY, githubService: githubSvc });
   const context = { ...body.context, spec: body.context.spec ? { title: "", description: body.context.spec, acceptanceCriteria: [] } : undefined };
-  const plan = await planner.createPlan(body.agentId, body.taskType as AgentTaskType, context, body.model);
+  const plan = await planner.createPlan(body.agentId, body.taskType as AgentTaskType, context, body.model as string | undefined);
   return c.json(plan, 201);
 });
 
@@ -979,8 +979,7 @@ const getRoutingRules = createRoute({
   },
 });
 
-// @ts-expect-error — AgentTaskType union expanded (10→13), Hono Zod inference stale
-agentRoute.openapi(getRoutingRules, async (c) => {
+agentRoute.openapi(getRoutingRules, async (c): Promise<any> => {
   const router = new ModelRouter(c.env.DB);
   const rules = await router.listRules();
   return c.json({ rules, defaults: DEFAULT_MODEL_MAP }, 200);
@@ -1001,8 +1000,7 @@ const updateRoutingRule = createRoute({
   },
 });
 
-// @ts-expect-error — AgentTaskType union expanded (10→13), Hono Zod inference stale
-agentRoute.openapi(updateRoutingRule, async (c) => {
+agentRoute.openapi(updateRoutingRule, async (c): Promise<any> => {
   const { taskType } = c.req.valid("param");
   const validTypes = ["code-review", "code-generation", "spec-analysis", "test-generation", "policy-evaluation", "skill-query", "ontology-lookup"];
   if (!validTypes.includes(taskType)) {
@@ -1036,7 +1034,7 @@ const architectAnalyze = createRoute({
   },
 });
 
-agentRoute.openapi(architectAnalyze, async (c) => {
+agentRoute.openapi(architectAnalyze, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const agent = new ArchitectAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1075,7 +1073,7 @@ const architectReviewDesign = createRoute({
   },
 });
 
-agentRoute.openapi(architectReviewDesign, async (c) => {
+agentRoute.openapi(architectReviewDesign, async (c): Promise<any> => {
   const { document, title } = c.req.valid("json");
   const agent = new ArchitectAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1112,7 +1110,7 @@ const evaluateOptimize = createRoute({
   },
 });
 
-agentRoute.openapi(evaluateOptimize, async (c) => {
+agentRoute.openapi(evaluateOptimize, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const { taskType, context, config } = body;
 
@@ -1190,7 +1188,7 @@ const testGenerate = createRoute({
   },
 });
 
-agentRoute.openapi(testGenerate, async (c) => {
+agentRoute.openapi(testGenerate, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const agent = new TestAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1229,7 +1227,7 @@ const testCoverageGaps = createRoute({
   },
 });
 
-agentRoute.openapi(testCoverageGaps, async (c) => {
+agentRoute.openapi(testCoverageGaps, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const agent = new TestAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1261,7 +1259,7 @@ const securityScan = createRoute({
   },
 });
 
-agentRoute.openapi(securityScan, async (c) => {
+agentRoute.openapi(securityScan, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const agent = new SecurityAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1300,7 +1298,7 @@ const securityPRDiff = createRoute({
   },
 });
 
-agentRoute.openapi(securityPRDiff, async (c) => {
+agentRoute.openapi(securityPRDiff, async (c): Promise<any> => {
   const { diff, context } = c.req.valid("json");
   const agent = new SecurityAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1332,7 +1330,7 @@ const qaBrowserTest = createRoute({
   },
 });
 
-agentRoute.openapi(qaBrowserTest, async (c) => {
+agentRoute.openapi(qaBrowserTest, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const agent = new QAAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1362,7 +1360,7 @@ const qaAcceptance = createRoute({
   },
 });
 
-agentRoute.openapi(qaAcceptance, async (c) => {
+agentRoute.openapi(qaAcceptance, async (c): Promise<any> => {
   const { spec, files } = c.req.valid("json");
   const agent = new QAAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1397,8 +1395,7 @@ const fallbackChainGet = createRoute({
   },
 });
 
-// @ts-expect-error — AgentTaskType union expanded (10→13), Hono Zod inference stale
-agentRoute.openapi(fallbackChainGet, async (c) => {
+agentRoute.openapi(fallbackChainGet, async (c): Promise<any> => {
   const { taskType } = c.req.valid("param");
   const router = new ModelRouter(c.env.DB);
   const chain = await router.getFallbackChain(taskType as AgentTaskType);
@@ -1423,7 +1420,7 @@ const fallbackEventsGet = createRoute({
   },
 });
 
-agentRoute.openapi(fallbackEventsGet, async (c) => {
+agentRoute.openapi(fallbackEventsGet, async (c): Promise<any> => {
   const router = new ModelRouter(c.env.DB);
   const service = new FallbackChainService(router, c.env.DB);
   const events = await service.listEvents(20);
@@ -1447,7 +1444,7 @@ const gatewaySanitize = createRoute({
   },
 });
 
-agentRoute.openapi(gatewaySanitize, async (c) => {
+agentRoute.openapi(gatewaySanitize, async (c): Promise<any> => {
   const { content } = c.req.valid("json");
   const gateway = new PromptGatewayService(c.env.DB);
   const result = await gateway.sanitizePrompt(content);
@@ -1464,7 +1461,7 @@ const gatewayRulesGet = createRoute({
   },
 });
 
-agentRoute.openapi(gatewayRulesGet, async (c) => {
+agentRoute.openapi(gatewayRulesGet, async (c): Promise<any> => {
   const gateway = new PromptGatewayService(c.env.DB);
   const rules = await gateway.listRules();
   return c.json({
@@ -1495,7 +1492,7 @@ const feedbackSubmit = createRoute({
   },
 });
 
-agentRoute.openapi(feedbackSubmit, async (c) => {
+agentRoute.openapi(feedbackSubmit, async (c): Promise<any> => {
   const { failureId, feedback, expectedOutcome } = c.req.valid("json");
   const service = new AgentFeedbackLoopService(c.env.DB);
   const record = await service.submitHumanFeedback(failureId, feedback, expectedOutcome);
@@ -1513,7 +1510,7 @@ const feedbackGet = createRoute({
   },
 });
 
-agentRoute.openapi(feedbackGet, async (c) => {
+agentRoute.openapi(feedbackGet, async (c): Promise<any> => {
   const { executionId } = c.req.valid("param");
   const service = new AgentFeedbackLoopService(c.env.DB);
   const records = await service.listByExecution(executionId);
@@ -1542,7 +1539,7 @@ const infraAnalyze = createRoute({
   },
 });
 
-agentRoute.openapi(infraAnalyze, async (c) => {
+agentRoute.openapi(infraAnalyze, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const agent = new InfraAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1581,7 +1578,7 @@ const infraSimulate = createRoute({
   },
 });
 
-agentRoute.openapi(infraSimulate, async (c) => {
+agentRoute.openapi(infraSimulate, async (c): Promise<any> => {
   const { description, currentConfig } = c.req.valid("json");
   const agent = new InfraAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1605,7 +1602,7 @@ const infraValidateMigration = createRoute({
   },
 });
 
-agentRoute.openapi(infraValidateMigration, async (c) => {
+agentRoute.openapi(infraValidateMigration, async (c): Promise<any> => {
   const { sql, existingSchema } = c.req.valid("json");
   const agent = new InfraAgent({
     env: { OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY, ANTHROPIC_API_KEY: c.env.ANTHROPIC_API_KEY },
@@ -1637,7 +1634,7 @@ const reflectExecute = createRoute({
   },
 });
 
-agentRoute.openapi(reflectExecute, async (c) => {
+agentRoute.openapi(reflectExecute, async (c): Promise<any> => {
   const { originalRequest, result } = c.req.valid("json");
   const runner = createAgentRunner(c.env);
   const reflection = new AgentSelfReflection();
@@ -1676,7 +1673,7 @@ const reflectConfig = createRoute({
   },
 });
 
-agentRoute.openapi(reflectConfig, async (c) => {
+agentRoute.openapi(reflectConfig, async (c): Promise<any> => {
   return c.json({
     threshold: AgentSelfReflection.DEFAULT_THRESHOLD,
     maxRetries: AgentSelfReflection.DEFAULT_MAX_RETRIES,
@@ -1706,7 +1703,7 @@ const createCustomRole = createRoute({
   },
 });
 
-agentRoute.openapi(createCustomRole, async (c) => {
+agentRoute.openapi(createCustomRole, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const mgr = new CustomRoleManager(c.env.DB);
   const role = await mgr.createRole(body);
@@ -1729,7 +1726,7 @@ const listCustomRoles = createRoute({
   },
 });
 
-agentRoute.openapi(listCustomRoles, async (c) => {
+agentRoute.openapi(listCustomRoles, async (c): Promise<any> => {
   const { orgId, includeDisabled } = c.req.valid("query");
   const mgr = new CustomRoleManager(c.env.DB);
   const roles = await mgr.listRoles(orgId, includeDisabled);
@@ -1750,7 +1747,7 @@ const getCustomRole = createRoute({
   },
 });
 
-agentRoute.openapi(getCustomRole, async (c) => {
+agentRoute.openapi(getCustomRole, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const mgr = new CustomRoleManager(c.env.DB);
   const role = await mgr.getRole(id);
@@ -1776,7 +1773,7 @@ const updateCustomRole = createRoute({
   },
 });
 
-agentRoute.openapi(updateCustomRole, async (c) => {
+agentRoute.openapi(updateCustomRole, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
   const mgr = new CustomRoleManager(c.env.DB);
@@ -1810,7 +1807,7 @@ const deleteCustomRole = createRoute({
   },
 });
 
-agentRoute.openapi(deleteCustomRole, async (c) => {
+agentRoute.openapi(deleteCustomRole, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const mgr = new CustomRoleManager(c.env.DB);
   try {
@@ -1851,7 +1848,7 @@ const ensembleExecute = createRoute({
   },
 });
 
-agentRoute.openapi(ensembleExecute, async (c) => {
+agentRoute.openapi(ensembleExecute, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const ensemble = new EnsembleVoting({
     OPENROUTER_API_KEY: c.env.OPENROUTER_API_KEY,
@@ -1890,7 +1887,7 @@ const ensembleStrategies = createRoute({
   },
 });
 
-agentRoute.openapi(ensembleStrategies, async (c) => {
+agentRoute.openapi(ensembleStrategies, async (c): Promise<any> => {
   return c.json({ strategies: VOTING_STRATEGIES });
 });
 
@@ -1918,7 +1915,7 @@ const publishMarketplaceItem = createRoute({
   },
 });
 
-agentRoute.openapi(publishMarketplaceItem, async (c) => {
+agentRoute.openapi(publishMarketplaceItem, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const orgId = c.get("orgId" as never) ?? "org_test";
   const marketplace = new AgentMarketplace(c.env.DB);
@@ -1948,7 +1945,7 @@ const searchMarketplace = createRoute({
   },
 });
 
-agentRoute.openapi(searchMarketplace, async (c) => {
+agentRoute.openapi(searchMarketplace, async (c): Promise<any> => {
   const query = c.req.valid("query");
   const marketplace = new AgentMarketplace(c.env.DB);
   const result = await marketplace.searchItems({
@@ -1986,7 +1983,7 @@ const installMarketplaceItem = createRoute({
   },
 });
 
-agentRoute.openapi(installMarketplaceItem, async (c) => {
+agentRoute.openapi(installMarketplaceItem, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const orgId = c.get("orgId" as never) ?? "org_test";
   const marketplace = new AgentMarketplace(c.env.DB);
@@ -2022,7 +2019,7 @@ const rateMarketplaceItem = createRoute({
   },
 });
 
-agentRoute.openapi(rateMarketplaceItem, async (c) => {
+agentRoute.openapi(rateMarketplaceItem, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
   const jwtPayload = c.get("jwtPayload" as never) as { sub?: string } | undefined;
@@ -2063,7 +2060,7 @@ const deleteMarketplaceItem = createRoute({
   },
 });
 
-agentRoute.openapi(deleteMarketplaceItem, async (c) => {
+agentRoute.openapi(deleteMarketplaceItem, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const orgId = c.get("orgId" as never) ?? "org_test";
   const marketplace = new AgentMarketplace(c.env.DB);
@@ -2094,7 +2091,7 @@ const getMarketplaceItemStats = createRoute({
   },
 });
 
-agentRoute.openapi(getMarketplaceItemStats, async (c) => {
+agentRoute.openapi(getMarketplaceItemStats, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const marketplace = new AgentMarketplace(c.env.DB);
   const stats = await marketplace.getItemStats(id);
