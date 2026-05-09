@@ -119,7 +119,8 @@ const updateRequirement = createRoute({
   },
 });
 
-requirementsRoute.openapi(updateRequirement, (c) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+requirementsRoute.openapi(updateRequirement, (c): any => {
   const { id } = c.req.valid("param");
   const { status } = c.req.valid("json");
 
@@ -132,7 +133,7 @@ requirementsRoute.openapi(updateRequirement, (c) => {
 
   // Return the updated item (override is ephemeral — Workers isolate scope only)
   const updated: RequirementItem = { ...item, status };
-  return c.json(updated);
+  return c.json(updated, 200);
 });
 
 

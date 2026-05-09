@@ -88,7 +88,7 @@ const listServers = createRoute({
   },
 });
 
-app.openapi(listServers, async (c) => {
+app.openapi(listServers, async (c): Promise<any> => {
   const registry = new McpServerRegistry(c.env.DB);
   const orgId = (c.get("jwtPayload") as Record<string, unknown> | undefined)?.orgId as string | undefined;
   const servers = await registry.listServers(orgId);
@@ -113,7 +113,7 @@ const createServer = createRoute({
   },
 });
 
-app.openapi(createServer, async (c) => {
+app.openapi(createServer, async (c): Promise<any> => {
   const body = c.req.valid("json");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await registry.createServer(body);
@@ -142,7 +142,7 @@ const deleteServer = createRoute({
   },
 });
 
-app.openapi(deleteServer, async (c) => {
+app.openapi(deleteServer, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -150,7 +150,7 @@ app.openapi(deleteServer, async (c) => {
     return c.json({ error: "Server not found" }, 404);
   }
   const deleted = await registry.deleteServer(id);
-  return c.json({ deleted });
+  return c.json({ deleted }, 200);
 });
 
 // ─── POST /mcp/servers/:id/test ───
@@ -175,7 +175,7 @@ const testConnection = createRoute({
   },
 });
 
-app.openapi(testConnection, async (c) => {
+app.openapi(testConnection, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -194,14 +194,14 @@ app.openapi(testConnection, async (c) => {
       status: "connected" as const,
       tools,
       toolCount: tools.length,
-    });
+    }, 200);
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     await registry.updateStatus(id, "error", errorMessage);
     return c.json({
       status: "error" as const,
       error: errorMessage,
-    });
+    }, 200);
   }
 });
 
@@ -237,7 +237,7 @@ const getServerTools = createRoute({
   },
 });
 
-app.openapi(getServerTools, async (c) => {
+app.openapi(getServerTools, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -252,7 +252,7 @@ app.openapi(getServerTools, async (c) => {
     if (now - cachedAt < TOOLS_CACHE_TTL_MS) {
       try {
         const tools = JSON.parse(server.toolsCache);
-        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt });
+        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt }, 200);
       } catch {
         // parse fail — fall through to live fetch
       }
@@ -264,18 +264,18 @@ app.openapi(getServerTools, async (c) => {
     const runner = createRunnerFromServer(server, registry);
     const tools = await runner.listTools();
     await registry.cacheTools(id, tools);
-    return c.json({ tools, cached: false, cachedAt: new Date().toISOString() });
+    return c.json({ tools, cached: false, cachedAt: new Date().toISOString() }, 200);
   } catch {
     // Fallback to stale cache
     if (server.toolsCache) {
       try {
         const tools = JSON.parse(server.toolsCache);
-        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt });
+        return c.json({ tools, cached: true, cachedAt: server.toolsCachedAt }, 200);
       } catch {
         // no valid cache at all
       }
     }
-    return c.json({ tools: [], cached: false, cachedAt: null });
+    return c.json({ tools: [], cached: false, cachedAt: null }, 200);
   }
 });
 
@@ -305,7 +305,7 @@ const listPrompts = createRoute({
   },
 });
 
-app.openapi(listPrompts, async (c) => {
+app.openapi(listPrompts, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -362,7 +362,7 @@ const getPrompt = createRoute({
   },
 });
 
-app.openapi(getPrompt, async (c) => {
+app.openapi(getPrompt, async (c): Promise<any> => {
   const { id, name } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -413,10 +413,14 @@ const handleSampling = createRoute({
       content: { "application/json": { schema: z.object({ error: z.string() }) } },
       description: "요청 제한 초과",
     },
+    500: {
+      content: { "application/json": { schema: z.object({ error: z.string() }) } },
+      description: "내부 서버 오류",
+    },
   },
 });
 
-app.openapi(handleSampling, async (c) => {
+app.openapi(handleSampling, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -430,7 +434,7 @@ app.openapi(handleSampling, async (c) => {
 
   try {
     const result = await handler.handleSamplingRequest(id, body);
-    return c.json(result);
+    return c.json(result, 200);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     if (message.includes("Rate limit")) {
@@ -468,7 +472,7 @@ const getSamplingLog = createRoute({
   },
 });
 
-app.openapi(getSamplingLog, async (c) => {
+app.openapi(getSamplingLog, async (c): Promise<any> => {
   const { serverId, limit } = c.req.valid("query");
 
   let query: string;
@@ -535,7 +539,7 @@ const listResources = createRoute({
   },
 });
 
-app.openapi(listResources, async (c) => {
+app.openapi(listResources, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -574,7 +578,7 @@ const listResourceTemplates = createRoute({
   },
 });
 
-app.openapi(listResourceTemplates, async (c) => {
+app.openapi(listResourceTemplates, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -620,7 +624,7 @@ const readResource = createRoute({
   },
 });
 
-app.openapi(readResource, async (c) => {
+app.openapi(readResource, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -672,7 +676,7 @@ const subscribeResource = createRoute({
   },
 });
 
-app.openapi(subscribeResource, async (c) => {
+app.openapi(subscribeResource, async (c): Promise<any> => {
   const { id } = c.req.valid("param");
   const registry = new McpServerRegistry(c.env.DB);
   const server = await getServerOrNull(registry, id);
@@ -685,7 +689,7 @@ app.openapi(subscribeResource, async (c) => {
   const client = new McpResourcesClient(registry, sse);
   try {
     await client.subscribeResource(id, body.uri);
-    return c.json({ subscribed: true, uri: body.uri });
+    return c.json({ subscribed: true, uri: body.uri }, 200);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return c.json({ error: message }, 500);

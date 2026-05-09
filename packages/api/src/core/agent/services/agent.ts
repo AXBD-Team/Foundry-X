@@ -98,7 +98,7 @@ agentRoute.openapi(getCustomRole, async (c) => {
   const mgr = new CustomRoleManager(c.env.DB);
   const role = await mgr.getRole(id);
   if (!role) return c.json({ error: "Role not found" }, 404);
-  return c.json(role);
+  return c.json(role, 200);
 });
 
 const updateCustomRole = createRoute({
@@ -120,7 +120,7 @@ agentRoute.openapi(updateCustomRole, async (c) => {
   const mgr = new CustomRoleManager(c.env.DB);
   try {
     const role = await mgr.updateRole(id, body);
-    return c.json(role);
+    return c.json(role, 200);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("builtin")) return c.json({ error: msg }, 403);

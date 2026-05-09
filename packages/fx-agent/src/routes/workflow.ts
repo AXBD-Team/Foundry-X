@@ -35,7 +35,7 @@ const listRoute = createRoute({
   },
 });
 
-workflowRoute.openapi(listRoute, async (c) => {
+workflowRoute.openapi(listRoute, async (c): Promise<any> => {
   const { orgId } = c.req.valid("param");
   const workflows = await getEngine(c.env).list(orgId);
   // Parse definitions for response
@@ -64,7 +64,7 @@ const createWorkflowRoute = createRoute({
   },
 });
 
-workflowRoute.openapi(createWorkflowRoute, async (c) => {
+workflowRoute.openapi(createWorkflowRoute, async (c): Promise<any> => {
   const orgRole = c.get("orgRole") as string;
   if (!orgRole || (orgRole !== "owner" && orgRole !== "admin")) {
     return c.json({ error: "Requires admin role or higher" }, 403);
@@ -90,7 +90,7 @@ const sprintTemplatesRoute = createRoute({
   },
 });
 
-workflowRoute.openapi(sprintTemplatesRoute, async (c) => {
+workflowRoute.openapi(sprintTemplatesRoute, async (c): Promise<any> => {
   const templates = getEngine(c.env).getSprintTemplates();
   return c.json({ templates }, 200);
 });
@@ -109,7 +109,7 @@ const getWorkflowRoute = createRoute({
   },
 });
 
-workflowRoute.openapi(getWorkflowRoute, async (c) => {
+workflowRoute.openapi(getWorkflowRoute, async (c): Promise<any> => {
   const { orgId, id } = c.req.valid("param");
   const workflow = await getEngine(c.env).get(orgId, id);
   if (!workflow) return c.json({ error: "Workflow not found" }, 404);
@@ -134,7 +134,7 @@ const updateWorkflowRoute = createRoute({
   },
 });
 
-workflowRoute.openapi(updateWorkflowRoute, async (c) => {
+workflowRoute.openapi(updateWorkflowRoute, async (c): Promise<any> => {
   const orgRole = c.get("orgRole") as string;
   if (!orgRole || (orgRole !== "owner" && orgRole !== "admin")) {
     return c.json({ error: "Requires admin role or higher" }, 403);
@@ -162,7 +162,7 @@ const deleteWorkflowRoute = createRoute({
   },
 });
 
-workflowRoute.openapi(deleteWorkflowRoute, async (c) => {
+workflowRoute.openapi(deleteWorkflowRoute, async (c): Promise<any> => {
   const orgRole = c.get("orgRole") as string;
   if (!orgRole || (orgRole !== "owner" && orgRole !== "admin")) {
     return c.json({ error: "Requires admin role or higher" }, 403);
@@ -192,7 +192,7 @@ const executeRoute = createRoute({
   },
 });
 
-workflowRoute.openapi(executeRoute, async (c) => {
+workflowRoute.openapi(executeRoute, async (c): Promise<any> => {
   const orgRole = c.get("orgRole") as string;
   if (!orgRole || (orgRole !== "owner" && orgRole !== "admin")) {
     return c.json({ error: "Requires admin role or higher" }, 403);

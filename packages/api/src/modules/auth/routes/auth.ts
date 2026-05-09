@@ -137,6 +137,10 @@ const login = createRoute({
       content: { "application/json": { schema: AuthResponseSchema } },
       description: "Login successful with tokens",
     },
+    400: {
+      content: { "application/json": { schema: ErrorSchema } },
+      description: "Validation error",
+    },
     401: {
       content: { "application/json": { schema: ErrorSchema } },
       description: "Invalid credentials",
@@ -184,7 +188,7 @@ authRoute.openapi(login, async (c) => {
   return c.json({
     user: { id: user.id, email: user.email, name: user.name, role: user.role },
     ...tokens,
-  });
+  }, 200);
 });
 
 // ─── POST /auth/refresh ───
@@ -265,7 +269,7 @@ authRoute.openapi(refresh, async (c) => {
     expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
   });
 
-  return c.json(tokens);
+  return c.json(tokens, 200);
 });
 
 // ─── POST /auth/switch-org ───
@@ -280,6 +284,7 @@ const switchOrg = createRoute({
   },
   responses: {
     200: { content: { "application/json": { schema: TokenPairSchema } }, description: "New token pair for switched org" },
+    401: { content: { "application/json": { schema: ErrorSchema } }, description: "Unauthorized" },
     403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a member" },
   },
 });
@@ -323,7 +328,7 @@ authRoute.openapi(switchOrg, async (c) => {
     expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
   });
 
-  return c.json(tokens);
+  return c.json(tokens, 200);
 });
 
 // ─── POST /auth/invitations/:token/accept ───
@@ -336,6 +341,7 @@ const acceptInvitation = createRoute({
   request: { params: InvitationTokenSchema },
   responses: {
     200: { content: { "application/json": { schema: TokenPairSchema } }, description: "Joined org, new token pair" },
+    401: { content: { "application/json": { schema: ErrorSchema } }, description: "Unauthorized" },
     403: { content: { "application/json": { schema: ErrorSchema } }, description: "Email mismatch" },
     410: { content: { "application/json": { schema: ErrorSchema } }, description: "Expired" },
   },
@@ -376,7 +382,7 @@ authRoute.openapi(acceptInvitation, async (c) => {
       expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
     });
 
-    return c.json(tokens);
+    return c.json(tokens, 200);
   } catch (e) {
     if (e instanceof OrgError) return c.json({ error: e.message }, e.status as any);
     throw e;
@@ -526,6 +532,7 @@ const googleAuth = createRoute({
   responses: {
     200: { content: { "application/json": { schema: AuthResponseSchema } }, description: "Google auth successful" },
     401: { content: { "application/json": { schema: ErrorSchema } }, description: "Invalid Google token" },
+    500: { content: { "application/json": { schema: ErrorSchema } }, description: "OAuth not configured" },
   },
 });
 
@@ -533,7 +540,7 @@ authRoute.openapi(googleAuth, async (c) => {
   const { credential, invitationToken } = c.req.valid("json");
   const clientId = c.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
-    return c.json({ error: "Google OAuth not configured", errorCode: "AUTH_005" }, 500 as any);
+    return c.json({ error: "Google OAuth not configured", errorCode: "AUTH_005" }, 500);
   }
 
   // Verify Google ID Token via Google's tokeninfo endpoint
@@ -648,7 +655,7 @@ authRoute.openapi(googleAuth, async (c) => {
   return c.json({
     user: { id: userId, email: googleUser.email, name: userName, role: userRole },
     ...tokens,
-  });
+  }, 200);
 });
 
 // ─── Sprint 67: F210 Password Reset ───
@@ -742,7 +749,7 @@ authRoute.openapi(resetPassword, async (c) => {
 
   try {
     await resetService.resetPassword(token, newPassword);
-    return c.json({ message: "Password has been reset successfully. Please login with your new password." });
+    return c.json({ message: "Password has been reset successfully. Please login with your new password." }, 200);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
     return c.json({ error: `Invalid or expired token: ${msg}`, errorCode: "AUTH_007" }, 400);
@@ -761,6 +768,7 @@ const cleanupTokens = createRoute({
       content: { "application/json": { schema: z.object({ deleted: z.number() }) } },
       description: "Number of deleted tokens",
     },
+    401: { content: { "application/json": { schema: ErrorSchema } }, description: "Unauthorized" },
     403: {
       content: { "application/json": { schema: ErrorSchema } },
       description: "Admin only",
@@ -789,5 +797,5 @@ authRoute.openapi(cleanupTokens, async (c) => {
     "DELETE FROM refresh_tokens WHERE expires_at < datetime('now') OR revoked_at IS NOT NULL"
   ).run();
 
-  return c.json({ deleted: result.meta?.changes ?? 0 });
+  return c.json({ deleted: result.meta?.changes ?? 0 }, 200);
 });
