@@ -269,8 +269,8 @@ importers:
         specifier: workspace:*
         version: link:../shared-contracts
       '@hono/zod-openapi':
-        specifier: ^0.9.0
-        version: 0.9.10(hono@4.12.8)(zod@3.25.76)
+        specifier: ^0.18.4
+        version: 0.18.4(hono@4.12.8)(zod@3.25.76)
       drizzle-orm:
         specifier: ^0.31.2
         version: 0.31.4(@cloudflare/workers-types@4.20260316.1)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/react@18.3.28)(better-sqlite3@12.8.0)(react@18.3.1)
