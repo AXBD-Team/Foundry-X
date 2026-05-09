@@ -50,6 +50,9 @@ const createOrgRoute = createRoute({
 orgRoute.openapi(createOrgRoute, async (c) => {
   const payload = getPayload(c);
   const { name, slug } = c.req.valid("json");
+  if (!name || !slug) {
+    return c.json({ error: "name and slug are required", errorCode: "VALIDATION_001" }, 400);
+  }
   try {
     const org = await getService(c.env).createOrg(payload.sub, { name, slug });
     return c.json(org, 201);

@@ -141,6 +141,9 @@ const updateWikiPage = createRoute({
 wikiRoute.openapi(updateWikiPage, async (c) => {
   const { slug } = c.req.valid("param");
   const { content } = c.req.valid("json");
+  if (!content) {
+    return c.json({ error: "content is required", errorCode: "VALIDATION_001" }, 400);
+  }
   const db = getDb(c.env.DB);
 
   const [existing] = await db
