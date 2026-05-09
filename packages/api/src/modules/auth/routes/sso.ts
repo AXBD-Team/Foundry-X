@@ -93,6 +93,10 @@ const verifyHubToken = createRoute({
       content: { "application/json": { schema: VerifyResponseSchema } },
       description: "Token verification result",
     },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
+      description: "잘못된 요청",
+    },
   },
 });
 
@@ -149,6 +153,10 @@ const updateOrgService = createRoute({
     200: {
       content: { "application/json": { schema: OrgServiceSchema } },
       description: "Service updated",
+    },
+    400: {
+      content: { "application/json": { schema: z.object({ error: z.string(), errorCode: z.string() }) } },
+      description: "잘못된 요청",
     },
   },
 });
