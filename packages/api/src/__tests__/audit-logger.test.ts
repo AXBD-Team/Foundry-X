@@ -13,6 +13,7 @@ const AUDIT_DDL = `CREATE TABLE IF NOT EXISTS audit_logs (
   output_type TEXT,
   approved_by TEXT,
   approved_at TEXT,
+  trace_id TEXT,
   metadata TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY (tenant_id) REFERENCES organizations(id)

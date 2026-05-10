@@ -11,6 +11,7 @@ export interface AuditEvent {
   inputClassification?: string;
   outputType?: string;
   approvedBy?: string;
+  traceId?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -25,8 +26,15 @@ export interface AuditLog {
   outputType: string | null;
   approvedBy: string | null;
   approvedAt: string | null;
+  traceId: string | null;
   metadata: Record<string, unknown>;
   createdAt: string;
+}
+
+export interface TraceChainResult {
+  traceId: string;
+  events: AuditLog[];
+  chainValid: boolean;
 }
 
 export interface AuditQueryParams {
@@ -55,8 +63,8 @@ export class AuditLogService {
 
     await this.db
       .prepare(
-        `INSERT INTO audit_logs (id, tenant_id, event_type, agent_id, model_id, prompt_hash, input_classification, output_type, approved_by, approved_at, metadata)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO audit_logs (id, tenant_id, event_type, agent_id, model_id, prompt_hash, input_classification, output_type, approved_by, approved_at, trace_id, metadata)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         id,
@@ -69,6 +77,7 @@ export class AuditLogService {
         event.outputType ?? null,
         event.approvedBy ?? null,
         approvedAt,
+        event.traceId ?? null,
         metadata,
       )
       .run();
@@ -139,6 +148,7 @@ export class AuditLogService {
         output_type: string | null;
         approved_by: string | null;
         approved_at: string | null;
+        trace_id: string | null;
         metadata: string;
         created_at: string;
       }>();
@@ -154,11 +164,53 @@ export class AuditLogService {
       outputType: r.output_type,
       approvedBy: r.approved_by,
       approvedAt: r.approved_at,
+      traceId: r.trace_id,
       metadata: JSON.parse(r.metadata || "{}"),
       createdAt: r.created_at,
     }));
 
     return { logs, total: countResult?.cnt ?? 0, page, pageSize };
+  }
+
+  async getByTraceId(traceId: string): Promise<TraceChainResult> {
+    const rows = await this.db
+      .prepare(
+        `SELECT * FROM audit_logs WHERE trace_id = ? ORDER BY created_at ASC`,
+      )
+      .bind(traceId)
+      .all<{
+        id: string;
+        tenant_id: string;
+        event_type: string;
+        agent_id: string | null;
+        model_id: string | null;
+        prompt_hash: string | null;
+        input_classification: string;
+        output_type: string | null;
+        approved_by: string | null;
+        approved_at: string | null;
+        trace_id: string | null;
+        metadata: string;
+        created_at: string;
+      }>();
+
+    const events: AuditLog[] = (rows.results ?? []).map((r) => ({
+      id: r.id,
+      tenantId: r.tenant_id,
+      eventType: r.event_type,
+      agentId: r.agent_id,
+      modelId: r.model_id,
+      promptHash: r.prompt_hash,
+      inputClassification: r.input_classification,
+      outputType: r.output_type,
+      approvedBy: r.approved_by,
+      approvedAt: r.approved_at,
+      traceId: r.trace_id,
+      metadata: JSON.parse(r.metadata || "{}"),
+      createdAt: r.created_at,
+    }));
+
+    return { traceId, events, chainValid: events.length > 0 };
   }
 
   async getStats(tenantId: string, period: number = 7): Promise<AuditStats> {
