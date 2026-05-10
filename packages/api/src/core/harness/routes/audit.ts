@@ -3,6 +3,8 @@ import {
   AuditEventSchema,
   AuditLogResponseSchema,
   AuditLogCreateResponseSchema,
+  AuditLogByTraceResponseSchema,
+  AuditTraceQuerySchema,
   AuditStatsSchema,
   AuditEventTypeEnum,
 } from "../schemas/audit.js";
@@ -115,5 +117,31 @@ auditRoute.openapi(getStats, async (c) => {
   const tenantId = getTenantId(c);
 
   const result = await service.getStats(tenantId, period);
+  return c.json(result);
+});
+
+// ─── GET /api/audit/log/by-trace ───
+
+const getByTrace = createRoute({
+  method: "get",
+  path: "/audit/log/by-trace",
+  tags: ["Audit"],
+  summary: "trace_id로 감사 로그 체인 조회",
+  request: {
+    query: AuditTraceQuerySchema,
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: AuditLogByTraceResponseSchema } },
+      description: "trace_id 체인 이벤트 목록",
+    },
+  },
+});
+
+auditRoute.openapi(getByTrace, async (c) => {
+  const { trace_id } = c.req.valid("query");
+  const service = new AuditLogService(c.env.DB);
+
+  const result = await service.getByTraceId(trace_id);
   return c.json(result);
 });

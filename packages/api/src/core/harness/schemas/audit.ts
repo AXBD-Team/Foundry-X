@@ -28,6 +28,7 @@ export const AuditEventSchema = z
     inputClassification: InputClassificationEnum.default("internal"),
     outputType: z.string().optional(),
     approvedBy: z.string().optional(),
+    traceId: z.string().optional(),
     metadata: z.record(z.unknown()).optional(),
   })
   .openapi("AuditEvent");
@@ -44,6 +45,7 @@ export const AuditLogSchema = z
     outputType: z.string().nullable(),
     approvedBy: z.string().nullable(),
     approvedAt: z.string().nullable(),
+    traceId: z.string().nullable(),
     metadata: z.record(z.unknown()),
     createdAt: z.string(),
   })
@@ -87,3 +89,15 @@ export const AuditLogCreateResponseSchema = z
     recorded: z.boolean(),
   })
   .openapi("AuditLogCreateResponse");
+
+export const AuditTraceQuerySchema = z.object({
+  trace_id: z.string().min(1),
+});
+
+export const AuditLogByTraceResponseSchema = z
+  .object({
+    traceId: z.string(),
+    events: z.array(AuditLogSchema),
+    chainValid: z.boolean(),
+  })
+  .openapi("AuditLogByTraceResponse");
