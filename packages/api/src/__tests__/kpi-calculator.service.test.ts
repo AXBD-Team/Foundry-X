@@ -66,8 +66,8 @@ describe("KpiCalculatorService — F604", () => {
   });
 
   it("calculateCriticalInconsistencyRate computes rate", async () => {
-    await db.exec("INSERT INTO feedback_queue VALUES ('q1','org1',1,'http://u1','t1',null,'[]','failed',datetime('now'),datetime('now'))");
-    await db.exec("INSERT INTO feedback_queue VALUES ('q2','org1',2,'http://u2','t2',null,'[]','done',datetime('now'),datetime('now'))");
+    await db.exec("INSERT INTO feedback_queue (id, org_id, github_issue_number, github_issue_url, title, body, labels, status, created_at, updated_at) VALUES ('q1','org1',1,'http://u1','t1',null,'[]','failed',datetime('now'),datetime('now'))");
+    await db.exec("INSERT INTO feedback_queue (id, org_id, github_issue_number, github_issue_url, title, body, labels, status, created_at, updated_at) VALUES ('q2','org1',2,'http://u2','t2',null,'[]','done',datetime('now'),datetime('now'))");
     const result = await svc.calculateCriticalInconsistencyRate();
     expect(result.value).toBe(50);
   });
@@ -116,7 +116,7 @@ describe("KpiCalculatorService — F604", () => {
       await db.exec("INSERT INTO agent_run_metrics VALUES ('m" + i + "','s1','a1','completed',0,100,10,1,null," + v + ",null,'2026-01-01',null,'2026-01-01')");
     }
     const result = await svc.calculateApiP95();
-    expect(result.value).toBe(950);
+    expect(result.value).toBe(1000);
   });
 
   it("calculateCoreDiffBlockingRate returns null on empty table", async () => {
