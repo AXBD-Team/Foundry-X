@@ -249,14 +249,48 @@ curl -X GET "https://foundry-x-api.ktds-axbd.workers.dev/api/audit/log?trace_id=
 
 ---
 
-## 5. 사전 점검 체크리스트 (5/14 까지)
+## 5. 사전 점검 체크리스트 (5/14 까지) — S350 분해 표
 
-- [ ] D1 시드: `demo-org`, `pol-rpa-pension-claim-001` 1건 사전 등록
-- [ ] JWT 발급: BeSir 데모용 1회 토큰 (TTL 24h)
-- [ ] 5 endpoint dry-run 1회 (curl 5건 200 응답 확인)
-- [ ] 비디오 백업 capture (네트워크 장애 대비)
-- [ ] Q&A 5분 모의 진행 (Sinclair + 서민원)
-- [ ] 18 v1 Conditional Gate 자료 동시 출력 (페어 자료)
+> **S350 추가**: 6항을 시점별 3 그룹으로 분해 — (a) 5/10~5/13 사전 준비 가능 / (b) 5/14 당일 필수 / (c) 5/15 미팅 직전. 사전 준비 가능 항목은 즉시 시작.
+
+### 5.1 5/10~5/13 사전 준비 가능 (W19 일~수, ~3.5일 분량)
+
+| # | 항목 | 소요 | 담당 | 의존 | Status (S350) |
+|---|------|------|------|------|--------------|
+| 1 | **D1 시드 SQL 초안 작성** — `demo-org` org_id + `pol-rpa-pension-claim-001` policy_id + `agent-decision-pension-001` agent_id 3건 INSERT script | 30분 | Sinclair | F642 ✅ MERGED 후 (trace_id 컬럼 포함) | 📋 **S350 다음** |
+| 2 | **18 v1 페어 자료 출력** | 5분 | Sinclair | 18 v1.1 보강 ✅ (S350 §6 Q&A 추가) | ✅ 즉시 가능 |
+| 3 | **5 endpoint dry-run 1차 (test JWT)** — F642 trace_id endpoint 포함 6 endpoint | 1시간 | Sinclair | F642 ✅ MERGED + JWT 발급 | 📋 **5/13 (수)** |
+| 4 | **Q&A 모의 답변 review** — 18 §6 5 답변 본문 다듬기 | 30분 | Sinclair + 서민원 | 18 §6 ✅ S350 작성 | ✅ 즉시 가능 |
+| 5 | **02 v0.4 본문 + 14 v1.1 + 16 v1.1 patch review** | 1시간 | Sinclair | ✅ S346 patch 완료 | ✅ 즉시 가능 |
+| 6 | **scripts/d1-migrate-remote.sh로 0154 migration 적용 확인** (F642 ✅ 후) | 5분 | Sinclair | F642 ✅ MERGED | 📋 **F642 직후** |
+
+### 5.2 5/14 당일 필수 (W19 목, dry-run 본 진행)
+
+| # | 항목 | 소요 | 담당 | 의존 |
+|---|------|------|------|------|
+| A | **D1 시드 적용** — wrangler d1 execute로 production D1에 INSERT 3건 | 10분 | Sinclair | 5.1 #1 + #6 |
+| B | **JWT 발급 + .env 등록** — TTL 24h, 5/15 18:00까지 유효 | 5분 | Sinclair | wrangler secret JWT_SECRET ✅ 등록됨 |
+| C | **5 endpoint dry-run 2차** — 6 endpoint 각 200/4xx 응답 확인 + 응답 body shape 정합성 | 30분 | Sinclair | A + B |
+| D | **trace_id chain 검증 시나리오 실행** — 5단계 trace_id 연결 → GET by-trace 4 events 반환 | 15분 | Sinclair | C 통과 |
+| E | **비디오 캡처 백업** — 5 step + Q&A 5건 시연 영상 (네트워크 장애 대비) | 1시간 | Sinclair | C + D 통과 |
+| F | **Q&A 모의 진행 1회** — Sinclair (시연자) + 서민원 (대안적 질문자) 5 질문 응답 시간 측정 | 1시간 | Sinclair + 서민원 | 18 §6 review 완료 |
+| G | **18 v1 + 20 v1 인쇄 페어 자료** — 미팅 자료로 출력 (3부) | 15분 | Sinclair | 모든 patch 완료 |
+
+### 5.3 5/15 미팅 직전 (D-day 오전, ~30분 점검)
+
+| # | 항목 | 소요 | 담당 |
+|---|------|------|------|
+| α | **JWT 유효성 재확인** | 1분 | Sinclair |
+| β | **5 endpoint smoke probe 1회** — 5/14 dry-run 이후 production 변동 0 확인 | 5분 | Sinclair |
+| γ | **비디오 백업 재생 가능 확인** — local + cloud 양쪽 | 2분 | Sinclair |
+| δ | **18 + 20 + 02 v0.4 인쇄물 + 노트북 dual screen 준비** | 15분 | Sinclair |
+| ε | **본부 참석자 확인** — 본부장 + SME 4명 + 서민원 + Sinclair 7명 입장 | 5분 | Sinclair (별 채널 confirm) |
+
+### 5.4 트리거 + 백업 트리거
+
+- **트리거**: F642 ✅ MERGED → 5.1 #1+#6 즉시 가동 → 5.1 #3 5/13 (수) 1차 dry-run → 5.2 5/14 당일 본 진행 → 5.3 5/15 D-day
+- **F642 MERGED 지연 시**: 5.1 #1+#3+#6은 차순위 (5/13~5/14), 5.1 #2+#4+#5는 즉시 진행 가능 (의존 0)
+- **백업**: D1 시드 실패 시 → 1주 빠른 메모리 시드 (test JWT 임시 사용) / Cloudflare Workers 다운 시 → 비디오 백업 영상 fallback / Q&A 어려운 질문 시 → 18 §6 답변 본문 즉시 보조
 
 ---
 

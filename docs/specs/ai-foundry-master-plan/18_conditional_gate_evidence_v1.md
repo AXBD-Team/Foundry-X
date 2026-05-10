@@ -109,10 +109,22 @@ status: C-1 자체 통과 증거 ✅ / C-2/C-4 외부 sign-off 대기 / C-3 W20 
 - 2순위: Ops 본부 (data 풍부, NDA 즉시 가능)
 - 미달 시 백업: 단일 본부로 시작 + W22 2번째 본부 합류
 
-**안건 2 — core_diff 워크샵**:
-- 일정 권장: W20 (5/22 화) — 4시간, SME 4명 (각 본부 2명)
-- 진행 방식: 12 dev plan §2.3 + F603 default-deny 룰 사전 출력
-- F626 차단율 KPI 사전 측정 → 워크샵에서 룰 보정 case 확인
+**안건 2 — core_diff 워크샵** (S350 보강):
+
+- **일정 권장 (1순위)**: W20 5/22 (목) — 4시간, SME 4명 (각 본부 2명) + Sinclair PM + 서민원
+- **백업 일정 (2순위)**: W20 5/23 (금) — 동일 4시간 (본부장 일정 conflict 시)
+- **백업 일정 (3순위)**: W21 5/29 (목) — G1 게이트 일주일 전 확보
+- **참석자**: 심사·승인 본부 SME 2명 + Ops 본부 SME 2명 + Sinclair (PM, 진행) + 서민원 (기록)
+- **진행 방식**:
+  - **9:00~9:30** Open + 4그룹 정의 review (12 dev plan §2.3 발췌 + F603 default-deny 룰 사전 출력)
+  - **9:30~11:00** 본부별 정책팩 sample 4건 그룹 분류 워크 (각 본부 2건 × 2 본부 = 8건)
+  - **11:00~12:00** 합의 + 룰 보정 case 도출 + Closing
+- **사전 자료** (5/14까지 본부 송부):
+  - F603 default-deny 룰 v1 (PRD §5.2)
+  - F626 차단율 KPI 사전 측정 → 워크샵에서 룰 보정 case 확인
+  - 04 cross_review_consolidation §1.4 4그룹 정의 + 사례 5건
+- **산출물**: (a) 본부별 정책팩 8건 그룹 분류 결과 표, (b) 룰 보정 patch 후보 목록, (c) Approver/Reviewer RBAC 5역 본부별 매핑 초안 (안건 3과 통합)
+- **백업** (워크숍 미진행 시): SME 인터뷰 1대1 4명 (각 30분 × 4 = 2시간 분량) + Sinclair 사후 통합 — 합의 가치 약화되나 진행 가능
 
 **안건 3 — Approver RBAC 5역**:
 - 5역: Admin / Reviewer / Approver / Operator / Auditor
@@ -308,6 +320,64 @@ curl "https://foundry-x-api.ktds-axbd.workers.dev/api/cross-org/blocking-rate?or
 
 ---
 
+## 6. Q&A 모의 답변 — 5/15 BeSir 미팅 5 예상 질문 (S350 추가)
+
+> 20 live demo §4 Q&A 표는 한 줄 요약. 본 §6은 답변 본문 (각 1~2분 분량). Sinclair PM 답변 시 사용할 가이드.
+
+### Q1. 외부 LLM 호출은 어디서 일어나고 비용·보안은 어떻게 통제하나?
+
+**답변 본문** (1분 30초):
+> "외부 LLM 호출은 **Foundry-X core/infra/llm.ts** 단일 entry-point로 통일됐습니다 (Sprint 365, F627 ✅). 모든 호출은 (1) **F624 Six Hats LLM 정책 (Sprint 356 ✅)** — KV cache + audit 발행 + zod 응답 검증, (2) **F627 service-proxy** — input/output 양방향 PII Mask + sanitize. 본부 데이터가 외부로 누출 안 됩니다.
+> 비용 통제는 **F628 7-타입 Entity (Sprint 350 ✅)** + **F629 5-Asset Model (Sprint 352 ✅)** 토큰 베이스라인 측정 인프라가 갖춰져 있고, **본 데모 Step 2** core_differentiator 그룹 분류 LLM 호출 시 audit 발행 → cost 추적 가능합니다. W20 KPI #6/#7과 함께 베이스라인 측정 시작입니다."
+
+**보조 자료**: F627 PR #748 reports, F624 Sprint 356 plan, KPI 측정 query (18 §4.5 KPI 6번)
+
+### Q2. 본부 정책 자산이 다른 본부에 섞이지 않는다는 보장은?
+
+**답변 본문** (1분):
+> "두 층위로 보장합니다. **(1) 데이터 격리** — F601 Multi-Tenant PG (P0-2 idea) 활성화 시 본부별 PG schema 단위 완전 격리. 현재는 D1에서 `org_id` 컬럼 + RLS-style query filter로 1차 차단. **(2) 정책 기반 차단** — F603 Cross-Org default-deny (Sprint 363 ✅) + F626 차단율 KPI (Sprint 364 ✅) — 본 데모 Step 3에서 직접 시연. core_differentiator 그룹은 **default-deny** 코드로 강제 차단되며, F626 차단율 KPI 100% 게이트 (PRD §5.3) 위반 시 알람 발동.
+> 자산 누출은 audit-bus T1 (F606 ✅, Sprint 351) trace_id chain으로 사후 추적 가능 — append-only D1 + HMAC SHA256으로 **사후 조작 불가**. F642 (Sprint 379, 오늘 작업) trace_id chain enrichment로 완전 추적 가능합니다."
+
+**보조 자료**: 12 dev plan §2.3, F603 Sprint 363 report, F626 차단율 query (18 §4.5 KPI 8번)
+
+### Q3. AI 의사결정의 신뢰성은 어떻게 입증하나? 잘못된 결정으로 손실 발생 시 책임은?
+
+**답변 본문** (2분):
+> "다층 보호로 입증합니다. **(1) Pre-decision 검증** — F624 Six Hats LLM 정책 + F632 CQ 5축 (등록) 90점 핸드오프 룰. CQ 점수 90 미만이면 자동으로 HITL escalation. **(2) AI 투명성** — F607 ✅ (Sprint 359, AI 투명성 + 윤리 임계). dual_ai_reviews + 6축 점수 prod 노출 + confidence < 0.7 자동 escalation (본 데모 Step 4 직접 시연). **(3) Kill Switch** — F607 kill_switch 활성화 시 즉시 agent 호출 차단 + ethics_violations 영구 기록 + audit-bus 발행.
+> **책임 추적** — 모든 결정은 audit-bus trace_id chain으로 (a) 어떤 agent가, (b) 어떤 모델로, (c) 어떤 prompt로, (d) 어떤 confidence로, (e) 어떤 시각에 결정했는지 영구 기록 — 사후 조작 불가. **운영자 권한** — F605 HITL Console (Sprint 378 ✅) 통합 큐로 confidence 미달 결정 review/reject/escalate 가능. RBAC 5역 (Admin/Reviewer/**Approver**/Operator/Auditor) 분리.
+> 미신뢰 시 **백업** — F640 cascading lock drift 학습 (S345)처럼 production 장애 1시간 41분에 즉시 revert 절차 확립 — 16회차 누적 학습됨 (rules/development-workflow.md)."
+
+**보조 자료**: F607 ethics 룰 plan, F605 HITL Console S349 report, audit-bus chain demo
+
+### Q4. 운영자가 emergency stop이 가능한가? 장애 발생 시 어떻게 정지·복구하나?
+
+**답변 본문** (1분):
+> "**즉시 가능**합니다. **(1) Agent 단위 Kill Switch** — F607 ✅ `POST /api/ethics/kill-switch` (본 데모 Step 4 보조). 운영자가 특정 agent_id에 대해 즉시 차단 → kill_switch_state 테이블 active=1 → 모든 후속 호출 거부. (2) **HITL Console 차단** — F605 (Sprint 378 ✅) Console에서 GET /api/hitl/queue + POST /api/hitl/decision으로 escalation pending 큐 일괄 reject 또는 단건 deny 가능.
+> **장애 복구** — autopilot Sprint 376 ✅ S341 학습 (16회차)에 따라 production smoke 1건이라도 5xx 응답하면 사용자 인터뷰 → revert vs hotfix forward 결정. revert PR 5분 내 생성 + auto-merge → deploy 트리거 + 7-probe smoke verify로 회복 확증. F636 첫 시도 production fail (Sprint 372)에서 **~4h41m 다운타임 후 정상 복구** 검증 사례 있음.
+> **다음 단계 권고** — F600 5-Layer 통합 (P0-1 idea, F601 unlock 후) 시점에 5 repo orchestration 단위 emergency stop SOP 제정. 현재는 단일 Foundry-X repo 기준 emergency stop 절차 가동 가능."
+
+**보조 자료**: F607 kill_switch endpoint, S341 revert 사례 reports
+
+### Q5. 만약 본 데모 시연 중 한 단계가 실패하면 어떻게 대응하나?
+
+**답변 본문** (45초):
+> "**디버깅 자체가 데모 가치**입니다. trace_id chain (F642 Sprint 379, 오늘 ✅ 작업) 단일 chain으로 어느 event부터 끊어졌는지 audit log로 즉시 식별 가능. (1) Step 1 실패 → diagnostic_runs 테이블 status=failed 확인. (2) Step 3 실패 → cross_org_export_blocks 테이블 last_decision 확인. (3) Step 5 실패 → audit_logs trace_id chain incomplete 식별.
+> **백업** — 사전 dry-run 1회 (5/14, D-1) + 비디오 캡처 백업. 네트워크 장애 시 비디오 fallback. 단계별 curl 실패 시 **trace_id chain 검증** 자체가 시연 가치 — '디버깅 가능한 시스템' 입증."
+
+**보조 자료**: 20 §5 dry-run 체크리스트, F642 trace_id chain endpoint
+
+---
+
+## 7. 다음 사이클 후보 (S350 시점, BeSir 미팅 사전 W19~W20)
+
+- **5/14 dry-run 사전 점검** (D-1, 20 §5 체크리스트 6항 분해 — 본 docs §3.5)
+- **F642 ✅ Sprint 379 MERGED 후 demo Step 5 검증** (trace_id chain endpoint live 확인)
+- **BeSir 5/15 미팅 진행** (D-day)
+- **W20 KPI 6/8 베이스라인 측정** (5/19 월요일 시작, §4.5 query 즉시 실행)
+- **F600/F605 후속** (BeSir sign-off 결과 따라 P0 idea 4건 → P1/P2 격상)
+
+---
+
 **관련 문서**:
 - 06_architecture_alignment_with_besir_v1.md (BeSir 정합성 P0 10건)
 - 15_msa_implementation_plan_v1.md §10.2 + §483~487 (Conditional 게이트 정의)
@@ -316,3 +386,4 @@ curl "https://foundry-x-api.ktds-axbd.workers.dev/api/cross-org/blocking-rate?or
 - 14_repo_status_audit_v1.md v1.1 (S346 baseline patch)
 - 16_validation_report_v1.md v1.1 (S346 검증 결과 patch)
 - 02_ai_foundry_phase1_v0.4 (S346 patch — Changelog v0.4 entry)
+- 20_live_demo_scenario_v1.md §4 (Q&A 한 줄 요약 ↔ 본 §6 본문)
