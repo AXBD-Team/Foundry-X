@@ -185,33 +185,61 @@ curl -X POST https://foundry-x-api.ktds-axbd.workers.dev/api/ethics/check-confid
 - ✅ kill_switch_state로 운영자가 즉시 정지 가능 (F605 HITL Console과 통합 예정)
 - ✅ ethics_violations 테이블 영구 기록
 
-### Step 5 — F606 Audit Bus 회수 (trace_id chain 검증)
+### Step 5 — F642 Audit Bus T2 회수 (trace_id chain 검증, F642 ✅ Sprint 379 신규)
 
 **curl**:
 ```bash
-curl -X GET "https://foundry-x-api.ktds-axbd.workers.dev/api/audit/log?trace_id=trc-demo-2026-05-15" \
+curl -X GET "https://foundry-x-api.ktds-axbd.workers.dev/api/audit/log/by-trace?trace_id=trc-demo-2026-05-15" \
   -H "Authorization: Bearer ${JWT}"
 ```
 
-**기대 응답**:
+**기대 응답** (F642 실측 shape, S350 갱신 — camelCase, F606 audit-bus T1 통합은 후속):
 ```json
 {
-  "trace_id": "trc-demo-2026-05-15",
+  "traceId": "trc-demo-2026-05-15",
   "events": [
-    {"event_id": "evt_diag_001", "type": "diagnostic.run", "ts": "2026-05-15T04:59:30Z", "hmac": "sha256-..."},
-    {"event_id": "evt_cross_001", "type": "cross-org.assign-group", "ts": "2026-05-15T05:00:00Z", "hmac": "sha256-..."},
-    {"event_id": "evt_cross_002", "type": "cross-org.check-export.deny", "ts": "2026-05-15T05:01:00Z", "hmac": "sha256-..."},
-    {"event_id": "evt_ethics_001", "type": "ethics.escalate", "ts": "2026-05-15T05:01:30Z", "hmac": "sha256-..."}
+    {
+      "id": "evt_diag_001",
+      "tenantId": "demo-org",
+      "eventType": "diagnostic.run",
+      "agentId": null,
+      "modelId": null,
+      "traceId": "trc-demo-2026-05-15",
+      "metadata": {"diagnostic_types": ["missing","duplicate","overspec","inconsistency"]},
+      "createdAt": "2026-05-15T04:59:30Z"
+    },
+    {
+      "id": "evt_cross_001",
+      "eventType": "cross-org.assign-group",
+      "traceId": "trc-demo-2026-05-15",
+      "metadata": {"policy_id": "pol-rpa-pension-claim-001", "group": "core_differentiator"},
+      "createdAt": "2026-05-15T05:00:00Z"
+    },
+    {
+      "id": "evt_cross_002",
+      "eventType": "cross-org.check-export.deny",
+      "traceId": "trc-demo-2026-05-15",
+      "metadata": {"target_org": "hr-bonbu", "decision": "deny"},
+      "createdAt": "2026-05-15T05:01:00Z"
+    },
+    {
+      "id": "evt_ethics_001",
+      "eventType": "ethics.escalate",
+      "agentId": "agent-decision-pension-001",
+      "traceId": "trc-demo-2026-05-15",
+      "metadata": {"confidence": 0.65, "threshold": 0.7},
+      "createdAt": "2026-05-15T05:01:30Z"
+    }
   ],
-  "chain_valid": true,
-  "hmac_algo": "sha256"
+  "chainValid": true
 }
 ```
 
 **포인트** (5-Asset Decision Log 핵심):
-- ✅ 4 events trace_id 단일 chain (W3C Trace Context 호환)
-- ✅ HMAC SHA256 무결성 검증 → SIEM 발행 가능
-- ✅ append-only D1 → 사후 조작 불가 (감독기관 응답 즉시 가능)
+- ✅ 4 events trace_id 단일 chain (`createdAt ASC` 정렬, F642 ✅ Sprint 379 구현)
+- ✅ append-only D1 + indexed `idx_audit_trace_id` → 사후 조작 불가, 빠른 조회 (감독기관 응답 즉시 가능)
+- ⚠️ HMAC SHA256 무결성 검증은 F606 `audit_events` 테이블에만 적용 (F642는 기존 `audit_logs` 테이블 trace_id enrichment) — F606↔F642 통합은 별 sprint 후보 (W20+ 처리)
+- ✅ trace_id 호출자 4건 (cross-org/diagnostic/ethics/launch) 통합은 별 sprint (out-of-scope) — 5/14 dry-run 시 **수동 trace_id 입력으로 시연 가능** (각 endpoint POST body에 trace_id 포함)
 
 ---
 
@@ -294,24 +322,37 @@ curl -X GET "https://foundry-x-api.ktds-axbd.workers.dev/api/audit/log?trace_id=
 
 ---
 
-## 6. 부록 — 데모 endpoint 사실 정합성 (S346 검증)
+## 6. 부록 — 데모 endpoint 사실 정합성 (S350 재검증, F642 ✅ Sprint 379 반영)
 
-본 시나리오의 모든 endpoint는 **2026-05-10 master HEAD `e1e4f9db`** 기준 실재 검증:
+본 시나리오의 모든 endpoint는 **2026-05-10 master HEAD `f13caf53`** (F642 MERGED) 기준 실재 검증:
 
 | endpoint | 검증 대상 | 검증 결과 |
 |----------|-----------|----------|
 | POST /api/diagnostic/run | `packages/api/src/core/diagnostic/routes/index.ts:15` | ✅ exist |
-| POST /api/cross-org/assign-group | `packages/api/src/core/cross-org/routes/index.ts:55` | ✅ exist |
-| POST /api/cross-org/check-export | `packages/api/src/core/cross-org/routes/index.ts:62` | ✅ exist |
+| POST /api/cross-org/assign-group | `packages/api/src/core/cross-org/routes/index.ts:51` | ✅ exist (S350 -4 line drift 보정) |
+| POST /api/cross-org/check-export | `packages/api/src/core/cross-org/routes/index.ts:59` | ✅ exist (S350 -3 line drift 보정) |
 | POST /api/ethics/check-confidence | `packages/api/src/core/ethics/routes/index.ts:18` | ✅ exist |
-| GET /api/audit/log | `packages/api/src/core/harness/routes/audit.ts` | ✅ exist (audit.route mounted at /api) |
+| **GET /api/audit/log/by-trace** ✱ | `packages/api/src/core/harness/routes/audit.ts:125` (createRoute) + `:141` (auditRoute.openapi) | ✅ exist (**F642 ✅ Sprint 379 신규** — S350 endpoint URL 갱신: `GET /api/audit/log` → `GET /api/audit/log/by-trace`) |
 
-**Mount points** (`packages/api/src/app.ts`):
-- `app.route("/api/diagnostic", diagnosticApp);` (L337)
-- `app.route("/api/ethics", ethicsApp);` (L340)
-- `app.route("/api/cross-org", crossOrgApp);` (L349)
-- `app.route("/api", auditRoute);` (L207)
+**Mount points** (`packages/api/src/app.ts`, S350 +2 line drift 일괄 보정):
+- `app.route("/api/diagnostic", diagnosticApp);` (L339)
+- `app.route("/api/ethics", ethicsApp);` (L342)
+- `app.route("/api/cross-org", crossOrgApp);` (L351)
+- `app.route("/api", auditRoute);` (L209) — F642 신규 endpoint도 같은 `auditRoute` sub-app 통해 mount
+
+**Production smoke 검증** (S350 master HEAD `f13caf53`, 2026-05-10 20:15 KST):
+- `GET /api/audit/log/by-trace?trace_id=` (no trace_id) → **HTTP 401** ✅ (인증 필요, 5xx 0건)
+- `GET /api/audit/log/by-trace?trace_id=test-001` → **HTTP 401** ✅ (인증 필요)
+- `GET /api/audit/log/by-trace?trace_id=nonexistent` → **HTTP 401** ✅ (인증 필요)
+- 회귀: `GET /api/audit/logs` (기존) → 401 ✅, `GET /api/openapi.json` → 200 ✅
+- **3 input pattern 모두 5xx 0건** (rules "Production Smoke Test 16회차 변종" 영구 차단 검증)
+
+**F642 추가 산출물**:
+- D1 migration `0154_audit_logs_trace_id.sql` (ALTER TABLE audit_logs ADD COLUMN trace_id + idx_audit_trace_id)
+- `core/harness/services/audit-logger.ts:175` `getByTraceId(traceId): TraceChainResult` method
+- `core/harness/schemas/audit.ts` `AuditLogByTraceResponseSchema` (traceId + events + chainValid)
+- `__tests__/audit-trace-chain.test.ts` (회귀 + 신규 케이스 검증)
 
 ---
 
-**Status**: v1 초안 (S346, 2026-05-10) — BeSir 5/14 dry-run 후 v1.1 보강 예정
+**Status**: v1.1 (S350, 2026-05-10) — F642 ✅ Sprint 379 endpoint 신규 반영 + 4 line drift 보정 + production smoke 검증. BeSir 5/14 dry-run 시 위 6 endpoint + trace_id chain 시연 가능.
