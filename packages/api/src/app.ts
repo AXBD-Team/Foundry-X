@@ -56,6 +56,7 @@ import { guardApp } from "./core/guard/routes/index.js";
 import { launchApp } from "./core/launch/routes/index.js";
 import { crossOrgApp } from "./core/cross-org/routes/index.js";
 import { kpiApp } from "./core/kpi/routes/index.js";
+import { hitlApp } from "./core/hitl/routes/index.js";
 import { handleScheduled } from "./scheduled.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { piiMaskerMiddleware } from "./middleware/pii-masker.middleware.js";
@@ -351,6 +352,9 @@ app.route("/api/cross-org", crossOrgApp);
 
 // Sprint 377: F604 KPI 위젯 4종 + 8 KPI 산정 매핑
 app.route("/api/kpi", kpiApp);
+
+// Sprint 378: F605 HITL Console — 분산 큐 통합 + 의사결정
+app.route("/api/hitl", hitlApp);
 
 // F630: BeSir 7-타입 자동 추출 (Sprint 354 → master cherry-pick)
 app.route("/api", sevenTypeExtractionRoute);

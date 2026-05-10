@@ -13,6 +13,7 @@ import {
   Lightbulb,
   FileText,
   Package,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TodoSection } from "@/components/feature/TodoSection";
@@ -128,6 +129,7 @@ const quickActions = [
   { label: "아이디어/BMC", href: "/discovery/ideas-bmc", icon: Lightbulb },
   { label: "PRD 작성", href: "/shaping/prd", icon: FileText },
   { label: "Offering", href: "/shaping/offerings", icon: Package },
+  { label: "HITL Console", href: "/hitl-console", icon: ShieldCheck },
 ];
 
 function QuickActions() {
