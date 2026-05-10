@@ -10,12 +10,15 @@ import { test, expect } from "./fixtures/auth";
 
 test.describe("AX BD Hub", () => {
   test("ax-bd 허브 — 사업기획서 인덱스 렌더링", async ({ authenticatedPage: page }) => {
+    // /shaping/proposal은 사업기획서 목록 전용 페이지 (F644 이후 허브 레이아웃 해체)
+    await page.route("**/api/biz-items", (route) =>
+      route.fulfill({ json: { items: [] } }),
+    );
     await page.goto("/shaping/proposal");
 
-    // /shaping/proposal은 사업기획서 인덱스 페이지를 렌더링
     await expect(page.getByRole("heading", { name: "사업기획서" })).toBeVisible({ timeout: 10000 });
-    // 아이디어 목록 링크 존재
-    await expect(page.getByText("아이디어 목록")).toBeVisible();
+    // 빈 상태 표시 — 목록 페이지 정상 렌더링 확인
+    await expect(page.getByText("등록된 아이템이 없어요.")).toBeVisible();
   });
 
   test("아이디어 목록 페이지 렌더링", async ({ authenticatedPage: page }) => {

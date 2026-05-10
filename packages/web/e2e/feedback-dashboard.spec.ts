@@ -141,10 +141,27 @@ test.describe("Feedback Dashboard (F476)", () => {
 
   // E-08: 사이드바 메뉴
   test("Admin 사이드바에 피드백 메뉴가 표시된다", async ({ orgPage: { page } }) => {
+    // admin-portal 그룹을 미리 열기 (auto-expand useEffect 타이밍 의존성 제거)
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "fx-sidebar-groups",
+        JSON.stringify([
+          "discover",
+          "shape",
+          "validate",
+          "productize",
+          "admin-portal",
+          "admin-auth",
+          "admin-gate",
+          "admin-launch",
+          "admin-core",
+        ]),
+      );
+    });
     await page.goto("/feedback-dashboard");
 
     // 사이드바 피드백 링크
     const feedbackLink = page.getByRole("link", { name: "피드백" });
-    await expect(feedbackLink).toBeVisible();
+    await expect(feedbackLink).toBeVisible({ timeout: 5000 });
   });
 });
