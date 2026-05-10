@@ -1,0 +1,75 @@
+--- a/.bashrc
++++ b/.bashrc
+@@ -391,10 +391,19 @@
+     # F-item + 한글 제목 추출 (SPEC.md에서)
+     local f_items="" f_title=""
+-    if [ -f "$wt_dir/.sprint-context" ]; then
+-      f_items=$(grep "^F_ITEMS=" "$wt_dir/.sprint-context" 2>/dev/null | cut -d= -f2)
+-    fi
+-    if [ -z "$f_items" ]; then
+-      # Sprint 컬럼이 정확히 "Sprint N"인 행에서 F-item 추출
+-      f_items=$(awk -F'|' -v s="Sprint ${num}" '$4 ~ s {match($2,/F[0-9]+/); print substr($2,RSTART,RLENGTH)}' SPEC.md 2>/dev/null | paste -sd, -)
+-    fi
++    # Fix B (F643 S380): SPRINT_NUM 검증 후에만 .sprint-context 읽기
++    if [ -f "$wt_dir/.sprint-context" ]; then
++      local ctx_num
++      ctx_num=$(grep "^SPRINT_NUM=" "$wt_dir/.sprint-context" 2>/dev/null | cut -d= -f2)
++      if [ "$ctx_num" = "$num" ]; then
++        f_items=$(grep "^F_ITEMS=" "$wt_dir/.sprint-context" 2>/dev/null | cut -d= -f2)
++      else
++        echo "⚠️ [sprint-ctx-drift] SPRINT_NUM=${ctx_num} != ${num} — SPEC.md 재추출 (S380 F643 fix)" >&2
++      fi
++    fi
++    if [ -z "$f_items" ]; then
++      # Fix A (F643 S380): exact column match (trim + ==) — substring regex $4 ~ s 차단
++      f_items=$(awk -F'|' -v s="Sprint ${num}" '{
++        col4=$4; gsub(/^[[:space:]]+|[[:space:]]+$/,"",col4)
++        if (col4 == s) { match($2,/F[0-9]+/); if(RSTART) print substr($2,RSTART,RLENGTH) }
++      }' SPEC.md 2>/dev/null | paste -sd, -)
++    fi
+@@ -449,12 +458,24 @@
+     local sig_dir="/tmp/sprint-signals"
+     mkdir -p "$sig_dir"
+     local sig_file="${sig_dir}/${project}-${num}.signal"
+-    if [ ! -f "$sig_file" ]; then
++    # Fix C (F643 S380): drift 감지 + force overwrite
++    local _sig_needs_create=true
++    if [ -f "$sig_file" ]; then
++      local _sig_num _sig_fitems
++      _sig_num=$(grep "^SPRINT_NUM=" "$sig_file" 2>/dev/null | cut -d= -f2)
++      _sig_fitems=$(grep "^F_ITEMS=" "$sig_file" 2>/dev/null | cut -d= -f2)
++      if [ "$_sig_num" = "$num" ] && { [ -z "$f_items" ] || [ "$_sig_fitems" = "$f_items" ]; }; then
++        echo "📡 Signal 존재 (검증 OK): ${sig_file}"
++        _sig_needs_create=false
++      else
++        echo "⚠️ [signal-drift] SPRINT_NUM=${_sig_num}→${num} F_ITEMS=${_sig_fitems}→${f_items} — force overwrite (S380 F643 fix)" >&2
++      fi
++    fi
++    if $_sig_needs_create; then
+       local gh_repo
+       gh_repo=$(git remote get-url origin 2>/dev/null | grep -oP '(?<=github.com[:/])[^.]+(?=\.git)?' | head -1 || true)
+       local proj_root
+       proj_root=$(git rev-parse --show-toplevel 2>/dev/null)
+       cat > "$sig_file" <<SIG
+ STATUS=CREATED
+ SPRINT_NUM=${num}
+ PROJECT=${project}
+ F_ITEMS=${f_items}
+ BRANCH=${branch}
+ PR_NUM=
+ GITHUB_REPO=${gh_repo}
+ PROJECT_ROOT=${proj_root}
+ CHECKPOINT=
+ ERROR_STEP=
+ ERROR_MSG=
+ MATCH_RATE=
+ TEST_RESULT=
+ MONITOR_TASK_ID=
+ TIMESTAMP=$(date -Iseconds)
+ SIG
+-      echo "📡 Signal 초기화: ${sig_file} (STATUS=CREATED)"
+-    else
+-      echo "📡 Signal 이미 존재: ${sig_file}"
+-    fi
++      echo "📡 Signal 초기화: ${sig_file} (STATUS=CREATED)"
++    fi  # end if $_sig_needs_create
