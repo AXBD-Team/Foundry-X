@@ -1,9 +1,9 @@
 ---
 title: AI Foundry Master Plan — Index
-version: v1
-date: 2026-05-05
+version: v1.1
+date: 2026-05-10
 owner: Sinclair Seo
-status: 별 트랙 정리 + Foundry-X SPEC backlog 매핑 완료
+status: v1.1 patch — Foundry-X 24h 드리프트 해소 (S332→S346) + W19 D-5 진입 + P0-3/P0-4/P0-7/P0-8 토대 ✅
 classification: 기업비밀II급 / Enterprise부문
 ---
 
@@ -11,6 +11,7 @@ classification: 기업비밀II급 / Enterprise부문
 
 > 폴더 정리: 2026-05-05 (S332). 한글 폴더명 `기업 의사결정 업무 Agentic AI 플랫폼` → `ai-foundry-master-plan`.
 > Secrets `.dev.vars` → `~/work/axbd/.secrets/ai-foundry/.dev.vars` (외부 안전 위치, 600 권한).
+> **v1.1 patch (S346, 2026-05-10)**: §2 Foundry-X 진척 갱신 (Sprint 341 → Sprint 376, +35 sprint) + §5 P0 충족률 4건 갱신 (P0-3 45%→100% / P0-4 0%→골격 100% / P0-7 25%→100% / P0-8 50%→토대 100%) + §7 W18→W19 D-5 + §8 누락 발견 4건 부분 해소 + §9 SPEC.md 매핑 4건 ✅ + §10 다음 액션 W19 갱신.
 
 ## 1. 한 줄 정의
 
@@ -20,7 +21,7 @@ classification: 기업비밀II급 / Enterprise부문
 
 | Repo | 역할 | Plane | 현재 상태 |
 |------|------|-------|----------|
-| **Foundry-X** | Control Plane 후보 | 5-Layer 통합 운영 + Multi-Tenant + 4대 진단 + Cross-Org + KPI/HITL/Audit | Phase 47 / Sprint 341 / v1.9.0 / 15 packages |
+| **Foundry-X** | Control Plane 후보 | 5-Layer 통합 운영 + Multi-Tenant + 4대 진단 + Cross-Org + KPI/HITL/Audit | Phase 47 / Sprint 376 ✅ / v1.9.x / 15 packages / **41 sprint 연속 성공** (S306~S346) — F560~F641, P0-3/P0-4/P0-7/P0-8 토대 ✅ |
 | Decode-X | Input Plane | SI 프로젝트 역공학 엔진 (퇴직연금 + 온누리상품권 Pilot) | v0.7.0 / 7 Workers / 5 D1 / Phase 2-E 머지, 도메인 실측 부재 |
 | Discovery-X | 발굴 | 사업 발굴 + BC 카드 export | v0.x / 47일 정체 ★ |
 | AXIS-DS | Design System | KPI 위젯 + HITL Console + agentic-ui | v1.x / 93일 정체 ★ / PR #55 14일 미머지 |
@@ -67,18 +68,23 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 - `ai-foundry-os/` — 서브 자료 보관소 (review round-1 archive 포함)
 - `ai_foundry_os_target_architecture.{png,svg}` — 아키텍처 다이어그램
 
-## 5. Foundry-X 영향도 — PRD P0 8개
+## 5. Foundry-X 영향도 — PRD P0 8개 (v1.1 patch 갱신, S346)
 
-| P0 | 책임 영역 | 현재 충족률 | Foundry-X 신규 작업 |
+| P0 | 책임 영역 | 충족률 (v1.1) | Foundry-X 작업 / 매핑 F-item |
 |----|----------|------------|---------------------|
-| P0-1 | 5-Layer 통합 운영 | 15% | 5 sub-app 통합 컨트롤 (5 repo orchestration 패턴) |
-| P0-2 | Multi-Tenant PG + RBAC 5역할 + KT DS SSO | 20% ★ | **PostgreSQL 도입 + core/multi-tenant/ sub-app 신설** |
-| P0-3 | 4대 진단 자동 실행 | 45% | core/diagnostic/ sub-app 신설 + Decode-X publisher 수신 |
-| P0-4 | Cross-Org 4그룹 + core_differentiator default-deny | **0% ★★** | core/cross-org/ sub-app 신설 + default-deny 코드 강제 |
-| P0-5 | KPI 대시보드 8개 | 40% | AXIS-DS v1.2 KPI 위젯 4종 + 산정 코드 매핑 |
-| P0-6 | HITL Console | 35% | AXIS-DS v1.2 agentic-ui + Foundry-X HITL escalation 룰 |
-| P0-7 | Audit Log Bus | 25% | trace_id chain + HMAC + SIEM 발행 횡단 레이어 신설 |
-| P0-8 | AI 에이전트 투명성 | 50% | dual_ai_reviews + 6축 점수 + confidence < 0.7 HITL escalation |
+| P0-1 | 5-Layer 통합 운영 | 15% (v1) → **15%** | F600 📋 idea (의존: F601 + F606 ✅ + F607 ✅ — 2/3 충족) |
+| P0-2 | Multi-Tenant PG + RBAC 5역할 + KT DS SSO | 20% (v1) → **20%** ★ | F601 📋 idea (PG 인프라 외부 의존 unlock 대기) |
+| P0-3 | 4대 진단 자동 실행 | 45% (v1) → **100%** ✅ | **F602 ✅ Sprint 357 MERGED** — core/diagnostic/ sub-app + 4 method (missing/duplicate/overspec/inconsistency) + audit-bus 통합 + D1 0144 |
+| P0-4 | Cross-Org 4그룹 + core_differentiator default-deny | 0% ★★ (v1) → **골격 100%** ✅ | **F603 ✅ Sprint 363 MERGED** — core/cross-org/ sub-app + 4그룹 분류 + default-deny export 차단 + audit emit + D1 0150. 후속: F626 (차단율 측정 코드) |
+| P0-5 | KPI 대시보드 8개 | 40% (v1) → **40%** | F604 📋 idea + F621 📋 idea (통합 한 화면) — AXIS-DS v1.2 KPI 위젯 4종 + 산정 코드 매핑 |
+| P0-6 | HITL Console | 35% (v1) → **35%** | F605 📋 idea — AXIS-DS v1.2 agentic-ui + HITL escalation 룰 |
+| P0-7 | Audit Log Bus | 25% (v1) → **100%** ✅ | **F606 ✅ Sprint 351 MERGED** — core/infra/audit-bus + trace_id chain + HMAC SHA256 + append-only D1 + W3C Trace Context middleware (S337 hardening PR #766) |
+| P0-8 | AI 에이전트 투명성 | 50% (v1) → **토대 100%** ✅ | **F607 ✅ Sprint 359 MERGED** — core/ethics/ sub-app + EthicsEnforcer (confidence < 0.7 escalation + FP 측정 + kill switch) + ethics_violations + kill_switch_state D1 0146 + 4 endpoints + 3 audit 이벤트 |
+
+**진척 요약 (v1.1)**:
+- ✅ **4/8 P0 토대 완결** (P0-3/P0-4/P0-7/P0-8) — 26 sprint 연속 진행 결과 (S320~S346)
+- 📋 **3/8 P0 idea 잔존** (P0-1/P0-2/P0-5/P0-6) — F600 (5-Layer 통합) + F601 (PG 외부 의존) + F604/F605 (UI 위젯 + Console)
+- 다음 우선순위: P0-2 PG 인프라 결정 unlock (외부) → P0-5/P0-6 UI 위주 (내부 즉시 가능)
 
 ## 6. Foundry-X 신규 작업 — 5 sub-app + 3 횡단 레이어
 
@@ -101,46 +107,79 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 2. **KT DS SSO 어댑터** — OIDC/SAML, arctic 또는 자체
 3. **Audit Log Bus** — trace_id chain + HMAC + append-only + SIEM 발행, 5 repo 모두 수신·발행
 
-## 7. 12주 Critical Path (W18 ~ W29)
+## 7. 12주 Critical Path (W18 ~ W29) — v1.1 갱신
 
-| 주차 | 게이트 / 작업 | Phase |
-|------|--------------|-------|
-| W18 (현재, 5/5) | Foundry-X SPEC backlog 등록 + 별 트랙 정리 | Phase 1 |
-| W19 (5/15 BeSir 미팅 D-day, **D-10**) | BeSir Conditional C-1·C-2·C-4 게이트 통과 | Phase 1 |
-| W20~W22 | 5 sub-app 스캐폴드 + types.ts + PG PoC | Phase 2 |
-| W22~W26 | 5-Layer α1~α4 통합 빌드 + Cross-Org default-deny 코드 강제 | Phase 2 |
-| W26 | KPI 위젯 + HITL Console + Audit Bus 통합 시연 | Phase 2 |
-| W29 (8월 초) | Phase 3 진입 정비 — 도메인 합의·데이터 협조·KT 본부 align | Phase 3 |
+| 주차 | 게이트 / 작업 | Phase | 진척 (v1.1) |
+|------|--------------|-------|-------------|
+| W18 (5/5~5/9) | Foundry-X SPEC backlog 등록 + 별 트랙 정리 | Phase 1 | ✅ **완료** + W19 일정 사전 진척 (P0-3/P0-4/P0-7/P0-8 토대 ✅, F602/F603/F606/F607 MERGED) |
+| W19 (현재, 5/10, **D-5 to 5/15 BeSir 미팅**) | BeSir Conditional C-1·C-2·C-4 게이트 통과 | Phase 1 | 🔧 진행 — 4/8 P0 토대 ✅ 사전 확보, 잔여 v1.1 patch 처리 + 발표 자료 보강 |
+| W20~W22 | 5 sub-app 스캐폴드 + types.ts + PG PoC | Phase 2 | ✅ **사전 진행 완료** — P0-3/P0-4/P0-7/P0-8 sub-app 모두 신설 + types.ts contract + audit-bus T1 토대. PG PoC만 잔여 |
+| W22~W26 | 5-Layer α1~α4 통합 빌드 + Cross-Org default-deny 코드 강제 | Phase 2 | 🔄 default-deny ✅ (F603), 5-Layer 통합 (F600) idea 잔존 |
+| W26 | KPI 위젯 + HITL Console + Audit Bus 통합 시연 | Phase 2 | 🔄 Audit Bus ✅ (F606), KPI 위젯 + HITL Console (F604/F605/F621) idea 잔존 |
+| W29 (8월 초) | Phase 3 진입 정비 — 도메인 합의·데이터 협조·KT 본부 align | Phase 3 | 📋 외부 의존 — BeSir D-day 후 결정 |
 
-## 8. 누락 발견 (16 v1 → v1.1 patch 후보, W18~W19 처리)
+## 8. 누락 발견 (16 v1 → v1.1 patch — S346 처리 현황)
 
-- **P1 누락 3건**: /ax:domain-init β / Six Hats 외부 LLM 호출 패턴 / CQ 5축 운영 검증 (BeSir 정합성 핵심)
-- **§6.4 윤리 AI 임계 정책 누락** — confidence < 0.7 HITL + FP 주간 측정 + 오분류 즉시 중단
-- **§5.3 core_diff 차단율 < 100% 측정 코드 부재**
-- **§5.1 KPI 8개 산정 코드/UI 매핑 1:1 부재**
-- **오픈이슈 3건 미반영**: #5 외부 자료 마스킹 가이드 v2 / #6 BeSir MCP Tools 통합 시점 / #9 본부 비개발자 교육 영상
-- **Foundry-X 24h 드리프트**: 14·15 baseline (Phase 46 / Sprint 331) → 실제 (Phase 47 / Sprint 341)
+- **P1 누락 3건** (BeSir 정합성 핵심):
+  - `/ax:domain-init β` → **F623 등록됨** (T4, F628+F629 ✅ 의존, idea 단계)
+  - `Six Hats 외부 LLM 호출 패턴` → **별 F-item 등록 검토 필요** (현재 미등록 추정 — BizPersonaEvaluator 등 부분 구현 존재)
+  - `CQ 5축 운영 검증` → **F632 등록됨** (CQ 5축 + 80-20-80 검수 룰, T3, F602 의존 ✅)
+- **§6.4 윤리 AI 임계 정책** → **부분 해소** (F607 ✅ Sprint 359 — confidence < 0.7 HITL escalation + FP 측정 + kill switch 모두 구현). 잔여: 운영 SOP + 주간 리포트 자동화
+- **§5.3 core_diff 차단율 < 100% 측정 코드** → **부분 해소** (F603 ✅ default-deny export 차단 + cross_org_export_blocks 테이블). 잔여: F626 (차단율 KPI 계측)
+- **§5.1 KPI 8개 산정 코드/UI 매핑 1:1** → **잔존** (F604 idea + F621 idea — KPI 위젯 4종 + 산정 코드 매핑 미구현)
+- **오픈이슈 3건 미반영**: #5 외부 자료 마스킹 가이드 v2 / #6 BeSir MCP Tools 통합 시점 / #9 본부 비개발자 교육 영상 — **모두 잔존**
+- **Foundry-X 24h 드리프트** → **해소** (14·15 baseline Phase 46/Sprint 331 → v1.1 갱신 Phase 47/Sprint 376, +35 sprint 진척, 41 sprint 연속 성공 S306~S346)
 
-## 9. SPEC.md 매핑 (S332 등록)
+## 9. SPEC.md 매핑 (v1.1 갱신, S346)
 
-| AI Foundry | Foundry-X SPEC §5 | REQ |
-|-----------|------------------|-----|
-| P0-1 5-Layer 통합 | F600 (idea, Phase 48 후보) | FX-REQ-664 |
-| P0-2 Multi-Tenant PG+RBAC+SSO | F601 (idea, Phase 48 후보) | FX-REQ-665 |
-| P0-3 4대 진단 자동 실행 | F602 (idea, Phase 48 후보) | FX-REQ-666 |
-| P0-4 Cross-Org default-deny | F603 (idea, Phase 48 후보) | FX-REQ-667 |
-| P0-5 KPI 대시보드 8개 | F604 (idea, Phase 48 후보) | FX-REQ-668 |
-| P0-6 HITL Console | F605 (idea, Phase 48 후보) | FX-REQ-669 |
-| P0-7 Audit Log Bus | F606 (idea, Phase 48 후보) | FX-REQ-670 |
-| P0-8 AI 에이전트 투명성 | F607 (idea, Phase 48 후보) | FX-REQ-671 |
+| AI Foundry | Foundry-X SPEC §5 | REQ | Status (v1.1) |
+|-----------|------------------|-----|---------------|
+| P0-1 5-Layer 통합 | F600 | FX-REQ-664 | 📋 idea (의존: F601 + F606 ✅ + F607 ✅, 2/3 충족) |
+| P0-2 Multi-Tenant PG+RBAC+SSO | F601 | FX-REQ-665 | 📋 idea (PG 외부 의존) |
+| P0-3 4대 진단 자동 실행 | F602 | FX-REQ-666 | **✅ Sprint 357 MERGED** |
+| P0-4 Cross-Org default-deny | F603 | FX-REQ-667 | **✅ Sprint 363 MERGED** (골격) |
+| P0-5 KPI 대시보드 8개 | F604 + F621 | FX-REQ-668, FX-REQ-686 | 📋 idea (UI 위주, 외부 무의존) |
+| P0-6 HITL Console | F605 | FX-REQ-669 | 📋 idea (UI 위주, 외부 무의존) |
+| P0-7 Audit Log Bus | F606 | FX-REQ-670 | **✅ Sprint 351 MERGED** (T1 토대 + S337 PR #766 hardening) |
+| P0-8 AI 에이전트 투명성 | F607 | FX-REQ-671 | **✅ Sprint 359 MERGED** (윤리 임계 + kill switch 포함) |
 
-> Phase 48은 잠정 명칭. 사용자 PM 확정 시 (W19 BeSir 미팅 후) 정식 Phase 등록 + Sprint 분해 진행.
+**P1 누락 추가 매핑**:
+| 누락 항목 | F-item | Status |
+|----------|--------|--------|
+| /ax:domain-init β | F623 | 📋 idea |
+| CQ 5축 검수 | F632 | 📋 idea |
+| Six Hats 외부 LLM 호출 패턴 | (미등록, 검토 필요) | — |
+| core_diff 차단율 측정 | F626 (예정) | 📋 idea (F603 후속) |
 
-## 10. 다음 액션
+> **Phase 48 → 미사용**: F602/F603/F606/F607이 Phase 47 안에서 모두 흡수됨 (Sprint 351~363). 잔여 idea(F600/F601/F604/F605)는 BeSir 미팅 결과에 따라 Phase 47 후반 또는 신규 Phase로 분해.
 
-1. **W18 (이번 주)**: 본 INDEX.md 합의 + SPEC.md F600~F607 idea 등록
-2. **W19 (5/15 D-day)**: BeSir 미팅 + Conditional 게이트 + v1.1 patch 10건 처리
-3. **W20+**: F600~F607 중 P0-2 (multi-tenant) + P0-4 (cross-org) 우선 sub-app 스캐폴드 sprint 분해
+## 10. 다음 액션 — v1.1 갱신 (S346, 오늘 2026-05-10 W19 D-5)
+
+### W18 (~5/9) — ✅ 완료 + 사전 진척
+- ✅ INDEX.md v1 합의 + SPEC.md F600~F607 등록 (W18 원안)
+- ✅ **사전 진척**: F602/F603/F606/F607 4건 모두 Sprint 351~363에서 MERGED 완료 (W18~W19 잠재 보너스)
+- ✅ Phase 47 / Sprint 376까지 41 sprint 연속 성공 (S306~S346)
+
+### W19 (현재, 5/10 → **5/15 BeSir 미팅 D-5**)
+1. **잔여 v1.1 patch 처리** (S346 부분 처리, 추가 잔여):
+   - Six Hats 외부 LLM 호출 패턴 → F-item 신규 등록 검토
+   - F626 core_diff 차단율 측정 코드 신규 등록 (F603 후속, KPI 8개 중 1개)
+   - 오픈이슈 #5/#6/#9 처리 방안 (Marker.io / 별 docs)
+   - 16_validation_report_v1.md → v1.1 patch (사용자 승인 후 14·15에 반영)
+2. **BeSir 미팅 발표 자료 보강**:
+   - 05_executive_one_pager v3 작성 (Phase 47 v1.9 진척 + 4/8 P0 토대 ✅ 반영)
+   - Conditional C-1·C-2·C-4 게이트 통과 자료 (06_architecture_alignment_with_besir_v1.md 참조)
+   - Live demo 시나리오 (F602/F603/F606/F607 통합 데모)
+3. **Conditional 게이트 통과 증거**:
+   - C-1: P0 토대 4건 ✅ (F602/F603/F606/F607)
+   - C-2: 외부 의존 정리 (`17_internal_dev_plan_with_besir_v1.md` T1~T7 매트릭스)
+   - C-4: 윤리/투명성 코드 강제 (F607 EthicsEnforcer + kill switch)
+
+### W20+ — BeSir 게이트 통과 후
+- F601 (Multi-Tenant PG) — PG 인프라 결정 unlock 후 sub-app 스캐폴드
+- F604 (KPI 위젯 4종) + F621 (KPI 통합 한 화면) — UI 위주 내부 즉시 가능
+- F605 (HITL Console) — AXIS-DS v1.2 agentic-ui 통합
+- F600 (5-Layer 통합 운영) — F601 unlock 후, 5 repo orchestration
 
 ---
 
