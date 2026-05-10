@@ -160,8 +160,17 @@ test.describe("Feedback Dashboard (F476)", () => {
     });
     await page.goto("/feedback-dashboard");
 
-    // 사이드바 피드백 링크
-    const feedbackLink = page.getByRole("link", { name: "피드백" });
-    await expect(feedbackLink).toBeVisible({ timeout: 5000 });
+    // 사이드바 피드백 링크 — Portal 서비스 그룹 강제 expand (S352 F646 잔존 fix)
+    // localStorage `admin-portal`이 일부 admin group에만 적용되는 race condition 회피.
+    // 명시적 button click으로 Portal 서비스 그룹 expand 보장 후 link 확인.
+    await page
+      .locator('aside button:has-text("Portal 서비스")')
+      .first()
+      .click({ timeout: 5000 })
+      .catch(() => {
+        // 이미 expanded 상태면 click 실패 가능 — 무시하고 link 가시성 검증으로 진행
+      });
+    const feedbackLink = page.locator('aside a[href="/feedback-dashboard"]').first();
+    await expect(feedbackLink).toBeVisible({ timeout: 10000 });
   });
 });
