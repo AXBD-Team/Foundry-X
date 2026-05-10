@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/api-client";
+import { MetricGrid } from "@/components/kpi";
+import type { KpiListResponse } from "@/components/kpi";
 import { STAGES } from "@/components/feature/ProcessStageGuide";
 import { cn } from "@/lib/utils";
 import {
@@ -156,6 +158,7 @@ function QuickActions() {
 /* ------------------------------------------------------------------ */
 
 export function Component() {
+  const kpiData = useApi<KpiListResponse>("/kpi");
   const pipelineStats = useApi<PipelineStats>("/pipeline/stats");
   const bizItemSummaryRaw = useApi<{ items: Array<{ bizItemId: string; title: string; currentStage: number }> }>("/biz-items/summary");
   const bizItemSummaryData = bizItemSummaryRaw.data?.items ?? null;
@@ -188,6 +191,24 @@ export function Component() {
       <div className="mt-4">
         <QuickActions />
       </div>
+
+      {/* F604: AI Foundry KPI 위젯 */}
+      {(kpiData.data || kpiData.loading) && (
+        <section className="mt-6" aria-label="AI Foundry KPI">
+          <h2 className="mb-3 text-sm font-semibold text-muted-foreground">AI Foundry KPI</h2>
+          {kpiData.loading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="h-24 animate-pulse rounded-lg border bg-muted" />
+              ))}
+            </div>
+          ) : kpiData.error ? (
+            <p className="text-sm text-destructive">{kpiData.error}</p>
+          ) : kpiData.data ? (
+            <MetricGrid kpis={kpiData.data.kpis} columns={4} />
+          ) : null}
+        </section>
+      )}
 
       {/* F323: ToDo List */}
       <section className="mt-8 space-y-6">
