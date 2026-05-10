@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~46 완료 + Phase 47 진행 (Sprint 1~381, F644 ✅ 최신 (S352), E2E selector/fixture 누적 부채 fix + master push CI 트리거 가시화 — 3 근본 원인 fix (JWT role/503 mock/LIFO fallback) + e2e.yml master push 트리거 + PR #803 squash merged. 46 sprint 연속 성공. 직전 F643 ✅ Sprint 380 (S351) — bashrc sprint() L1 fix, Stale F_ITEMS 16회 누적 lifecycle 승격 임계점 영구 차단). 상세: SPEC.md §5
+Phase 1~46 완료 + Phase 47 진행 (Sprint 1~382, F646 ✅ 최신 (S352), F644 후속 e2e shard 1+2 잔존 4 spec content drift fix — 3 autopilot fix (ax-bd-hub:18 + conflict-resolution:57+64) + 1 master fix (feedback-dashboard:165 sidebar Portal 그룹 race) + PR #804 + master commit `a1de7833`. **47 sprint 연속 성공**. 직전 F644 ✅ Sprint 381 (S352) — E2E selector/fixture 누적 부채 fix + master push CI 트리거 가시화. **S352 META 병행**: MEMORY 33.5KB→9.1KB(-73%) + rules ax-config Stale F_ITEMS 17회차 → ✅ FIXED + F644 row escape pipe fix silent layer 7 1차 차단. 직전 F643 ✅ Sprint 380 (S351) — bashrc sprint() L1 fix, Stale F_ITEMS 16회 누적 lifecycle 승격 임계점 영구 차단). 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
