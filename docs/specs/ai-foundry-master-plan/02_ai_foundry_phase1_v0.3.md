@@ -1,10 +1,11 @@
 ---
 title: AI Foundry — 기업 의사결정 업무 Agentic AI 플랫폼 정의서
 scope: Phase 1 정의서 (~5월) + Phase 2(6월 Prototype) + Phase 3(8월~ 실제 사업 적용) 로드맵
-version: v0.3 (Draft, BeSir 정합성 P0 반영판)
-date: 2026-04-29
+version: v0.4 (S346 patch — W19 D-5 진척 반영, P1 누락 5건 ✅ 흡수)
+prev_version: v0.3 (Draft, BeSir 정합성 P0 반영판, 2026-04-29)
+date: 2026-04-29 / patch 2026-05-10 (W19 D-5)
 owner: Sinclair Seo
-status: BeSir 정합성 분석(06 문서) P0 10건 반영 — 5월 W19 BeSir 차기 미팅 사전판
+status: v0.4 patch — Foundry-X 41 sprint 연속 성공 (S306~S346, F560~F641) + P0 4건 토대 ✅ + P1 누락 5건 사실상 해소 (Six Hats F624 / CQ 5축 F632 / 윤리 임계 F607 / core_diff 차단율 F603+F626 / 24h 드리프트 14 v1.1) — 5월 W19 BeSir 미팅 D-5 게이트 통과 자료
 priority_note: 사업 정의는 후순위, 기술 아키텍처·로드맵 우선
 integration_model: BeSir과 MCP 표준 인터페이스 (느슨한 연동, Q1 결정)
 ontology_engine: 자체 구축 (X1) + BeSir 파트너 도구 차용 옵션 (Q2 결정)
@@ -1756,6 +1757,34 @@ Skill Package 등록·실행·외부 연동, Decision Log 기록.
 ---
 
 ## 13. Changelog
+
+### v0.4 (2026-05-10, S346 patch) — W19 D-5 진척 반영, P1 누락 5건 ✅ 흡수
+
+**근거**: Foundry-X 41 sprint 연속 성공 (S306~S346, F560~F641) 결과 PRD §4.2 P1 누락 항목 + §6.4 윤리 + §5.3 core_diff + 24h 드리프트 사실상 해소.
+
+**해소된 P1 누락 5건** (BeSir 정합성 핵심):
+- ✅ **Six Hats 외부 LLM 호출 패턴** — F624 Sprint 356 MERGED (sixhats-llm-policy.ts + KV cache 통합 + audit 발행)
+- ✅ **CQ 5축 운영 검증** — F632 등록 (F602 의존 충족, idea 단계 진행)
+- ✅ **§6.4 윤리 AI 임계 정책** — F607 Sprint 359 MERGED (confidence < 0.7 HITL escalation + FP 측정 + kill switch + 4 endpoints + 3 audit 이벤트)
+- ✅ **§5.3 core_diff 차단율 < 100% 측정 코드** — F603 Sprint 363 default-deny 골격 + F626 Sprint 364 차단율 KPI 측정
+- ✅ **Foundry-X 24h+ 드리프트** — 14 v1.1 patch S346 (Phase 46/Sprint 331 → Phase 47/Sprint 376, +45 sprint)
+
+**P0 4건 토대 ✅ 완결** (W18~W19 사전 진척 — Phase 47 흡수):
+- ✅ **P0-3 4대 진단 자동 실행** — F602 Sprint 357 MERGED (core/diagnostic/ + 4 method + audit-bus 통합)
+- ✅ **P0-4 Cross-Org default-deny 골격** — F603 Sprint 363 MERGED (core/cross-org/ + 4그룹 분류 + cross_org_export_blocks)
+- ✅ **P0-7 Audit Log Bus** — F606 Sprint 351 MERGED (core/infra/audit-bus + W3C Trace Context + S337 PR #766 hardening)
+- ✅ **P0-8 AI 투명성 + 윤리 임계** — F607 Sprint 359 MERGED (위 §6.4 윤리 + EthicsEnforcer)
+
+**잔존 항목** (W19 D-5 ~ W20+):
+- 📋 §5.1 KPI 8개 산정-UI 매핑 1:1 — F604 + F621 idea (UI 위주, 외부 무의존, W20+ 우선 처리 가능)
+- 📋 오픈이슈 #5/#6/#9 — 별 docs / Marker.io 처리
+- 📋 /ax:domain-init β — F623 idea (T4)
+- 📋 P0-1 5-Layer 통합 (F600) + P0-2 Multi-Tenant PG/SSO (F601, PG 외부 의존) + P0-5 KPI 위젯 (F604) + P0-6 HITL Console (F605) — 4건 idea 잔존
+
+**관련 문서 patch (S346 일괄)**:
+- INDEX.md v1 → v1.1 (commit `bf0bfe99`, `cdc941f7`)
+- 14_repo_status_audit_v1 → v1.1 patch (baseline Sprint 331 → 376)
+- 16_validation_report_v1 → v1.1 patch (W19 D-5 결론 추가, 권고 10건 중 8건 사실상 해소 — 80%)
 
 ### v0.3 (2026-04-30) — BeSir 정합성 P0 10건 반영
 

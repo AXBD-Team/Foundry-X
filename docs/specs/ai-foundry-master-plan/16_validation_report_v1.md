@@ -1,18 +1,20 @@
-# 16. 14·15 검증 보고서 v1
+# 16. 14·15 검증 보고서 v1.1 (S346 patch — W19 D-5 결과 반영)
 
-**버전:** v1
-**날짜:** 2026-05-04 (24h 재-fetch 시점 동일)
+**버전:** v1.1 (S346 patch, 2026-05-10) / 이전 v1 2026-05-04
+**날짜:** 2026-05-04 / **patch 2026-05-10 (W19 D-5)**
 **작성자:** Sinclair Seo (KTDS-AXBD AX컨설팅팀, PM 겸 프로그래머)
-**검증 대상:** 14_repo_status_audit_v1.md + 15_msa_implementation_plan_v1.md (둘 다 2026-05-04 작성)
-**검증 방식:** ① 14·15 × prd-final.md 조항별 cross-check ② 14·15 × 09~12 dev plan(2026-05-02) 정합 cross-check ③ 5 repo 핵심 수치 24시간 재-fetch
+**검증 대상:** 14_repo_status_audit_v1.md (**v1.1 patch 적용 완료 S346**) + 15_msa_implementation_plan_v1.md (둘 다 2026-05-04 작성)
+**검증 방식:** ① 14·15 × prd-final.md 조항별 cross-check ② 14·15 × 09~12 dev plan(2026-05-02) 정합 cross-check ③ 5 repo 핵심 수치 24시간 재-fetch / **v1.1 patch (S346): 6일 진척 반영 (Sprint 331 → Sprint 376, 41 sprint 연속 성공)**
 **분류:** 기업비밀 II급
-**다음 액션:** 본 16의 v1.1 patch 권고 10건을 사용자 승인 후 14·15에 반영 (또는 14_v1.1·15_v1.1 신규 파일)
+**다음 액션:** v1 권고 10건 중 **5건 사실상 해소 / 3건 부분 해소 / 2건 잔존** (S346 결과 본 v1.1 §0 갱신 단락 참조). 잔여 3건 사용자 승인 후 W19 안에 처리
 
 ---
 
 ## 0. 한 줄 결론
 
-14·15 v1은 **구조적으로는 PRD-final + 09~12 dev plan과 정합**(sub-app 위치·contract·Sprint 매핑 모두 일치)이지만, **24시간 안에 Foundry-X가 Phase 47/Sprint 335로 진입**하면서 14의 baseline이 1건 stale가 됐고, **PRD §4.2 P1 항목 3건(Six Hats / CQ 5축 / /ax:domain-init)과 §6.4 윤리 AI 임계 정책이 14·15 어디에도 반영되지 않음**. dev plan과의 정합은 좋지만 F-item 번호 역매핑·multi-tenant/audit-bus 동등 dev plan 신규·contract 다이어그램 확장 등 **v1.1 patch 권고 10건**이 식별됨. **14·15 v1 자체는 유지하고 16을 보조 SSOT로 두면서 v1.1 patch는 W18~W19 안에 처리**가 권고.
+**v1 결론 (2026-05-04 시점, 보존)**: 14·15 v1은 **구조적으로는 PRD-final + 09~12 dev plan과 정합**(sub-app 위치·contract·Sprint 매핑 모두 일치)이지만, **24시간 안에 Foundry-X가 Phase 47/Sprint 335로 진입**하면서 14의 baseline이 1건 stale가 됐고, **PRD §4.2 P1 항목 3건(Six Hats / CQ 5축 / /ax:domain-init)과 §6.4 윤리 AI 임계 정책이 14·15 어디에도 반영되지 않음**. dev plan과의 정합은 좋지만 F-item 번호 역매핑·multi-tenant/audit-bus 동등 dev plan 신규·contract 다이어그램 확장 등 **v1.1 patch 권고 10건**이 식별됨. **14·15 v1 자체는 유지하고 16을 보조 SSOT로 두면서 v1.1 patch는 W18~W19 안에 처리**가 권고.
+
+**v1.1 patch 결론 (2026-05-10, S346, W19 D-5)**: v1에서 W18~W19 안에 처리 권고했던 10건 중 **8건이 W19 D-5 시점에 사실상/부분 해소** (해소율 80%). PRD §4.2 P1 3건 중 **2건 ✅ 완결** (F624 Six Hats Sprint 356 / F632 CQ 5축 등록), §6.4 윤리 AI 임계 정책 **1건 ✅ 완결** (F607 Sprint 359 — confidence + FP + kill switch + 4 endpoints + 3 audit 이벤트), §5.3 core_diff 차단율 **1건 ✅ 완결** (F603 Sprint 363 default-deny 골격 + F626 Sprint 364 차단율 KPI 측정), 24h 드리프트 **1건 ✅ 해소** (14 v1.1 patch S346, Sprint 331 → Sprint 376). **잔존 3건**: §5.1 KPI 8개 산정-UI 매핑 (F604/F621 idea — 외부 무의존, W20+ 우선 처리 가능), 오픈이슈 #5/#6/#9 (별 docs/Marker.io), /ax:domain-init β (F623 idea). Foundry-X **41 sprint 연속 성공** (S306~S346, F560~F641) 결과 P0 평균 충족률 ~25% → **~58%** (4건 100% 진입). **W19 BeSir D-5 게이트 통과 위한 Conditional C-1·C-2·C-4 증거 자료 충분** (P0 토대 4건 ✅ + 외부 의존 정리 17_internal_dev_plan_with_besir_v1 + 윤리/투명성 코드 강제 F607).
 
 ---
 

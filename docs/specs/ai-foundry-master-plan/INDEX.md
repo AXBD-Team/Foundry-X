@@ -40,7 +40,7 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 ## 4. 문서 Navigation (16건)
 
 ### 마스터 기획 (활성)
-- **02_ai_foundry_phase1_v0.3.md** — Phase 1 정의서 (BeSir 정합성 P0 10건 반영판) ★ SSOT
+- **02_ai_foundry_phase1_v0.3.md** — Phase 1 정의서 (BeSir 정합성 P0 10건 + **v0.4 patch S346**) ★ SSOT
 - **07_ai_foundry_os_target_architecture.md** — Target Architecture (5-Layer + 4-Asset)
 - **08_build_plan_v1.md** — 마스터 빌드 플랜 (W18~W29 12주 매핑)
 
@@ -57,9 +57,11 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 
 ### 검토 + 임원 보고
 - **03_cross_review_prompts.md / 04_cross_review_consolidation_v1.md** — 외부 LLM 교차 검토 프롬프트 + 통합본
-- **05_executive_one_pager_v1/v2.md/docx/pdf** — 임원 1페이지 (8월 Show & Tell용)
+- **05_executive_one_pager_v1/v2/v3.md** — 임원 1페이지 (v3 = S346 W19 D-5 BeSir 사전 자료)
 - **06_architecture_alignment_with_besir_v1.md** — BeSir 정합성 분석 (P0 10건)
 - **13_cross_review_prompts_for_build_plan_v1.md** — Build Plan 외부 검토용 프롬프트
+- **18_conditional_gate_evidence_v1.md** (S346 신규) — BeSir Conditional C-1·C-2·C-3·C-4 게이트 통과 증거
+- **19_open_issues_resolution_plan_v1.md** (S346 신규) — 오픈이슈 #5/#6/#9 처리 방안
 
 ### Deprecated
 - **01_master_plan_v0.1.md** — Decision Foundry 명칭 시절 (2026-04-29 v0.2 방향 전환으로 폐기)
@@ -163,6 +165,14 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 - ✅ INDEX.md v1 합의 + SPEC.md F600~F607 등록 (W18 원안)
 - ✅ **사전 진척**: F602/F603/F606/F607 4건 모두 Sprint 351~363에서 MERGED 완료 (W18~W19 잠재 보너스)
 - ✅ Phase 47 / Sprint 376까지 41 sprint 연속 성공 (S306~S346)
+- ✅ **S346 W19 D-5 v1.1 patch 일괄 처리** (이번 세션):
+  - INDEX.md v1 → v1.1 (commit `bf0bfe99`, `cdc941f7`)
+  - 14_repo_status_audit_v1 → v1.1 patch (Sprint 331 → Sprint 376)
+  - 16_validation_report_v1 → v1.1 patch (권고 10건 80% 해소)
+  - 02_ai_foundry_phase1_v0.3 → v0.4 patch (Changelog v0.4 entry)
+  - **18_conditional_gate_evidence_v1.md** 신규 (C-1 ✅ 통과 증거 + C-2/C-3/C-4 진행)
+  - **19_open_issues_resolution_plan_v1.md** 신규 (#5/#6/#9 처리 방안)
+  - **05_executive_one_pager_v3.md** 신규 (BeSir 5/15 D-5 사전 자료)
 
 ### W19 (현재, 5/10 → **5/15 BeSir 미팅 D-5**)
 1. **잔여 v1.1 patch 처리** (S346 사실 확인 결과, 잔여 축소):
