@@ -10,6 +10,7 @@ function makeFakeJwt(): string {
     JSON.stringify({
       sub: "test-user-id",
       email: "test@foundry-x.dev",
+      role: "admin",
       exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
     }),
   );

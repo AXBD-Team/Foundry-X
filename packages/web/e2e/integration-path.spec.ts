@@ -31,10 +31,9 @@ test.describe("Phase 4 Integration Path", () => {
   test("BFF proxy API call via dashboard", async ({
     authenticatedPage: page,
   }) => {
-    // Mock API endpoints to prevent 5xx from missing API server
-    await page.route("**/api/**", (route) =>
-      route.fulfill({ status: 200, contentType: "application/json", body: "[]" }),
-    );
+    // Use fallback so fixture's specific AppShell mocks (orgs, nps/check, agents)
+    // are not overridden by this broad handler (Playwright LIFO route ordering)
+    await page.route("**/api/**", async (route) => route.fallback());
 
     await page.goto("/dashboard");
     await expect(page.locator("main")).toBeVisible();
