@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PrPipelineService } from "../services/pr-pipeline.js";
+import { PrPipelineService } from "../core/agent/services/pr-pipeline.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 import type { AgentExecutionResult, PrReviewResult } from "@foundry-x/shared";
 

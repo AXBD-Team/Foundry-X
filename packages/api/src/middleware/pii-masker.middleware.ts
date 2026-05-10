@@ -4,7 +4,7 @@
  */
 import { createMiddleware } from "hono/factory";
 import type { Env } from "../env.js";
-import { PiiMaskerService } from "../services/pii-masker.js";
+import { PiiMaskerService } from "../core/infra/pii-masker.js";
 import type { JwtPayload } from "../middleware/auth.js";
 
 const AI_PATH_PREFIXES = ["/api/agents/", "/api/spec/generate", "/api/mcp/"];

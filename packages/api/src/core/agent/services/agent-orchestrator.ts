@@ -6,7 +6,7 @@ import type {
 import type { AgentRunner } from "./agent-runner.js";
 import type { SSEManager } from "../../../core/infra/types.js";
 import type { McpServerRegistry } from "./mcp-registry.js";
-import type { MergeQueueService } from "../../../services/merge-queue.js";
+import type { MergeQueueService } from "./merge-queue.js";
 import type { PlannerAgent } from "./planner-agent.js";
 import { type AutoFixService, type CustomRoleManager, type WorktreeManager } from "../../harness/types.js";
 import type { ArchitectAgent } from "./architect-agent.js";

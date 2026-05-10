@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { ConflictDetector } from "../../services/conflict-detector.js";
-import type { ExistingSpec } from "../../services/conflict-detector.js";
+import { ConflictDetector } from "../../core/spec/services/conflict-detector.js";
+import type { ExistingSpec } from "../../core/spec/services/conflict-detector.js";
 import { createMockD1 } from "../helpers/mock-d1.js";
 
 describe("ConflictDetector", () => {
