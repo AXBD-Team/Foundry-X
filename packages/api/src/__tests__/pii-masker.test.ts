@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PiiMaskerService, DEFAULT_PII_PATTERNS } from "../services/pii-masker.js";
+import { PiiMaskerService, DEFAULT_PII_PATTERNS } from "../core/infra/pii-masker.js";
 
 function createMockDb(rows: any[] = []) {
   const all = vi.fn().mockResolvedValue({ results: rows });

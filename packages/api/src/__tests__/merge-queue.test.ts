@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MergeQueueService } from "../services/merge-queue.js";
+import { MergeQueueService } from "../core/agent/services/merge-queue.js";
 import { createMockD1 } from "./helpers/mock-d1.js";
 
 function createMockGitHub() {

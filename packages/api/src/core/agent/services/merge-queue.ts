@@ -1,6 +1,6 @@
-import type { GitHubService } from "../modules/portal/services/github.js";
-import type { SSEManager } from "../core/infra/types.js";
-import type { AutoRebaseService } from "../core/harness/services/auto-rebase.js";
+import type { GitHubService } from "../../../modules/portal/services/github.js";
+import type { SSEManager } from "../../infra/types.js";
+import type { AutoRebaseService } from "../../harness/types.js";
 import type {
   MergeQueueEntry,
   MergeQueueStatus,
