@@ -63,6 +63,7 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 - **18_conditional_gate_evidence_v1.md** (S346 신규, S346 W19 D-5 보강) — BeSir Conditional C-1·C-2·C-3·C-4 게이트 통과 증거 + 미팅 talking points + KPI query 예제
 - **19_open_issues_resolution_plan_v1.md** (S346 신규) — 오픈이슈 #5/#6/#9 처리 방안
 - **20_live_demo_scenario_v1.md** (S346 신규, W19 D-5 추가) — F602/F603/F606/F607 통합 데모 시나리오 (15-20분, BeSir 5/15 미팅 실시간 시연)
+- **21_kpi_calculation_table_v1.md** (S348 신규, Sprint 377 F604) — 8 KPI 산정 메커니즘 표 (D1 소스 / SQL / 주기 / 단위 / 임계값 / §2.3 #6 매핑). 16 v1.1 §2.3 권고 #6 영구 해소.
 
 ### Deprecated
 - **01_master_plan_v0.1.md** — Decision Foundry 명칭 시절 (2026-04-29 v0.2 방향 전환으로 폐기)
@@ -79,7 +80,7 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 | P0-2 | Multi-Tenant PG + RBAC 5역할 + KT DS SSO | 20% (v1) → **20%** ★ | F601 📋 idea (PG 인프라 외부 의존 unlock 대기) |
 | P0-3 | 4대 진단 자동 실행 | 45% (v1) → **100%** ✅ | **F602 ✅ Sprint 357 MERGED** — core/diagnostic/ sub-app + 4 method (missing/duplicate/overspec/inconsistency) + audit-bus 통합 + D1 0144 |
 | P0-4 | Cross-Org 4그룹 + core_differentiator default-deny | 0% ★★ (v1) → **골격 100%** ✅ | **F603 ✅ Sprint 363 MERGED** — core/cross-org/ sub-app + 4그룹 분류 + default-deny export 차단 + audit emit + D1 0150. 후속: F626 (차단율 측정 코드) |
-| P0-5 | KPI 대시보드 8개 | 40% (v1) → **40%** | F604 📋 idea + F621 📋 idea (통합 한 화면) — AXIS-DS v1.2 KPI 위젯 4종 + 산정 코드 매핑 |
+| P0-5 | KPI 대시보드 8개 | 40% (v1) → **토대 100%** ✅ | **F604 ✅ Sprint 377 MERGED** — core/kpi/ sub-app + 4 위젯 (KpiTile/Sparkline/MetricGrid/TrendArrow) + 8 KPI 산정 코드 + dashboard 연동 + 산정 표 docs. F621 📋 idea (통합 한 화면) 별건 |
 | P0-6 | HITL Console | 35% (v1) → **35%** | F605 📋 idea — AXIS-DS v1.2 agentic-ui + HITL escalation 룰 |
 | P0-7 | Audit Log Bus | 25% (v1) → **100%** ✅ | **F606 ✅ Sprint 351 MERGED** — core/infra/audit-bus + trace_id chain + HMAC SHA256 + append-only D1 + W3C Trace Context middleware (S337 hardening PR #766) |
 | P0-8 | AI 에이전트 투명성 | 50% (v1) → **토대 100%** ✅ | **F607 ✅ Sprint 359 MERGED** — core/ethics/ sub-app + EthicsEnforcer (confidence < 0.7 escalation + FP 측정 + kill switch) + ethics_violations + kill_switch_state D1 0146 + 4 endpoints + 3 audit 이벤트 |
