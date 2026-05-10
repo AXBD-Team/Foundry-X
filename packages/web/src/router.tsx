@@ -119,6 +119,7 @@ export const router = createBrowserRouter([
       { path: "agent-meta", lazy: () => import("@/routes/agent-meta") },
       { path: "orchestration", lazy: () => import("@/routes/orchestration") },
       { path: "dashboard/metrics", lazy: () => import("@/routes/dashboard.metrics") },
+      { path: "hitl-console", lazy: () => import("@/routes/hitl-console") },
       { path: "tokens", lazy: () => import("@/routes/tokens") },
       { path: "architecture", lazy: () => import("@/routes/architecture") },
       { path: "workspace", lazy: () => import("@/routes/workspace") },
