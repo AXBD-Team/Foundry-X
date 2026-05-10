@@ -1,9 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-05T18:30:00.000Z",
+  "generated_at": "2026-05-10T05:45:18.515Z",
   "description": "F613 Pass 시리즈 종결 baseline — violations 0, MSA 룰 강제 교정 완결 (F608~F613).",
-  "msa_total": 0,
+  "msa_total": 2,
   "msa_errors": 0,
-  "msa_warnings": 0,
-  "fingerprints": []
+  "msa_warnings": 2,
+  "fingerprints": [
+    "src/core/kpi/services/kpi-calculator.service.ts:158:foundry-x-api/no-cross-domain-d1",
+    "src/core/kpi/services/kpi-calculator.service.ts:56:foundry-x-api/no-cross-domain-d1"
+  ]
 }
