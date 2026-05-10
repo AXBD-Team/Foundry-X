@@ -122,13 +122,17 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 
 - **P1 누락 3건** (BeSir 정합성 핵심):
   - `/ax:domain-init β` → **F623 등록됨** (T4, F628+F629 ✅ 의존, idea 단계)
-  - `Six Hats 외부 LLM 호출 패턴` → **별 F-item 등록 검토 필요** (현재 미등록 추정 — BizPersonaEvaluator 등 부분 구현 존재)
-  - `CQ 5축 운영 검증` → **F632 등록됨** (CQ 5축 + 80-20-80 검수 룰, T3, F602 의존 ✅)
-- **§6.4 윤리 AI 임계 정책** → **부분 해소** (F607 ✅ Sprint 359 — confidence < 0.7 HITL escalation + FP 측정 + kill switch 모두 구현). 잔여: 운영 SOP + 주간 리포트 자동화
-- **§5.3 core_diff 차단율 < 100% 측정 코드** → **부분 해소** (F603 ✅ default-deny export 차단 + cross_org_export_blocks 테이블). 잔여: F626 (차단율 KPI 계측)
+  - `Six Hats 외부 LLM 호출 패턴` → **F624 ✅ Sprint 356 MERGED** (sixhats-llm-policy + KV cache 통합 + audit 발행, T2 마무리)
+  - `CQ 5축 운영 검증` → **F632 등록됨** (CQ 5축 + 80-20-80 검수 룰, T3, F602 의존 ✅, idea 단계)
+- **§6.4 윤리 AI 임계 정책** → **사실상 해소** (F607 ✅ Sprint 359 — confidence < 0.7 HITL escalation + FP 측정 + kill switch + 4 endpoints + 3 audit 이벤트 모두 구현). 잔여: 운영 SOP + 주간 리포트 자동화 (별 F-item)
+- **§5.3 core_diff 차단율 < 100% 측정 코드** → **사실상 해소** (F603 ✅ Sprint 363 default-deny export 차단 + cross_org_export_blocks + **F626 ✅ Sprint 364 MERGED** core_differentiator 차단율 KPI 측정 코드)
 - **§5.1 KPI 8개 산정 코드/UI 매핑 1:1** → **잔존** (F604 idea + F621 idea — KPI 위젯 4종 + 산정 코드 매핑 미구현)
 - **오픈이슈 3건 미반영**: #5 외부 자료 마스킹 가이드 v2 / #6 BeSir MCP Tools 통합 시점 / #9 본부 비개발자 교육 영상 — **모두 잔존**
-- **Foundry-X 24h 드리프트** → **해소** (14·15 baseline Phase 46/Sprint 331 → v1.1 갱신 Phase 47/Sprint 376, +35 sprint 진척, 41 sprint 연속 성공 S306~S346)
+- **Foundry-X 24h+ 드리프트** → **해소** (14 baseline v1 Phase 46/Sprint 331 → v1.1 patch Phase 47/Sprint 376, +45 sprint 진척, 41 sprint 연속 성공 S306~S346)
+
+**§8 누락 8건 → 5건 사실상 해소 / 3건 잔존** (해소율 62.5%):
+- ✅ 해소: Six Hats(F624) / CQ 5축(F632 등록) / §6.4 윤리(F607) / §5.3 core_diff(F603+F626) / 24h 드리프트(14 v1.1)
+- 📋 잔존: §5.1 KPI 매핑(F604/F621) / 오픈이슈 3건(별 docs/Marker.io) / /ax:domain-init β(F623 idea)
 
 ## 9. SPEC.md 매핑 (v1.1 갱신, S346)
 
@@ -143,13 +147,13 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 | P0-7 Audit Log Bus | F606 | FX-REQ-670 | **✅ Sprint 351 MERGED** (T1 토대 + S337 PR #766 hardening) |
 | P0-8 AI 에이전트 투명성 | F607 | FX-REQ-671 | **✅ Sprint 359 MERGED** (윤리 임계 + kill switch 포함) |
 
-**P1 누락 추가 매핑**:
+**P1 누락 추가 매핑** (S346 갱신):
 | 누락 항목 | F-item | Status |
 |----------|--------|--------|
 | /ax:domain-init β | F623 | 📋 idea |
-| CQ 5축 검수 | F632 | 📋 idea |
-| Six Hats 외부 LLM 호출 패턴 | (미등록, 검토 필요) | — |
-| core_diff 차단율 측정 | F626 (예정) | 📋 idea (F603 후속) |
+| CQ 5축 검수 | F632 | 📋 idea (의존: F602 ✅ 충족) |
+| Six Hats 외부 LLM 호출 패턴 | F624 | **✅ Sprint 356 MERGED** (sixhats-llm-policy + KV cache + audit) |
+| core_diff 차단율 측정 | F626 | **✅ Sprint 364 MERGED** (F603 후속) |
 
 > **Phase 48 → 미사용**: F602/F603/F606/F607이 Phase 47 안에서 모두 흡수됨 (Sprint 351~363). 잔여 idea(F600/F601/F604/F605)는 BeSir 미팅 결과에 따라 Phase 47 후반 또는 신규 Phase로 분해.
 
@@ -161,11 +165,12 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 - ✅ Phase 47 / Sprint 376까지 41 sprint 연속 성공 (S306~S346)
 
 ### W19 (현재, 5/10 → **5/15 BeSir 미팅 D-5**)
-1. **잔여 v1.1 patch 처리** (S346 부분 처리, 추가 잔여):
-   - Six Hats 외부 LLM 호출 패턴 → F-item 신규 등록 검토
-   - F626 core_diff 차단율 측정 코드 신규 등록 (F603 후속, KPI 8개 중 1개)
-   - 오픈이슈 #5/#6/#9 처리 방안 (Marker.io / 별 docs)
-   - 16_validation_report_v1.md → v1.1 patch (사용자 승인 후 14·15에 반영)
+1. **잔여 v1.1 patch 처리** (S346 사실 확인 결과, 잔여 축소):
+   - ~~Six Hats 외부 LLM 호출 패턴 → F-item 신규 등록 검토~~ → **F624 ✅ Sprint 356 사실상 처리됨**
+   - ~~F626 core_diff 차단율 측정 코드 신규 등록~~ → **F626 ✅ Sprint 364 사실상 처리됨**
+   - 오픈이슈 #5/#6/#9 처리 방안 (Marker.io / 별 docs) — **잔존**
+   - 02_ai_foundry_phase1_v0.3.md → v0.4 patch (P1 누락 5건 ✅ 반영) — **선택적**
+   - 16_validation_report_v1.md → v1.1 patch (S346 잔존 3건 / 해소 5건 명시) — **선택적**
 2. **BeSir 미팅 발표 자료 보강**:
    - 05_executive_one_pager v3 작성 (Phase 47 v1.9 진척 + 4/8 P0 토대 ✅ 반영)
    - Conditional C-1·C-2·C-4 게이트 통과 자료 (06_architecture_alignment_with_besir_v1.md 참조)
