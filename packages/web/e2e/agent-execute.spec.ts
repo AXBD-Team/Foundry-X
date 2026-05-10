@@ -128,12 +128,14 @@ test.describe("Agent Execute Flow", () => {
       route.fulfill({ status: 200, body: "", headers: { "Content-Type": "text/event-stream" } }),
     );
 
-    // Mock execute API with 503 error
+    // Mock execute API with 503 error — omit body error field so api-client
+    // falls back to "API 503: Service Unavailable" which matches /503/
     await page.route("**/api/agents/*/execute", (route) =>
       route.fulfill({
         status: 503,
-        body: JSON.stringify({ error: "Service unavailable" }),
+        body: JSON.stringify({}),
         headers: { "Content-Type": "application/json" },
+        statusText: "Service Unavailable",
       }),
     );
 
