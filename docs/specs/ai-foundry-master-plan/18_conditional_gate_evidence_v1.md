@@ -98,6 +98,37 @@ status: C-1 자체 통과 증거 ✅ / C-2/C-4 외부 sign-off 대기 / C-3 W20 
 3. **Approver RBAC 5역 매핑** — F601 PG 인프라 결정과 동시
 4. **KPI 베이스라인 측정 협조 요청** — 본부 데이터 협조
 
+### 2.4 미팅 진행 talking points (5/15 D-day)
+
+**Open** (1분):
+> "v3 executive 자료에서 본 4 sign-off 안건 모두 W18~W19 사전 진척으로 즉시 진행 가능합니다. 오늘 동의하시면 W20 KPI 측정 + W21 G1+G2 게이트 일정이 확정됩니다."
+
+**안건 1 — 본부 2개 선정**:
+- 후보: HR / Ops / 심사·승인 (06 정합성 분석 P0-1 기준)
+- 1순위 권장: 심사·승인 본부 (정책 자산화 가치 가장 높음)
+- 2순위: Ops 본부 (data 풍부, NDA 즉시 가능)
+- 미달 시 백업: 단일 본부로 시작 + W22 2번째 본부 합류
+
+**안건 2 — core_diff 워크샵**:
+- 일정 권장: W20 (5/22 화) — 4시간, SME 4명 (각 본부 2명)
+- 진행 방식: 12 dev plan §2.3 + F603 default-deny 룰 사전 출력
+- F626 차단율 KPI 사전 측정 → 워크샵에서 룰 보정 case 확인
+
+**안건 3 — Approver RBAC 5역**:
+- 5역: Admin / Reviewer / Approver / Operator / Auditor
+- 06 PRD §11.4 매핑 — 본부 RBAC 권한 5건 (5명/본부 × 2 본부 = 10명)
+- F601 PG unlock 후 즉시 적용 가능
+
+**안건 4 — KPI 협조**:
+- 본부 데이터 협조: 정책팩 1건 / Decision Log 50건 / SME 인터뷰 (각 1시간 × 4)
+- 데이터 anonymize: F627 llm+service-proxy ✅ 자동 처리
+- 측정 시작 가능: 5/19 (W20 월요일)
+
+### 2.5 백업 (BeSir sign-off 지연 시, 15 §487 fallback)
+- **시나리오 A**: 본부 1개만 sign-off → C-2 부분 통과, W20 단일 본부 시작
+- **시나리오 B**: BeSir sign-off 1주 지연 → W21 G1+G2 게이트도 1주 지연 (5/30)
+- **시나리오 C**: BeSir 전체 거부 → C-1 ✅ 자체 증거로 Phase 2 PoC 단독 진입 + W26 G3 게이트로 재검토
+
 ---
 
 ## 3. C-3: AI 에이전트 자동화 범위·한계 명확화 — 📋 W20 일정
@@ -124,6 +155,27 @@ status: C-1 자체 통과 증거 ✅ / C-2/C-4 외부 sign-off 대기 / C-3 W20 
 - **본부 SME 워크샵**: core_diff 4그룹 분류는 SME 인터뷰 필수
 - **데이터 협조**: KPI 베이스라인 측정은 본부 데이터 제공 필수
 - **윤리 판단**: ethics 임계 정책은 자동 trigger but kill switch 활성화는 사람 결정 (F607 운영 SOP 잔여)
+
+### 3.4 자동화 성공/실패 경계 (실 사례)
+
+| 사례 | 분류 | 결과 |
+|------|------|------|
+| F602 4대 진단 (Sprint 357) | T3 자동화 가능 | autopilot Match 100% / ~12분 / 0 Sinclair 개입 |
+| F603 Cross-Org 골격 (Sprint 363) | T4 자동화 가능 | autopilot Match 100% / ~14분 / 0 Sinclair 개입 |
+| F606 Audit Bus T1 (Sprint 351) | T1 자동화 가능 | autopilot Match 100% / S337 PR #766 hardening |
+| F607 Ethics + Kill Switch (Sprint 359) | T3 자동화 가능 | autopilot Match 97% / 윤리 임계 룰 적용 |
+| F636 zod-openapi 0.18 첫 시도 (Sprint 372) | **자동화 한계 노출** | autopilot 자체 PASS but Production HTTP 500 → revert (~4h41m) |
+| F640 zod-openapi 본 통합 (Sprint 375) | T3 자동화 + 인간 학습 | F639 PoC 사전 분리 + multi-input smoke probe CI 자동화 → 영구 차단 |
+| F641 services/ closure (Sprint 376) | T3 자동화 가능 | autopilot Match 100% / ~11분 / 0 Sinclair 개입 |
+
+**경계 패턴 (S341 학습)**: dependency upgrade는 codemod logic-altering nature → multi-input smoke probe + manual review 필수. type 충족 ≠ logic 정확성. autopilot 단독 신뢰 영역은 (a) `core/{domain}/` 도메인 closure, (b) 신규 sub-app 스캐폴드, (c) D1 migration 단순 추가. autopilot + 인간 검증 영역은 (a) dependency upgrade, (b) production endpoint 신규/변경, (c) 외부 API 통합.
+
+### 3.5 W20 PRD §6.3.1 보강 계획
+
+- 본 §3.4 사례 표 → PRD §6.3.1 본문 흡수
+- T1~T7 매트릭스 (17_internal_dev_plan §2~§3) → PRD §6.3.2 신규
+- 자동화 가능/한계 분류 룰 → PRD §6.3.3 신규
+- W20 작업: 5/19 (월) ~ 5/24 (금), 1 sprint 분량 (별 F-item 등록 검토)
 
 ---
 
@@ -156,6 +208,80 @@ status: C-1 자체 통과 증거 ✅ / C-2/C-4 외부 sign-off 대기 / C-3 W20 
 - KPI 6개 즉시 측정 시작 동의
 - 본부 데이터 협조 요청 (KPI 1, 5 위한 multi-tenant context + 5-Layer 흐름)
 - W19~W20 측정 결과 → W21 PRD §5.1 반영
+
+### 4.5 KPI 측정 query 예제 (즉시 실행 가능 6개)
+
+본부 데이터 협조 unlock 후 5/19 (월) 오전 즉시 실행 가능. 모든 query는 production D1 직접 실행.
+
+**KPI 2 — Critical inconsistency 카운트**:
+```bash
+# Diagnostic Engine 실행 → inconsistency 결과
+curl -X POST https://foundry-x-api.ktds-axbd.workers.dev/api/diagnostic/run \
+  -H "Authorization: Bearer ${JWT}" -H "Content-Type: application/json" \
+  -d '{"orgId": "본부-id", "diagnosticTypes": ["inconsistency"]}'
+# 기대: findings[0].count = 베이스라인 N건
+```
+
+**KPI 3 — 자산 재사용률**:
+```sql
+-- system_knowledge + 참조 카운트 (F629)
+SELECT COUNT(DISTINCT sk.id) AS total_assets,
+       COUNT(DISTINCT skr.parent_id) AS reused_count,
+       (CAST(COUNT(DISTINCT skr.parent_id) AS REAL) / COUNT(DISTINCT sk.id)) * 100 AS reuse_rate_pct
+FROM system_knowledge sk
+LEFT JOIN system_knowledge_refs skr ON skr.parent_id = sk.id
+WHERE sk.org_id = '본부-id';
+-- 기대: reuse_rate_pct = N% (베이스라인 측정)
+```
+
+**KPI 4 — 진단 시간 단축** (베이스라인 측정 대비 측정):
+```sql
+-- F602 diagnostic_runs 평균 시간
+SELECT AVG((completed_at - created_at) * 1000) AS avg_duration_ms,
+       COUNT(*) AS run_count
+FROM diagnostic_runs
+WHERE org_id = '본부-id' AND created_at > strftime('%s', 'now', '-7 days');
+-- 기대: avg_duration_ms 분석 + As-Is 사람 진단 시간 (1주) 비교
+```
+
+**KPI 6 — HITL 평균 처리 시간**:
+```sql
+-- F607 ethics_violations escalated_to_human
+SELECT AVG(resolved_at - created_at) AS avg_hitl_seconds, COUNT(*) AS hitl_count
+FROM ethics_violations
+WHERE escalated_to_human = 1 AND org_id = '본부-id';
+-- 기대: avg_hitl_seconds 베이스라인 (목표: < 30분 = 1800s)
+```
+
+**KPI 7 — API p95 latency**:
+```bash
+# Cloudflare Workers analytics 직접 query
+wrangler tail --format=pretty foundry-x-api | grep -E "p95|p99"
+# 또는 Cloudflare dashboard → Analytics → Response Time → p95
+# 기대: < 500ms (5-Layer E2E 미통합 시)
+```
+
+**KPI 8 — core_differentiator default-deny 차단율**:
+```bash
+# F626 blocking-rate API
+curl "https://foundry-x-api.ktds-axbd.workers.dev/api/cross-org/blocking-rate?org_id=본부-id&days=7" \
+  -H "Authorization: Bearer ${JWT}"
+# 기대 응답: {"blocking_rate": 0.95, "total_attempts": N, "blocked": M}
+# PRD §5.3 게이트: blocking_rate = 100% (미달 시 룰 보정 필요)
+```
+
+### 4.6 베이스라인 목표 수치 (BeSir sign-off 후 본부 데이터로 확정)
+
+| KPI | 목표 (Phase 1 종료 시점) | 측정 시작 | 비고 |
+|-----|-----------------------|----------|------|
+| 1 본부 동시 운영 수 | ≥ 2 본부 | 📋 F601 unlock 후 | C-2 안건 1번 의존 |
+| 2 Critical inconsistency | ≥ 10건 발견 | 5/19 (W20) | F602 ✅ 즉시 |
+| 3 자산 재사용률 | ≥ 30% | 5/19 (W20) | F629 ✅ 즉시 |
+| 4 진단 시간 단축 | ≥ 70% (1주 → 1일) | 5/19 (W20) | F602 ✅ 즉시 |
+| 5 5-Layer E2E 성공률 | ≥ 80% | 📋 F600 unlock 후 | W26 G3 게이트 |
+| 6 HITL 평균 처리 시간 | < 30분 (1800s) | 5/19 (W20) | F607 ✅ 즉시 |
+| 7 API p95 latency | < 500ms | 즉시 | 기존 모든 endpoint |
+| 8 core_diff 차단율 | 100% (게이트 PRD §5.3) | 5/19 (W20) | F603+F626 ✅ 즉시 |
 
 ---
 

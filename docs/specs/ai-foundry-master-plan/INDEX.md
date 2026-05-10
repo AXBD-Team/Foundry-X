@@ -60,8 +60,9 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 - **05_executive_one_pager_v1/v2/v3.md** — 임원 1페이지 (v3 = S346 W19 D-5 BeSir 사전 자료)
 - **06_architecture_alignment_with_besir_v1.md** — BeSir 정합성 분석 (P0 10건)
 - **13_cross_review_prompts_for_build_plan_v1.md** — Build Plan 외부 검토용 프롬프트
-- **18_conditional_gate_evidence_v1.md** (S346 신규) — BeSir Conditional C-1·C-2·C-3·C-4 게이트 통과 증거
+- **18_conditional_gate_evidence_v1.md** (S346 신규, S346 W19 D-5 보강) — BeSir Conditional C-1·C-2·C-3·C-4 게이트 통과 증거 + 미팅 talking points + KPI query 예제
 - **19_open_issues_resolution_plan_v1.md** (S346 신규) — 오픈이슈 #5/#6/#9 처리 방안
+- **20_live_demo_scenario_v1.md** (S346 신규, W19 D-5 추가) — F602/F603/F606/F607 통합 데모 시나리오 (15-20분, BeSir 5/15 미팅 실시간 시연)
 
 ### Deprecated
 - **01_master_plan_v0.1.md** — Decision Foundry 명칭 시절 (2026-04-29 v0.2 방향 전환으로 폐기)
