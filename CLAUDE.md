@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~46 완료 + Phase 47 진행 (Sprint 1~378 시동, F605 🔧(plan) 최신 (S349), AI Foundry P0-6 HITL Console 신설 시동 — 4 widgets + core/hitl/ + 분산 7+ services 통합 + RBAC 5역 mock + confidence < 0.7 escalation, BeSir 5/15 D-5). 상세: SPEC.md §5
+Phase 1~46 완료 + Phase 47 진행 (Sprint 1~378, F605 ✅ 최신 (S349), AI Foundry P0-6 HITL Console 신설 완결 — 4 widgets + core/hitl/ + 분산 7+ services 통합 + RBAC 5역 mock + confidence < 0.7 escalation, BeSir 5/15 D-5 HITL Console 토대 100%). 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
