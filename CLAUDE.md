@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~46 완료 + Phase 47 진행 (Sprint 1~379, F642 ✅ 최신 (S350), AI Foundry P0-7 Audit Bus T2 trace_id chain enrichment 완결 — D1 0154 ALTER + getByTraceId method + GET /api/audit/log/by-trace endpoint + AuditLogByTraceResponseSchema, BeSir 5/15 D-5 demo Step 5 unblock 완성). 상세: SPEC.md §5
+Phase 1~46 완료 + Phase 47 진행 (Sprint 1~380 시동, F643 📋(plan) 최신 (S351), bashrc sprint() L1 fix — Stale F_ITEMS 16회 누적 lifecycle 승격 임계점 영구 차단 (P2, FX-REQ-708, S350+S351 명시 결정), Cross-repo dual-track (Foundry-X 내부 = 회귀 테스트 + rules update + ~/.bashrc patch draft / 외부 = Master post-merge 수동 적용). 직전 F642 ✅ Sprint 379 (S350) — AI Foundry P0-7 Audit Bus T2 trace_id chain enrichment 완결, BeSir 5/15 D-5 demo Step 5 unblock). 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
