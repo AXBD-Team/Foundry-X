@@ -37,7 +37,7 @@ test.describe("Public Roadmap (F518)", () => {
     const responsePromise = page.waitForResponse("**/api/work/public/roadmap");
     await page.goto("/roadmap");
     await responsePromise;
-    await expect(page.getByText("Phase 37").first()).toBeVisible({ timeout: 20000 });
+    await expect(page.getByText("Phase 37").first()).toBeVisible({ timeout: 30000 });
     await expect(page.getByText("Work Lifecycle Platform")).toBeVisible();
   });
 

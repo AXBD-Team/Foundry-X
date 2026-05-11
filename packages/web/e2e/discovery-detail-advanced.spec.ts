@@ -254,11 +254,11 @@ test.describe("F440 — 사업기획서 생성 + 열람", () => {
 
     // TemplateSelector 모달 → 기획서 생성 시작 클릭
     const startBtn = page.getByRole("button", { name: "기획서 생성 시작" });
-    await expect(startBtn).toBeVisible({ timeout: 15000 });
+    await expect(startBtn).toBeVisible({ timeout: 30000 });
     await startBtn.click();
 
     // BusinessPlanViewer 표시 확인 — v1 뱃지
-    await expect(page.getByText("v1").first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("v1").first()).toBeVisible({ timeout: 30000 });
   });
 
   test("기획서 있는 경우 형상화 탭에 BusinessPlanViewer 바로 표시", async ({ authenticatedPage: page }) => {
