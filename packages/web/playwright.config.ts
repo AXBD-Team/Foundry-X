@@ -20,9 +20,19 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: {
-    command: "pnpm dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: "pnpm dev",
+      url: "http://localhost:3000",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command: "pnpm --filter @foundry-x/api dev",
+      url: "http://localhost:3001/",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+      cwd: "../..",
+    },
+  ],
 });
