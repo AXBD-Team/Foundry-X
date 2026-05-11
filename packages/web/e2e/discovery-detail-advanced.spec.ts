@@ -116,6 +116,16 @@ function setupDetailMocks(page: import("@playwright/test").Page, withPlan = fals
     page.route("**/api/help-agent/**", (route) =>
       route.fulfill({ json: { content: "mock" } }),
     ),
+    page.route("**/api/biz-items/biz-1/discovery-graph/sessions", (route) =>
+      route.fulfill({ json: { sessions: [] } }),
+    ),
+    page.route("**/api/biz-items/biz-1/business-plan/export*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "text/html",
+        body: "<html><body><h1>AI 문서 자동화 사업기획서</h1></body></html>",
+      }),
+    ),
   ]);
 }
 
@@ -147,9 +157,7 @@ test.describe("F439 — 아이템 상세 허브 3탭", () => {
     await expect(page.getByText("wizard")).toBeVisible();
   });
 
-  // F650 (S354): 발굴분석 탭 컨텐츠 drift — 분석 스텝퍼/9기준 체크리스트 위치 변경 또는 mock 데이터 정합성 이슈
-  // F651 후속 정밀 진단 위임 (mock route 보강 또는 컴포넌트 selector 재확인 필요)
-  test.skip("발굴분석 탭 클릭 → 분석 스텝퍼 + 9기준 체크리스트 표시", async ({ authenticatedPage: page }) => {
+  test("발굴분석 탭 클릭 → 분석 스텝퍼 + 9기준 체크리스트 표시", async ({ authenticatedPage: page }) => {
     await setupDetailMocks(page);
     await page.goto("/discovery/items/biz-1");
 
@@ -160,12 +168,10 @@ test.describe("F439 — 아이템 상세 허브 3탭", () => {
 
     // 분석 스텝퍼 헤딩
     await expect(page.getByText("발굴 분석 실행")).toBeVisible();
-    // 분석 시작 버튼
-    await expect(page.getByRole("button", { name: "분석 시작" })).toBeVisible();
     // 9기준 체크리스트 헤딩
     await expect(page.getByText("발굴 9기준 체크리스트")).toBeVisible();
-    // 완료 수 표시 — "3 / 9 기준 완료"
-    await expect(page.getByText(/3\s*\/\s*9\s*기준\s*완료/)).toBeVisible();
+    // 완료 수 표시 — "3 / 9 기준 충족" (DiscoveryCriteriaPanel:100 기준 충족)
+    await expect(page.getByText(/3\s*\/\s*9\s*기준\s*충족/).first()).toBeVisible();
   });
 
   test("형상화 탭 클릭 → 파이프라인 표시 (기획서 미생성 상태)", async ({ authenticatedPage: page }) => {
@@ -209,9 +215,7 @@ test.describe("F439 — 아이템 상세 허브 3탭", () => {
 });
 
 test.describe("F440 — 사업기획서 생성 + 열람", () => {
-  // F650 (S354): 기획서 생성 후 BusinessPlanViewer 컨텐츠 drift — mock 응답 후 viewer mount 타이밍 또는 컴포넌트 변경
-  // F651 후속 정밀 진단 위임 (generate-business-plan mock 응답 정합성 + BusinessPlanViewer prop 확인 필요)
-  test.skip("형상화 탭에서 생성하기 클릭 → 기획서 생성 후 BusinessPlanViewer 표시", async ({ authenticatedPage: page }) => {
+  test("형상화 탭에서 생성하기 클릭 → 기획서 생성 후 BusinessPlanViewer 표시", async ({ authenticatedPage: page }) => {
     await setupDetailMocks(page, false);
 
     // 기획서 생성 API mock
@@ -243,17 +247,21 @@ test.describe("F440 — 사업기획서 생성 + 열람", () => {
     await page.getByRole("tab", { name: "형상화" }).click();
     await expect(page.getByText("형상화 파이프라인")).toBeVisible();
 
-    // 생성하기 버튼 클릭
+    // 생성하기 버튼 클릭 → TemplateSelector 모달 열림
     const generateBtn = page.getByRole("button", { name: "생성하기" }).first();
     await expect(generateBtn).toBeVisible();
     await generateBtn.click();
 
-    // 기획서 콘텐츠 표시
-    await expect(page.getByText(/AI 문서 자동화 사업기획서/).first()).toBeVisible({ timeout: 15000 });
+    // TemplateSelector 모달 → 기획서 생성 시작 클릭
+    const startBtn = page.getByRole("button", { name: "기획서 생성 시작" });
+    await expect(startBtn).toBeVisible({ timeout: 5000 });
+    await startBtn.click();
+
+    // BusinessPlanViewer 표시 확인 — v1 뱃지
+    await expect(page.getByText("v1").first()).toBeVisible({ timeout: 15000 });
   });
 
-  // F650 hotfix (S354): 잔존 fail — 본 test 다른 assertion이 fail (v1 .first() fix는 적용했지만 페이지 mount 또는 form ation 탭 클릭 후 다른 element 미렌더). F651 후속 정밀 진단 위임.
-  test.skip("기획서 있는 경우 형상화 탭에 BusinessPlanViewer 바로 표시", async ({ authenticatedPage: page }) => {
+  test("기획서 있는 경우 형상화 탭에 BusinessPlanViewer 바로 표시", async ({ authenticatedPage: page }) => {
     await setupDetailMocks(page, true);
 
     await page.goto("/discovery/items/biz-1");
@@ -263,9 +271,8 @@ test.describe("F440 — 사업기획서 생성 + 열람", () => {
     await page.getByRole("tab", { name: "형상화" }).click();
 
     // 기획서 뷰어 — v1 뱃지
-    // F650 (S354): strict mode 회피 — v1 이 badge + viewer 2 elements로 resolved
     await expect(page.getByText("v1").first()).toBeVisible({ timeout: 10000 });
-    // 재생성 버튼
-    await expect(page.getByRole("button", { name: "재생성" })).toBeVisible();
+    // 재생성 버튼 — aria-label="사업기획서 재생성" → accessible name 포함 매칭
+    await expect(page.getByRole("button", { name: /재생성/ }).first()).toBeVisible();
   });
 });

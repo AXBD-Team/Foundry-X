@@ -100,13 +100,12 @@ test.describe("F436 — 내 아이템 목록", () => {
     await expect(page.getByText("고객 데이터 플랫폼")).toBeVisible();
   });
 
-  // F650 hotfix (S354): 신규 발견 fail — F435 위자드 page 부재로 인한 데이터 미생성? 상태 뱃지 selector drift. F651 후속 위임.
-  test.skip("상태 뱃지가 올바르게 표시된다", async ({ authenticatedPage: page }) => {
+  test("상태 뱃지가 올바르게 표시된다", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery");
     // "분석 중" 뱃지 (status: analyzing)
     await expect(page.getByText("분석 중").first()).toBeVisible();
-    // "대기" 뱃지 (status: draft)
-    await expect(page.getByText("대기")).toBeVisible();
+    // "대기" 뱃지 (status: draft) — strict mode: 필터 버튼 + 뱃지 2 elements → .first()
+    await expect(page.getByText("대기").first()).toBeVisible();
   });
 
   test("새 아이템 버튼이 getting-started로 링크된다", async ({ authenticatedPage: page }) => {

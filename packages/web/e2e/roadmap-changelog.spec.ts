@@ -18,8 +18,7 @@ test.describe("Public Roadmap (F518)", () => {
     await expect(page.getByRole("heading", { name: "Roadmap" })).toBeVisible();
   });
 
-  // F650 hotfix (S354): `.first()` fix 후에도 잔존 fail — 페이지 mount 또는 mock 응답 미수신 가능성. F651 후속 정밀 진단.
-  test.skip("Roadmap 페이지에 Phase 정보가 표시된다", async ({ page }) => {
+  test("Roadmap 페이지에 Phase 정보가 표시된다", async ({ page }) => {
     await page.route("**/api/work/public/roadmap", async route => {
       await route.fulfill({
         status: 200,
@@ -34,9 +33,11 @@ test.describe("Public Roadmap (F518)", () => {
       });
     });
 
+    // waitForResponse 보장 — mock 응답 수신 후 assertion
+    const responsePromise = page.waitForResponse("**/api/work/public/roadmap");
     await page.goto("/roadmap");
-    // F650 (S354): strict mode 회피 — Phase 37 이 헤딩+카드 2 elements로 resolved
-    await expect(page.getByText("Phase 37").first()).toBeVisible();
+    await responsePromise;
+    await expect(page.getByText("Phase 37").first()).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("Work Lifecycle Platform")).toBeVisible();
   });
 
@@ -101,8 +102,7 @@ test.describe("Public Changelog (F518)", () => {
 });
 
 test.describe("Public KG Trace API (F518)", () => {
-  // F650 hotfix (S354): `window.location.origin` fix 후에도 잔존 fail — page.evaluate 환경에서 다른 assert 또는 mock 응답 정합성. F651 후속 위임.
-  test.skip("공개 KG trace API는 인증 없이 접근 가능하다", async ({ page }) => {
+  test("공개 KG trace API는 인증 없이 접근 가능하다", async ({ page }) => {
     await page.route("**/api/work/public/kg/trace?*", async route => {
       await route.fulfill({
         status: 200,
@@ -120,8 +120,9 @@ test.describe("Public KG Trace API (F518)", () => {
       });
     });
 
-    // API 직접 호출 (페이지 컨텍스트에서 fetch)
-    // F650 (S354): page.evaluate 내부에서 relative URL parse fail → window.location.origin 사용
+    // page.goto 선행 — about:blank 상태에서 window.location.origin = "null" → invalid URL 방지
+    await page.goto("/roadmap");
+
     const response = await page.evaluate(async () => {
       const res = await fetch(
         `${window.location.origin}/api/work/public/kg/trace?id=F518&depth=2`,

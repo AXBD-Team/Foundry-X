@@ -129,9 +129,7 @@ test.describe("Offering Pipeline E2E", () => {
     await expect(page.getByText("보고용").first()).toBeVisible();
   });
 
-  // F650 (S354): button '다음' disabled — wizard 1단계 mock 데이터 미정합 (createWizard 진행 조건 미충족)
-  // F651 후속 정밀 진단 위임 (offering-create-wizard mock 데이터 + button enable 조건 확인 필요)
-  test.skip("offering-create-wizard — 위자드 1단계 표시", async ({
+  test("offering-create-wizard — 위자드 1단계 표시", async ({
     authenticatedPage: page,
   }) => {
     await setupOfferingMocks(page);
