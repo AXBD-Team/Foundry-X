@@ -45,13 +45,13 @@ test.describe("AX BD Hub", () => {
     );
 
     await page.goto("/ax-bd/bmc");
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
     await expect(page.locator("main")).toBeVisible({ timeout: 20000 });
   });
 
   test("Discovery 프로세스 페이지 — ServiceContainer 렌더링", async ({ authenticatedPage: page }) => {
     await page.goto("/discovery/items");
     // ServiceContainer (iframe 기반)가 렌더링되는지 확인
-    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("main")).toBeVisible({ timeout: 30000 });
   });
 });

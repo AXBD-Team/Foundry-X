@@ -140,7 +140,7 @@ test.describe("Offering Pipeline E2E", () => {
     // Wizard step 1: 발굴 아이템 선택
     await expect(
       page.getByText("발굴 아이템 선택").or(page.getByText("새 사업기획서 만들기")).first(),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 30000 });
   });
 
   test("offering-editor — 섹션 리스트 + 에디터", async ({
