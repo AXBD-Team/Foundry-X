@@ -32,6 +32,9 @@ jobs:
       - name: Build shared package
         run: pnpm -F @foundry-x/shared build
 
+      - name: Build harness-kit (api dev-server dep, F649)
+        run: pnpm -F @foundry-x/harness-kit build
+
       - name: Install Playwright Chromium
         run: pnpm -F @foundry-x/web exec playwright install --with-deps chromium
 
