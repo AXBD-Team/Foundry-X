@@ -39,9 +39,7 @@ async function dismissOverlays(page: import("@playwright/test").Page) {
 // 1. 사업기획서 (/shaping/business-plan)
 // ════════════════════════════════════════════════════════════
 
-// F650 (S354): shaping HTML view iframe sandbox selector drift — 2 spec fail (F648 측정 동일)
-// F651 후속 정밀 진단 위임 (iframe sandbox 패턴 + content selector 확인 필요)
-test.describe.skip("사업기획서 HTML 미리보기", () => {
+test.describe("사업기획서 HTML 미리보기", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
     await dismissOverlays(page);
 
@@ -68,29 +66,33 @@ test.describe.skip("사업기획서 HTML 미리보기", () => {
     await expect(page.getByText("스마트 팩토리 솔루션")).toBeVisible();
   });
 
-  test("카드 클릭 시 iframe으로 HTML이 표시돼요", async ({ authenticatedPage: page }) => {
+  test("전체 보기 클릭 시 Sheet에서 iframe으로 HTML이 표시돼요", async ({ authenticatedPage: page }) => {
     await page.goto("/shaping/business-plan");
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible({ timeout: 10000 });
 
-    await page.getByTestId("bp-card-item-1").click();
+    // 전체 보기 버튼 클릭 → Sheet 열림
+    await page.getByTestId("bp-full-view-item-1").click();
 
-    const iframe = page.getByTestId("bp-iframe-item-1");
+    // Sheet 내 공유 iframe 확인 (bp-sheet-iframe)
+    const iframe = page.getByTestId("bp-sheet-iframe");
     await expect(iframe).toBeVisible({ timeout: 10000 });
 
-    // Verify iframe has content
+    // iframe 내 콘텐츠 확인
     const frame = iframe.contentFrame();
     await expect(frame.locator("body")).toContainText("테스트 기획서", { timeout: 5000 });
   });
 
-  test("카드를 다시 클릭하면 iframe이 닫혀요", async ({ authenticatedPage: page }) => {
+  test("전체 보기 Sheet를 닫으면 iframe이 사라져요", async ({ authenticatedPage: page }) => {
     await page.goto("/shaping/business-plan");
     await expect(page.getByText("AI 헬스케어 플랫폼")).toBeVisible({ timeout: 10000 });
 
-    await page.getByTestId("bp-card-item-1").click();
-    await expect(page.getByTestId("bp-iframe-item-1")).toBeVisible({ timeout: 10000 });
+    // 전체 보기 열기 → Sheet + iframe 확인
+    await page.getByTestId("bp-full-view-item-1").click();
+    await expect(page.getByTestId("bp-sheet-iframe")).toBeVisible({ timeout: 10000 });
 
-    await page.getByTestId("bp-card-item-1").click();
-    await expect(page.getByTestId("bp-iframe-item-1")).not.toBeVisible();
+    // Escape로 Sheet 닫기
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("bp-sheet-iframe")).not.toBeVisible({ timeout: 5000 });
   });
 
   test("새 창 버튼 클릭 시 window.open이 호출돼요", async ({ authenticatedPage: page }) => {
