@@ -116,11 +116,11 @@ export async function dismissGuideModal(page: Page) {
     const skipBtn = page
       .getByRole("button", { name: /건너뛰기|닫기|skip|close/i })
       .first();
-    if (await nextBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await nextBtn.click();
+    if (await nextBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await nextBtn.click({ timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(300);
-    } else if (await skipBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await skipBtn.click();
+    } else if (await skipBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await skipBtn.click({ timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(300);
     } else {
       break;

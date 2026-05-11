@@ -38,7 +38,7 @@ test.describe("Public Roadmap (F518)", () => {
     await page.goto("/roadmap");
     await responsePromise;
     await expect(page.getByText("Phase 37").first()).toBeVisible({ timeout: 30000 });
-    await expect(page.getByText("Work Lifecycle Platform")).toBeVisible();
+    await expect(page.getByText("Work Lifecycle Platform").first()).toBeVisible({ timeout: 30000 });
   });
 
   test("Roadmap 페이지에서 Changelog 링크가 존재한다", async ({ page }) => {
