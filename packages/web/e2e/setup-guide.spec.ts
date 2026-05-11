@@ -4,7 +4,10 @@ import { test, expect } from "./fixtures/auth";
 // @sprint: 187
 // @tagged-by: F400
 
-test.describe("Setup Guide — F267 설치 가이드 UI", () => {
+// F650 (S354): obsolete page — packages/web/src/routes/setup-guide.tsx 부재
+// (tools-guide.tsx로 renamed 또는 페이지 자체 제거). spec 9건 일괄 .skip + 사유 기록.
+// 후속: tools-guide 페이지 사용 여부 확인 후 spec 재작성 또는 영구 제거.
+test.describe.skip("Setup Guide — F267 설치 가이드 UI", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
     // Mock onboarding progress API
     await page.route("**/api/onboarding/progress", (route) => {

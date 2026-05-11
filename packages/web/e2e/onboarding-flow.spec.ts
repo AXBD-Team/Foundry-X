@@ -6,7 +6,10 @@ import { test, expect } from "./fixtures/auth";
 
 // ─── F435: 아이템 등록 위저드 테스트 ───
 
-test.describe("Item Registration Wizard (F435)", () => {
+// F650 (S354): obsolete page — packages/web/src/routes/onboarding-flow.tsx 부재.
+// F435 위자드 페이지가 다른 경로로 이전 또는 제거된 상태. spec 6건 일괄 .skip + 사유 기록.
+// 후속: 신 위자드 경로 확인 후 spec 재작성 또는 영구 제거.
+test.describe.skip("Item Registration Wizard (F435)", () => {
   test.beforeEach(async ({ authenticatedPage: page }) => {
     // Mock POST /biz-items
     await page.route("**/api/biz-items", (route) => {
