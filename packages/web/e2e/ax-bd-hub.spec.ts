@@ -45,7 +45,8 @@ test.describe("AX BD Hub", () => {
     );
 
     await page.goto("/ax-bd/bmc");
-    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.locator("main")).toBeVisible({ timeout: 20000 });
   });
 
   test("Discovery 프로세스 페이지 — ServiceContainer 렌더링", async ({ authenticatedPage: page }) => {

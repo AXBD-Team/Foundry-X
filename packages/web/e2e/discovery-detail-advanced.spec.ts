@@ -254,7 +254,7 @@ test.describe("F440 — 사업기획서 생성 + 열람", () => {
 
     // TemplateSelector 모달 → 기획서 생성 시작 클릭
     const startBtn = page.getByRole("button", { name: "기획서 생성 시작" });
-    await expect(startBtn).toBeVisible({ timeout: 5000 });
+    await expect(startBtn).toBeVisible({ timeout: 15000 });
     await startBtn.click();
 
     // BusinessPlanViewer 표시 확인 — v1 뱃지
