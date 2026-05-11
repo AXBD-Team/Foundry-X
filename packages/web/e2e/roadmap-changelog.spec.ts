@@ -34,7 +34,8 @@ test.describe("Public Roadmap (F518)", () => {
     });
 
     await page.goto("/roadmap");
-    await expect(page.getByText("Phase 37")).toBeVisible();
+    // F650 (S354): strict mode 회피 — Phase 37 이 헤딩+카드 2 elements로 resolved
+    await expect(page.getByText("Phase 37").first()).toBeVisible();
     await expect(page.getByText("Work Lifecycle Platform")).toBeVisible();
   });
 
@@ -118,8 +119,11 @@ test.describe("Public KG Trace API (F518)", () => {
     });
 
     // API 직접 호출 (페이지 컨텍스트에서 fetch)
+    // F650 (S354): page.evaluate 내부에서 relative URL parse fail → window.location.origin 사용
     const response = await page.evaluate(async () => {
-      const res = await fetch("/api/work/public/kg/trace?id=F518&depth=2");
+      const res = await fetch(
+        `${window.location.origin}/api/work/public/kg/trace?id=F518&depth=2`,
+      );
       return { status: res.status, body: await res.json() };
     });
 
