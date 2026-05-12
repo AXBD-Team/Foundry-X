@@ -132,6 +132,9 @@ export const router = createBrowserRouter([
       // ── Sprint 261: Work Observability Walking Skeleton (F509) ──
       { path: "work-management", lazy: () => import("@/routes/work-management") },
 
+      // ── Sprint 393: F621 AI Foundry 운영 통합 대시보드 ──
+      { path: "operations", lazy: () => import("@/routes/operations") },
+
       // ── Redirects ──
       { path: "ax-bd/discovery", element: <Navigate to="/discovery/items" replace /> },
       { path: "ax-bd/discovery/:id", element: <RedirectDiscoveryDetail /> },
