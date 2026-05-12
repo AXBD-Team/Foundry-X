@@ -26,6 +26,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Restore Vite dependency pre-bundle cache
+        id: vite-deps-cache
+        uses: actions/cache@v4
+        with:
+          path: packages/web/node_modules/.vite
+          key: vite-deps-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml', 'packages/web/vite.config.ts') }}
+          restore-keys: |
+            vite-deps-${{ runner.os }}-
+
       - name: Build shared-contracts (dependency of shared)
         run: pnpm -F @foundry-x/shared-contracts build
 
@@ -37,6 +46,10 @@ jobs:
 
       - name: Install Playwright Chromium
         run: pnpm -F @foundry-x/web exec playwright install --with-deps chromium
+
+      - name: Pre-warm Vite dependency optimization
+        if: steps.vite-deps-cache.outputs.cache-hit != 'true'
+        run: pnpm -F @foundry-x/web exec vite optimize
 
       - name: Run E2E tests (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
         run: pnpm -F @foundry-x/web e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
