@@ -64,6 +64,7 @@ W18(현재) → W19 BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5
 - **19_open_issues_resolution_plan_v1.md** (S346 신규) — 오픈이슈 #5/#6/#9 처리 방안
 - **20_live_demo_scenario_v1.md** (S346 신규, W19 D-5 추가) — F602/F603/F606/F607 통합 데모 시나리오 (15-20분, BeSir 5/15 미팅 실시간 시연)
 - **21_kpi_calculation_table_v1.md** (S348 신규, Sprint 377 F604) — 8 KPI 산정 메커니즘 표 (D1 소스 / SQL / 주기 / 단위 / 임계값 / §2.3 #6 매핑). 16 v1.1 §2.3 권고 #6 영구 해소.
+- **17_internal_dev_plan_with_besir_v2.md** (S357 신규, 2026-05-12 D-3 BeSir 미팅) — v1 작성 후 6일간 Tier 1~5 17건 ✅ 완결 + T6 외부 unlock 4건(F604/F605/F619/F621) 매핑. v1과 1:1 진척 비교 표 포함. **5/14 dry-run + 5/15 미팅 페어 자료**.
 
 ### Deprecated
 - **01_master_plan_v0.1.md** — Decision Foundry 명칭 시절 (2026-04-29 v0.2 방향 전환으로 폐기)
