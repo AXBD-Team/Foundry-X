@@ -15,18 +15,18 @@
 
 -- 1. 시드 종속성 역순 삭제 (FK 충돌 회피)
 
--- 1-1. HITL 큐 3 source
+-- 1-1. HITL 큐 3 source (S357+ balanced 보완 — rev-decode-001 추가)
 DELETE FROM hitl_artifact_reviews WHERE artifact_id IN ('art-demo-001','art-axis-001','art-foundry-001');
-DELETE FROM cross_org_review_queue WHERE review_id IN ('rev-demo-001','rev-koami-001');
+DELETE FROM cross_org_review_queue WHERE review_id IN ('rev-demo-001','rev-koami-001','rev-decode-001');
 DELETE FROM agent_improvement_proposals WHERE id LIKE 'prop-demo-%' OR id LIKE 'prop-koami-%' OR id LIKE 'prop-axis-%' OR id LIKE 'prop-foundry-%';
 
 -- 1-2. Ethics + Kill Switch
 DELETE FROM kill_switch_state WHERE id = 'ks-demo-001';
 DELETE FROM ethics_violations WHERE id = 'viol-001';  -- append-only이지만 DELETE 허용
 
--- 1-3. Cross-Org (export_blocks → groups 순)
+-- 1-3. Cross-Org (export_blocks → groups 순, S357+ balanced 보완 — cog-decode-001 추가)
 DELETE FROM cross_org_export_blocks WHERE id = 'blk-demo-001';  -- append-only, DELETE 허용
-DELETE FROM cross_org_groups WHERE id = 'cog-demo-001';
+DELETE FROM cross_org_groups WHERE id IN ('cog-demo-001','cog-decode-001');
 
 -- 1-4. Diagnostic (findings → runs 순, FK 의존)
 DELETE FROM diagnostic_findings WHERE run_id = 'diag-demo-001';

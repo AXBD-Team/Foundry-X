@@ -33,14 +33,14 @@ related_docs:
 | 6 | `feedback_queue` | 5건 | KPI-2 critical_inconsistency_rate | organizations |
 | 7 | `audit_logs` | 5건 | F642 trace_id chain (Step 1~5 events) | (none) |
 | 8 | `diagnostic_runs` + `diagnostic_findings` | 1+6건 | F602 Step 1 시연 | (none) |
-| 9 | `cross_org_groups` | 1건 | F603 Step 2 그룹 분류 | organizations |
+| 9 | `cross_org_groups` | **2건** | F603 Step 2 그룹 분류 + Decode-X balanced | organizations |
 | 10 | `cross_org_export_blocks` | 1건 | F603 Step 3 default-deny (append-only) | cross_org_groups |
 | 11 | `ethics_violations` + `kill_switch_state` | 1+1건 | F607 Step 4 escalation (append-only) | (none) |
 | 12 | `agent_improvement_proposals` | 4건 | F605 meta-approval (1건 escalated rubric_score=0) | (none) |
-| 13 | `cross_org_review_queue` | 2건 | F605 expert-review | cross_org_groups |
+| 13 | `cross_org_review_queue` | **3건** | F605 expert-review + Decode-X balanced | cross_org_groups |
 | 14 | `hitl_artifact_reviews` | 3건 | F605 artifact-review | (none) |
 
-**합계 INSERT 행 수**: 5 + 5 + 6 + 6 + 6 + 5 + 5 + 7 + 1 + 1 + 2 + 4 + 2 + 3 = **58 rows**
+**합계 INSERT 행 수**: 5 + 5 + 6 + 6 + 6 + 5 + 5 + 7 + 2 + 1 + 2 + 4 + 3 + 3 = **60 rows** (S357+ balanced 보완 +2)
 
 ---
 
@@ -97,12 +97,12 @@ UNION ALL SELECT 'feedback_queue',              COUNT(*) FROM feedback_queue    
 UNION ALL SELECT 'audit_logs',                  COUNT(*) FROM audit_logs                  WHERE trace_id = 'trc-dry-run-2026-05-14'
 UNION ALL SELECT 'diagnostic_runs',             COUNT(*) FROM diagnostic_runs             WHERE id = 'diag-demo-001'
 UNION ALL SELECT 'diagnostic_findings',         COUNT(*) FROM diagnostic_findings         WHERE run_id = 'diag-demo-001'
-UNION ALL SELECT 'cross_org_groups',            COUNT(*) FROM cross_org_groups            WHERE id = 'cog-demo-001'
+UNION ALL SELECT 'cross_org_groups',            COUNT(*) FROM cross_org_groups            WHERE id IN ('cog-demo-001','cog-decode-001')
 UNION ALL SELECT 'cross_org_export_blocks',     COUNT(*) FROM cross_org_export_blocks     WHERE id = 'blk-demo-001'
 UNION ALL SELECT 'ethics_violations',           COUNT(*) FROM ethics_violations           WHERE id = 'viol-001'
 UNION ALL SELECT 'kill_switch_state',           COUNT(*) FROM kill_switch_state           WHERE id = 'ks-demo-001'
 UNION ALL SELECT 'agent_improvement_proposals', COUNT(*) FROM agent_improvement_proposals WHERE id LIKE 'prop-%-001'
-UNION ALL SELECT 'cross_org_review_queue',      COUNT(*) FROM cross_org_review_queue      WHERE review_id LIKE 'rev-%-001'
+UNION ALL SELECT 'cross_org_review_queue',      COUNT(*) FROM cross_org_review_queue      WHERE review_id IN ('rev-demo-001','rev-koami-001','rev-decode-001')
 UNION ALL SELECT 'hitl_artifact_reviews_demo',  COUNT(*) FROM hitl_artifact_reviews       WHERE artifact_id LIKE 'art-%-001';
 ```
 
@@ -110,9 +110,9 @@ UNION ALL SELECT 'hitl_artifact_reviews_demo',  COUNT(*) FROM hitl_artifact_revi
 - organizations: 5 / biz_items: 5 / graph_sessions: 6 / agent_run_metrics: 6
 - dual_ai_reviews_demo: 6 / feedback_queue: 5 / audit_logs: 5
 - diagnostic_runs: 1 / diagnostic_findings: 6
-- cross_org_groups: 1 / cross_org_export_blocks: 1
+- cross_org_groups: **2** / cross_org_export_blocks: 1
 - ethics_violations: 1 / kill_switch_state: 1
-- agent_improvement_proposals: 4 / cross_org_review_queue: 2 / hitl_artifact_reviews_demo: 3
+- agent_improvement_proposals: 4 / cross_org_review_queue: **3** / hitl_artifact_reviews_demo: 3
 
 ### 3.2 KPI 응답 정합성 (production smoke)
 
@@ -145,10 +145,10 @@ curl -s "https://foundry-x-api.ktds-axbd.workers.dev/api/hitl/queue" \
   -H "Authorization: Bearer ${JWT}" | jq '{total, escalatedCount, sources: [.items[].source] | unique}'
 ```
 
-**기대 응답**:
+**기대 응답** (S357+ balanced 보완 후):
 ```json
 {
-  "total": 9,                                                       // 4 (meta) + 2 (expert) + 3 (artifact)
+  "total": 10,                                                      // 4 (meta) + 3 (expert) + 3 (artifact)
   "escalatedCount": 1,                                              // prop-demo-001 rubric_score=0
   "sources": ["artifact-review", "expert-review", "meta-approval"]
 }
@@ -590,6 +590,71 @@ INSERT OR IGNORE INTO cross_org_groups (id, asset_id, asset_kind, org_id, group_
 > **meta-approval 노출 설명**: "AI 에이전트 자동 개선 제안은 본부 분기 없는 전사 공통 큐. 후속 F-item에서 본부별 분기 강화 예정."
 
 > **빈 큐 안전**: "운영 중 큐가 일시 비더라도 화면 정상 표시 — Promise 누락 처리 견고성 입증."
+
+#### 8.9.6 4 본부 Balanced 보완 시드 적용 (NEW v1, 사용자 결정 5/13 D-2)
+
+§8.9.3에서 식별한 **Decode-X 시드 부재 → baseline pending=4 불균형** 이슈를 해소하기 위해 **d1-seed-demo.sql + d1-seed-rollback.sql 영구 보강**.
+
+**적용된 보완 시드 2 row**:
+
+```sql
+-- §9 cross_org_groups에 추가
+INSERT OR IGNORE INTO cross_org_groups (id, asset_id, asset_kind, org_id, group_type, ...)
+VALUES ('cog-decode-001', 'pol-decode-analysis-001', 'policy', 'Decode-X', 'org_specific', ...);
+
+-- §14 cross_org_review_queue에 추가
+INSERT OR IGNORE INTO cross_org_review_queue (review_id, assignment_id, org_id, status, ...)
+VALUES ('rev-decode-001', 'cog-decode-001', 'Decode-X', 'pending', NULL, ...);
+```
+
+**Balanced 시뮬레이션 결과** (S357+, 깨끗한 sqlite로 재구축 + 보강 시드 적용):
+
+| 시점 | total | sources | 4 본부 분포 (pending) |
+|------|-------|---------|------------------------|
+| **이전 H0 baseline** | 9 | 4/2/3 | KOAMI=5 / AXIS-DS=5 / Decode-X=**4** ⚠️ / Foundry-X=5 |
+| **Balanced (S357+ 보강 후)** | **10** | 4/**3**/3 | **모두 pending=5, escalated=1 ✅** |
+
+**검증 결과 매트릭스**:
+
+| 검증 | 결과 |
+|------|------|
+| Decode-X cross_org_groups (cog-decode-001) 존재 | ✅ 1건 |
+| Decode-X cross_org_review_queue (rev-decode-001) 존재 | ✅ 1건 |
+| 4 본부 baseline pending 균형 | ✅ 모두 5 (KOAMI/AXIS-DS/Decode-X/Foundry-X) |
+| 4 본부 baseline escalated 균형 | ✅ 모두 1 (meta orgId=undefined 전사 표시) |
+| Rollback `cog-decode-001` 제거 | ✅ rollback 후 0건 |
+| Rollback `rev-decode-001` 제거 | ✅ rollback 후 0건 |
+| Rollback 4 본부 organizations 보존 | ✅ 4/4 유지 |
+
+**영향 받은 본문 수치**:
+
+- §1 합계 INSERT: **58 rows → 60 rows** (+2)
+- §1 cross_org_groups: 1 → **2**
+- §1 cross_org_review_queue: 2 → **3**
+- §2.3 KPI 기대값: 변동 없음 (KPI는 dual_ai_reviews + graph_sessions + agent_run_metrics 의존, HITL 영향 0)
+- §3.1 검증 query: cog-decode + rev-decode WHERE 절 추가
+- §3.3 HITL 응답 기대: total **9 → 10**
+
+**시연 시 메시지 변화** (NEW):
+
+> "4 본부 모두 pending=5건으로 균형. 본부별 시드(KOAMI expert / AXIS-DS+Foundry-X artifact / Decode-X expert)가 다양한 source 분포 노출 → graceful degradation 시각화에 적합."
+
+**Rollback 정합성**: d1-seed-rollback.sql 양쪽 (cross_org_groups + cross_org_review_queue) DELETE 절에 신규 ID 추가 완료. 시드/rollback 양방향 정합.
+
+#### 8.9.7 보완 후 통합 dry-run 결과 — **GO 판정 유지 ✅**
+
+| 검증 영역 | 결과 |
+|----------|------|
+| §3.1 시드 row 수 (60 rows) | ✅ 16/16 PASS |
+| §3.2 KPI 8개 응답값 | ✅ 8/8 PASS (HITL 보완 영향 0) |
+| §3.3 HITL queue total **10** + escalated 1 | ✅ PASS |
+| §3.4 trace_id chain 5 events | ✅ PASS |
+| §8.6 Rollback (보완 시드 포함) | ✅ 16/16 PASS + 4 본부 보존 |
+| §8.8 Graceful Null (2 시나리오) | ✅ PASS (변동 없음) |
+| §8.9 HITL 4 시나리오 | ✅ PASS (Decode-X 본부 column 분포 정상화) |
+| **§8.9.6 Balanced 보완 시드** | ✅ **4 본부 모두 pending=5 균형** |
+
+5/14 D-1 production 적용 즉시 가능, 5/15 미팅 시연 시 4 본부 시각적 균형 확보.
 
 **production 적용 권장 절차** (5/14 본 진행):
 1. `npx wrangler d1 migrations list foundry-x-db --remote` — 0154 적용 확인

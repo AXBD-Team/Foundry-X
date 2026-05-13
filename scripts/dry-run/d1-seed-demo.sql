@@ -86,8 +86,10 @@ INSERT OR IGNORE INTO diagnostic_findings (id, run_id, org_id, diagnostic_type, 
   ('df-006', 'diag-demo-001', 'demo-org', 'overspec',      'info',     'ent-logging',          '{"reason":"verbose logging overhead"}');
 
 -- 9. cross_org_groups (F603) — demo policy를 core_differentiator로 분류
+-- + Decode-X balanced 보완 (S357+, 23 v1 §8.9.3 결정 적용): expert-review용 asset 사전 등록
 INSERT OR IGNORE INTO cross_org_groups (id, asset_id, asset_kind, org_id, group_type, commonality, variance, documentation_rate, business_impact, assigned_by, assigned_at) VALUES
-  ('cog-demo-001', 'pol-rpa-pension-claim-001', 'policy', 'demo-org', 'core_differentiator', 0.15, 0.78, 0.85, 'high', 'auto', 1747273820000);
+  ('cog-demo-001',   'pol-rpa-pension-claim-001', 'policy', 'demo-org', 'core_differentiator', 0.15, 0.78, 0.85, 'high',   'auto', 1747273820000),
+  ('cog-decode-001', 'pol-decode-analysis-001',   'policy', 'Decode-X', 'org_specific',         0.45, 0.50, 0.70, 'medium', 'auto', 1747273825000);
 
 -- 10. cross_org_export_blocks (F603 default-deny) — demo Step 3 시연용 (append-only)
 INSERT INTO cross_org_export_blocks (id, asset_id, org_id, reason, attempted_action, trace_id, metadata) VALUES
@@ -119,10 +121,13 @@ INSERT OR IGNORE INTO agent_improvement_proposals (id, session_id, agent_id, typ
 -- (현재 schema 0133에 rubric_score 없음 — F605 collector가 rubric_score를 별 컬럼이 아닌 NULL 처리한다고 가정. 22 v2 §4 참조)
 -- ↑ 위 INSERT가 0133 schema에 없는 컬럼이라 에러 발생 가능 → schema 확인 후 별도 ALTER 또는 column 제외 처리 권장.
 
--- 14. cross_org_review_queue (F605 expert-review source) — 2건 pending
+-- 14. cross_org_review_queue (F605 expert-review source) — 3건 pending (S357+ balanced 보완)
+-- demo-org + KOAMI + Decode-X (Decode-X 보완 시드, 23 v1 §8.9.3 결정 적용 → 4 본부 balanced)
+-- 주의: cog-koami-001 assignment_id는 cross_org_groups에 사전 등록 안 됨 — 의도된 dangling reference (F605 collectReviewQueue가 assignment_id FK 검증 안 함)
 INSERT OR IGNORE INTO cross_org_review_queue (review_id, assignment_id, org_id, status, decision, expert_id, notes, enqueued_at) VALUES
-  ('rev-demo-001',  'cog-demo-001', 'demo-org',  'pending', NULL, NULL, NULL, 1747273830000),
-  ('rev-koami-001', 'cog-koami-001','KOAMI',     'pending', NULL, NULL, NULL, 1747273840000);
+  ('rev-demo-001',   'cog-demo-001',   'demo-org', 'pending', NULL, NULL, NULL, 1747273830000),
+  ('rev-koami-001',  'cog-koami-001',  'KOAMI',    'pending', NULL, NULL, NULL, 1747273840000),
+  ('rev-decode-001', 'cog-decode-001', 'Decode-X', 'pending', NULL, NULL, NULL, 1747273850000);
 
 -- 15. hitl_artifact_reviews (F605 artifact-review source) — 3건 (action enum: approved/modified/regenerated/rejected, 'pending' 불가)
 INSERT OR IGNORE INTO hitl_artifact_reviews (id, tenant_id, artifact_id, reviewer_id, action, reason) VALUES
