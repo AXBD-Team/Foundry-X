@@ -19,7 +19,7 @@ Foundry-X가 이를 읽고 분석하고 동기화를 강제해요.
 | 항목 | 수치 |
 |------|------|
 | Phase | 47 (Sprint 393) |
-| Sprints | 391 완료 |
+| Sprints | 393 완료 |
 | API Routes | ~4 |
 | API Services | ~0 (F641 closure) |
 | API Schemas | ~13 |
