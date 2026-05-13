@@ -38,7 +38,7 @@ classification: 기업비밀II급 / Enterprise부문
 
 W18(✅) → **W19 D-2 (현재, 5/13)** BeSir 미팅 + Conditional 게이트 → W20~W22 Foundry-X 5 sub-app 스캐폴드(**P0-3/P0-4/P0-5/P0-6/P0-7/P0-8 ✅ 사전 진행**) → W26 5-Layer 통합 → W29 Phase 3 진입 정비.
 
-## 4. 문서 Navigation (21건 + scripts/dry-run/ 2 SQL)
+## 4. 문서 Navigation (22건 + scripts/dry-run/ 2 SQL)
 
 ### 마스터 기획 (활성)
 - **02_ai_foundry_phase1_v0.3.md** — Phase 1 정의서 (BeSir 정합성 P0 10건 + v0.4 patch S346 + **v0.5 patch S357+ W19 D-2** — P0 6/8 토대 ✅ + 5 v2 docs 완비) ★ SSOT
@@ -70,7 +70,8 @@ W18(✅) → **W19 D-2 (현재, 5/13)** BeSir 미팅 + Conditional 게이트 →
 - **21_kpi_calculation_table_v2.md** (S357 신규, 2026-05-12) — v1 8 KPI 산정 표 위에 **F621 4 본부 통합 시각화 매핑 + production API shape + graceful degradation + orgId filter 비대칭 + 5/14 dry-run 기대값** 추가. v2 정본.
 - **22_hitl_console_v2.md** (S357 갱신, 2026-05-12) — v1 위에 **F605 ✅ MERGED 검증 + F621 4 본부 통합 모니터링 매핑 + source별 D1 UPDATE 실 구현 + F607 trace_id 통합 + 20 demo v2 Step 4/7 시나리오 + 잔존 5 F-item 후속**. v2 정본.
 - **18_conditional_gate_evidence_v2.md** (S357+ 갱신, 2026-05-13 W19 D-2) — v1(D-5) 위에 **C-1 57 sprint(+16) / C-2 안건 3건 축소(AXIS-DS unlock + stub 우회) / C-3 17건 완결 매핑 + autopilot 17회차 학습 / C-4 8/8 KPI ✅ production 측정 가능 / Q&A 8건 / 5/14 dry-run D-1 통합 점검 매핑**. 5/15 미팅 입장 정본.
-- **23_dry_run_d1_seed_v1.md** (S357+ 신규, 2026-05-13 W19 D-2) — **production D1 시드 SQL 초안** 11 테이블 58 rows + 검증 5 query + 실행/rollback 절차 + 안전 룰 4건. 실행 SQL 파일: `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql`. 5/14 D-1 dry-run 적용 자료.
+- **23_dry_run_d1_seed_v1.md** (S357+ 신규, 2026-05-13 W19 D-2) — **production D1 시드 SQL 초안** 11 테이블 60 rows + 검증 5 query + 실행/rollback 절차 + 안전 룰 4건 + **§8 통합 시뮬레이션 6 sub-section** (시드/rollback/graceful null/HITL 4 시나리오/Decode-X balanced/multi-degradation 3 시나리오 = **61 PASS / 0 FAIL**). 실행 SQL 파일: `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql`. 5/14 D-1 dry-run 적용 자료.
+- **24_production_apply_cheatsheet_v1.md** (S357+ 신규, 2026-05-13 W19 D-2) — **5/13 D-2 메타 세션 14 commits 회고 + 5/14~5/16 production 적용/시연/rollback cheatsheet** 통합. 미팅 직전 1면 참조용. **5/16+ 다음 사이클 4 시나리오** (BeSir sign-off 결과별 후속).
 
 ### Deprecated
 - **01_master_plan_v0.1.md** — Decision Foundry 명칭 시절 (2026-04-29 v0.2 방향 전환으로 폐기)
