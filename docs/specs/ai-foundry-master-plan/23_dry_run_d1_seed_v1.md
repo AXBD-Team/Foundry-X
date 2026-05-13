@@ -748,6 +748,62 @@ HITL:   total=0
 3. `npx wrangler d1 execute foundry-x-db --remote --command="SELECT COUNT(*) FROM organizations WHERE id='demo-org'"` — 검증 1회
 4. 7 endpoint smoke (Step 1~5 curl + Step 6 코드 trace + Step 7 `/operations` URL)
 
+### 8.11 5/13 D-2 Live Production Dry-Run (S358+, 시드 적용 후 7 endpoint 실측)
+
+> **결과**: 7 endpoint 모두 ✅ + F619 multi-evidence test 10/10 PASS + KPI/HITL 안정. **20 v1 docs schema drift 2건 발견** (Step 2/3/4 body) → 별 patch 사이클로 분리.
+
+#### 8.11.1 Step 1~7 실측 매트릭스
+
+| Step | endpoint / 산출물 | HTTP / 결과 | 분석 |
+|------|-------------------|-------------|------|
+| 1 | `POST /api/diagnostic/run` `{orgId:"demo-org",diagnosticTypes:[...]}` | **200 ✅** runId 응답, findings=0 | demo-org 진단 대상 부재, endpoint 정상 |
+| 2 | `POST /api/cross-org/assign-group` (실 schema: `{assetId, assetKind, orgId, groupType}`) | **200 ✅** `cog-demo-001` 갱신 | **20 v1 docs body drift fix 후 PASS** (docs는 `{orgId, policyId, trace_id}` outdated) |
+| 3 | `POST /api/cross-org/check-export` (실 schema: `{assetId, attemptedAction, traceId}`) | **200 ✅** `allowed=false, blockId=5f83fb0b...` | **drift fix 후 PASS**, D1 export_blocks +1 row INSERT 확증 |
+| 4 | `POST /api/ethics/check-confidence` (실 schema: `{orgId, agentId, callMeta:{confidence, callId, traceId}}`) | **200 ✅** `passed=false, escalated=true` | **drift fix 후 PASS**, confidence 0.65 < 0.7 escalation 정확 |
+| 5 | `GET /api/audit/log/by-trace?trace_id=trc-dry-run-2026-05-14` | **200 ✅** 5 events + chainValid=true | 시드 5 events 유지. **라이브 호출이 audit_logs에 추가 emit 안 함** — 별 발견 |
+| 6 | F619 `processMultiEvidence` test 8/8 + audit-bus integration 2/2 | **10/10 PASS ✅** | E1/E2/E3 pipeline + traceId 전파 + diagnosticSessionId 독립 검증 완료 |
+| 7 | `GET https://fx.minu.best/operations` (SPA) | **200 ✅** | 5/13 14:23 + 20:23 두 시점 모두 LIVE |
+
+#### 8.11.2 KPI 8건 + HITL queue 재측정 (5/13 20:23 KST)
+
+KPI/HITL 모두 5/13 14:23 시점과 **동일 안정값** — Step 1~4 dry-run이 KPI/HITL agg에 즉각 영향 없는 분야 (KPI agg는 dual_ai_reviews/graph_sessions/agent_run_metrics 중심, HITL queue는 시드 그대로 유지).
+
+| | 14:23 시점 | 20:23 시점 | 안정성 |
+|------|-----------|-----------|--------|
+| KPI 8건 | bureau=2 / inconsistency=11.1% / reuse=2.9% / time=9분 / e2e=88.9% / hitl_avg=5.4% / **p95=38015ms** / blocking=83% | **동일** | ✅ 6시간 안정 |
+| HITL queue | total=44, escalated=1, 3 source | **동일** | ✅ 6시간 안정 |
+
+#### 8.11.3 발견 사항 2건 (별 fix 사이클)
+
+**발견 1: 20 v1 docs Step 2/3/4 body schema drift (immediate-fix 권장)**
+
+| Step | docs body (outdated) | 실 production schema | drift 원인 |
+|------|----------------------|-----------------------|-----------|
+| 2 | `{orgId, policyId, trace_id}` | `{assetId, assetKind, orgId, groupType, signals?}` | S350 (Sprint 350) cross-org schema 갱신 미반영 |
+| 3 | `{orgId, policyId, targetOrgId, trace_id}` | `{assetId, attemptedAction?, traceId?}` | S350 동일, `targetOrgId` 제거 |
+| 4 | `{agentId, orgId, decision, confidence, trace_id}` | `{orgId, agentId, callMeta:{confidence, callId, traceId?}}` | ethics schema 객체 nesting 갱신 |
+
+**5/15 시연 영향**: 시연자가 20 v1 cheatsheet body 그대로 curl 사용 시 모두 HTTP 400. **5/14 dry-run 본 진행 또는 직전 20 v1 body patch 필수**.
+
+**발견 2: 라이브 endpoint audit_logs emit 0건 (별 발견)**
+
+Step 1~4 라이브 호출 후 `/api/audit/log/by-trace?trace_id=trc-dry-run-2026-05-14` 응답 events count = 5 (시드 그대로). 라이브 endpoint들이 `audit_logs` 테이블에 신규 row INSERT 안 함. 가능성: (i) `audit_events` 테이블로 분리 emit, (ii) trace_id 전파 path 차이, (iii) endpoint별 audit emit 정책 분기. **5/15 시연 자체는 시드 5 events로 충분** — 별 fix 사이클로 분리.
+
+#### 8.11.4 GO 판정 갱신 (8.7 보강)
+
+| 검증 영역 | 시뮬레이션 (§8.1~8.10) | **5/13 라이브 (§8.11)** | 종합 |
+|----------|------------------------|--------------------------|------|
+| §3.1 시드 16 테이블 row 수 | ✅ 16/16 PASS | ✅ 15/16 + 1 known drift (dual_ai sprint_id overlap) | ✅ GO 유지 |
+| §3.2 KPI 8 응답 | ✅ 8/8 PASS (시드 isolation) | ✅ 8 endpoint HTTP 200 (수치는 production 누적) | ✅ GO 유지 |
+| §3.3 HITL queue | ✅ total=10, escalated=1 | ✅ total=44 (운영 누적 34), escalated=1 정확 | ✅ GO 유지 |
+| §3.4 trace_id chain | ✅ 5 events | ✅ 5 events + chainValid=true | ✅ GO 유지 |
+| **Step 1~5 라이브 curl** | (시뮬레이션 단계 아님) | ✅ **schema drift fix 후 4/4 PASS** | ⚠️ 20 v1 body docs patch 필요 |
+| **Step 6 F619 코드 trace** | (시뮬레이션 단계 아님) | ✅ test 10/10 PASS (multi-evidence + audit-bus) | ✅ |
+| **Step 7 /operations** | (시뮬레이션 단계 아님) | ✅ HTTP 200 (2회) | ✅ |
+| 운영 데이터 보호 | ✅ 4 본부 + APPROVE 5건 보존 | (rollback 미실행) | ✅ rollback SQL 검증 완료 |
+
+**판정**: ✅ **GO 유지 (5/15 D-day production 시연 가능)** + **5/14 D-1 직전 20 v1 body docs patch 필수** (또는 시연자가 본 §8.11.1 실 schema 사용).
+
 ---
 
 ## 9. 이력
@@ -755,7 +811,8 @@ HITL:   total=0
 | 버전 | 날짜 | 변경 | 작성자 |
 |------|------|------|--------|
 | v1 | 2026-05-13 | 최초 작성 (S357+ W19 D-2). 11 테이블 시드 + 검증 5 query + 실행/rollback 절차 + 안전 룰 4건 + **§8 사전 dry-run 결과 (local sqlite, 모든 검증 PASS)** | Sinclair |
+| v1.1 patch | 2026-05-13 | S358+ D-1 라이브 dry-run 결과 추가 (§8.11). production 시드 적용 + 7 endpoint 실측 + F619 multi-evidence test + KPI/HITL 안정. **20 v1 docs schema drift 2건 발견** (Step 2/3/4) + audit_logs 라이브 emit 0건 (별 fix 사이클). GO 판정 유지. | Sinclair (S358+) |
 
 ---
 
-**Status**: v1.0 (S357+, 2026-05-13 W19 D-2) — 5/14 D-1 dry-run + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 dry-run 시드 + rollback 모두 검증 PASS (§8)** — 5/14 production 적용 GO 판정 ✅.
+**Status**: v1.1 (S358+, 2026-05-13 W19 D-2) — 5/14 D-1 dry-run + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 시뮬레이션 (§8.1~§8.10) + 라이브 production (§8.11) 모두 검증 완료** — 5/15 production 시연 GO 판정 ✅. 단 5/14 D-1 본 진행 직전 **20 v1 cheatsheet body schema patch 필수** (Step 2/3/4 outdated body 사용 시 HTTP 400).
