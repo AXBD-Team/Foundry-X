@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~46 완료 + Phase 47 진행 (Sprint 1~382, F646 ✅ 최신 (S352), F644 후속 e2e shard 1+2 잔존 4 spec content drift fix — 3 autopilot fix (ax-bd-hub:18 + conflict-resolution:57+64) + 1 master fix (feedback-dashboard:165 sidebar Portal 그룹 race) + PR #804 + master commit `a1de7833`. **47 sprint 연속 성공**. 직전 F644 ✅ Sprint 381 (S352) — E2E selector/fixture 누적 부채 fix + master push CI 트리거 가시화. **S352 META 병행**: MEMORY 33.5KB→9.1KB(-73%) + rules ax-config Stale F_ITEMS 17회차 → ✅ FIXED + F644 row escape pipe fix silent layer 7 1차 차단. 직전 F643 ✅ Sprint 380 (S351) — bashrc sprint() L1 fix, Stale F_ITEMS 16회 누적 lifecycle 승격 임계점 영구 차단). 상세: SPEC.md §5
+Phase 1~46 완료 + Phase 47 진행 (Sprint 1~393, **57 sprint 연속 성공** S306~S357, F560~F621). 직전 S358+ (2026-05-13 W19 D-2) **AI Foundry BeSir 5/15 D-day 준비 본 진행**: 5/13 14:23 production D1 시드 적용(16 INSERT / 60 rows) + 7 endpoint 라이브 dry-run 2회(14:23/20:23) HTTP 200 PASS + F619 multi-evidence test 10/10 PASS + 20 v1 docs Step 2/3/4 schema drift 즉시 fix + 18 v2 §7 Q&A 보강(Q2/Q4/Q5 라이브 증거) + F658/F659 P2 부채 신규 등록 + 9 docs PDF 변환(177p / 5MB) + 18 v2 §8.2 cosmetic patch. master commits 5건(493d61a3 → 862c2494 → 3f05bb94 → 2e667240 → f86da590). 직전 (S357) Sprint 392+393 F619+F621 ✅ MERGED. 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
