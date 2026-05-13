@@ -41,7 +41,7 @@ W18(✅) → **W19 D-2 (현재, 5/13)** BeSir 미팅 + Conditional 게이트 →
 ## 4. 문서 Navigation (20건)
 
 ### 마스터 기획 (활성)
-- **02_ai_foundry_phase1_v0.3.md** — Phase 1 정의서 (BeSir 정합성 P0 10건 + **v0.4 patch S346**) ★ SSOT
+- **02_ai_foundry_phase1_v0.3.md** — Phase 1 정의서 (BeSir 정합성 P0 10건 + v0.4 patch S346 + **v0.5 patch S357+ W19 D-2** — P0 6/8 토대 ✅ + 5 v2 docs 완비) ★ SSOT
 - **07_ai_foundry_os_target_architecture.md** — Target Architecture (5-Layer + 4-Asset)
 - **08_build_plan_v1.md** — 마스터 빌드 플랜 (W18~W29 12주 매핑)
 
@@ -52,9 +52,9 @@ W18(✅) → **W19 D-2 (현재, 5/13)** BeSir 미팅 + Conditional 게이트 →
 - **12_dev_plan_cross_org_v1.md** — Cross-Org 4그룹 분류 + core_differentiator default-deny
 
 ### Live Audit + Implementation (2026-05-04)
-- **14_repo_status_audit_v1.md** — 5 repo 라이브 정밀 분석 (PRD P0 평균 25% 충족, Foundry-X P0-4 0%)
+- **14_repo_status_audit_v1.md** — 5 repo 라이브 정밀 분석 (v1 25% → v1.1 patch S346 58% → **v1.2 patch S357+ ~75%** — P0 6/8 토대 ✅)
 - **15_msa_implementation_plan_v1.md** ★ — 5 sub-app + 3 횡단 레이어 + W18~W29 통합 sprint 매핑
-- **16_validation_report_v1.md** — 14·15 검증 + v1.1 patch 권고 10건
+- **16_validation_report_v1.md** — 14·15 검증 + v1.1 patch 권고 10건 → **v1.2 patch S357+ 해소율 90%** (잔존: 오픈이슈 3건 묶음만)
 
 ### 검토 + 임원 보고
 - **03_cross_review_prompts.md / 04_cross_review_consolidation_v1.md** — 외부 LLM 교차 검토 프롬프트 + 통합본

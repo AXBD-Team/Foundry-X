@@ -1,7 +1,7 @@
-# 14. AI Foundry OS 5개 Repo 현황 점검 보고서 v1.1 (S346 baseline patch)
+# 14. AI Foundry OS 5개 Repo 현황 점검 보고서 v1.2 (S357+ baseline patch)
 
-**버전:** v1.1 (S346 patch, 2026-05-10 baseline 갱신)
-**날짜:** 2026-05-04 / **patch 2026-05-10**
+**버전:** v1.2 (S357+ patch, 2026-05-13 W19 D-2 baseline 갱신) / 이전 v1.1 (S346, 2026-05-10) / v1 2026-05-04
+**날짜:** 2026-05-04 / **v1.1 patch 2026-05-10** / **v1.2 patch 2026-05-13 (W19 D-2)**
 **작성자:** Sinclair Seo (KTDS-AXBD AX컨설팅팀, PM 겸 프로그래머)
 **기반 문서:** prd-final.md (2026-05-02) + 02_ai_foundry_phase1_v0.3.md + 07_ai_foundry_os_target_architecture.md + 08_build_plan_v1.md (마스터 빌드 플랜) + 09~12 dev plan (Guard-X·Launch-X·Diagnostic·Cross-Org)
 **조사 방식:** GitHub 라이브 정밀 분석 (5 repo × README/SPEC/CHANGELOG/MEMORY/package.json/디렉토리 트리/최근 커밋·PR·이슈 + npm registry)
@@ -10,6 +10,8 @@
 **문서 위치:** 본 14는 5월 2일 작성된 08·09~12 문서들의 가설을 5월 4일 시점 GitHub 라이브 상태로 검증하는 보정 문서. 메모리 9건·기존 문서 가정과 실제 repo 사이의 드리프트를 명시.
 
 > **v1.1 patch (S346, 2026-05-10)**: Foundry-X 진척 24h+ 드리프트 누적 해소 — Phase 46/Sprint 331 → Phase 47/Sprint 376 (+45 sprint). P0-3/P0-4/P0-7/P0-8 4건 토대 ✅ 완결 (F602/F603/F606/F607 모두 MERGED). PRD MVP P0 평균 충족률 ~25% → ~58% (4건 100% 진입). 41 sprint 연속 성공 (S306~S346, F560~F641).
+>
+> **v1.2 patch (S357+, 2026-05-13 W19 D-2)**: 추가 17 sprint 진척 — Sprint 376 → Sprint 393 (+17 sprint). **P0-5/P0-6 ✅ 2건 신규 unlock** (F604 ✅ Sprint 377 + F605 ✅ Sprint 378 + F621 ✅ Sprint 393 + F619 ✅ Sprint 392 + F642 ✅ Sprint 379). PRD MVP P0 평균 충족률 ~58% → **~75%** (6/8 P0 토대 ✅). **57 sprint 연속 성공** (S306~S357, F560~F621). **AXIS-DS PR #55 ✅ unlock + v1.2 publish** (93일 정체 깸). 잔존 외부 의존 2건 (F600 5-Layer + F601 PG/SSO, 5/15 BeSir 미팅 안건).
 
 ---
 
@@ -18,6 +20,8 @@
 **v1 한 줄 결론 (2026-05-04 시점)**: 5개 repo는 모두 살아 있지만 PRD-final MVP의 8개 P0 기능 중 어느 것도 50% 이상 구현되어 있지 않다. 가장 진척된 P0-8(AI 투명성)도 50%, 평균은 ~25%. Foundry-X는 자체 BD 파이프라인으로는 v1.9.0까지 성숙(15 packages, Phase 46/Sprint 331)했으나 PRD가 요구하는 5-Layer Control Plane 정체성과 5개 신규 sub-app은 0%. Discovery-X·AXIS-DS는 각각 47일·93일 commit 정체. 7월 MVP까지 12주 남짓에서 critical path는 **Foundry-X core sub-app 5개 신설 + PostgreSQL/SSO 도입 + Decode-X 도메인 실측 + AXIS-DS v1.2 KPI/HITL 위젯 라인업**으로 좁혀진다.
 
 **v1.1 patch (2026-05-10, S346)**: 6일 만에 P0 4건 토대 100% 완결 — **F602(P0-3 4대 진단) ✅ Sprint 357 / F603(P0-4 Cross-Org default-deny 골격) ✅ Sprint 363 / F606(P0-7 Audit Bus T1 토대) ✅ Sprint 351 / F607(P0-8 윤리 임계 + kill switch) ✅ Sprint 359**. P0 평균 충족률 ~25% → **~58%** (4건 100% + 4건 잔존 평균 27.5%). Foundry-X 자체 진척 v1.9.0/Sprint 331 → **Sprint 376/v1.9.x** (+45 sprint, 41 sprint 연속 성공 S306~S346). Critical path 갱신 — **잔여 P0 4건(F600 5-Layer 통합 / F601 PG+SSO / F604 KPI 위젯 / F605 HITL Console) + Discovery-X·AXIS-DS 외부 의존 unlock + Decode-X 도메인 실측**. F624(Six Hats LLM 정책)/F626(core_diff 차단율 측정)도 ✅ 추가 흡수 — INDEX.md §8 P1 누락 3건 중 2건 해소.
+
+**v1.2 patch (2026-05-13, S357+, W19 D-2)**: 추가 3일 만에 P0 2건 추가 토대 100% — **F604(P0-5 KPI 위젯) ✅ Sprint 377 + F621 ✅ Sprint 393(KPI 통합 화면 4 본부) / F605(P0-6 HITL Console) ✅ Sprint 378 / F619(P0-3 Multi-Evidence Integration stub) ✅ Sprint 392 / F642(P0-7 trace endpoint) ✅ Sprint 379**. P0 평균 충족률 ~58% → **~75%** (6건 100% + 2건 잔존 평균 17.5%). Foundry-X **Sprint 376 → Sprint 393** (+17 sprint, **57 sprint 연속 성공** S306~S357, F560~F621). **AXIS-DS PR #55 ✅ 머지 + v1.2 publish** (93일 정체 → 깸, F604/F605 unlock). Critical path 추가 축소 — **잔여 P0 2건(F600 5-Layer + F601 PG/SSO) 모두 5/15 BeSir 미팅 안건**. P1 누락 4건 모두 ✅ 해소 (F623 /ax:domain-init Sprint 362 / F624 Six Hats / F626 core_diff / F632 CQ 5축 Sprint 358). INDEX.md §8 해소율 62.5% → 87.5% (잔존: 오픈이슈 3건만).
 
 ---
 

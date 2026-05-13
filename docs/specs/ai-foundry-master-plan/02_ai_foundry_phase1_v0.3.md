@@ -1,11 +1,11 @@
 ---
 title: AI Foundry — 기업 의사결정 업무 Agentic AI 플랫폼 정의서
 scope: Phase 1 정의서 (~5월) + Phase 2(6월 Prototype) + Phase 3(8월~ 실제 사업 적용) 로드맵
-version: v0.4 (S346 patch — W19 D-5 진척 반영, P1 누락 5건 ✅ 흡수)
-prev_version: v0.3 (Draft, BeSir 정합성 P0 반영판, 2026-04-29)
-date: 2026-04-29 / patch 2026-05-10 (W19 D-5)
+version: v0.5 (S357+ patch — W19 D-2 진척 반영, P0 6/8 토대 ✅ + 5 v2 docs 완비)
+prev_version: v0.4 (S346 patch, 2026-05-10) / v0.3 (Draft, BeSir 정합성 P0 반영판, 2026-04-29)
+date: 2026-04-29 / v0.4 patch 2026-05-10 (W19 D-5) / v0.5 patch 2026-05-13 (W19 D-2)
 owner: Sinclair Seo
-status: v0.4 patch — Foundry-X 41 sprint 연속 성공 (S306~S346, F560~F641) + P0 4건 토대 ✅ + P1 누락 5건 사실상 해소 (Six Hats F624 / CQ 5축 F632 / 윤리 임계 F607 / core_diff 차단율 F603+F626 / 24h 드리프트 14 v1.1) — 5월 W19 BeSir 미팅 D-5 게이트 통과 자료
+status: v0.5 patch — Foundry-X 57 sprint 연속 성공 (S306~S357, F560~F621) + **P0 6/8 토대 ✅** (P0-3/4/5/6/7/8) + 5 v2 docs (17/18/20/21/22) 작성 완료 + MVP W27 게이트 사전 충족 — 5월 W19 BeSir 미팅 D-2 입장 자료 (잔존 외부 의존 2건 F600/F601만)
 priority_note: 사업 정의는 후순위, 기술 아키텍처·로드맵 우선
 integration_model: BeSir과 MCP 표준 인터페이스 (느슨한 연동, Q1 결정)
 ontology_engine: 자체 구축 (X1) + BeSir 파트너 도구 차용 옵션 (Q2 결정)
@@ -1758,6 +1758,45 @@ Skill Package 등록·실행·외부 연동, Decision Log 기록.
 
 ## 13. Changelog
 
+### v0.5 (2026-05-13, S357+ patch) — W19 D-2 진척 반영, P0 6/8 토대 ✅ + 5 v2 docs 완비
+
+**근거**: v0.4(S346 W19 D-5) 작성 후 3일간 추가 17 sprint 진척 (Sprint 376 → Sprint 393) + 5 v2 docs (17/18/20/21/22) 작성 완료 + AXIS-DS PR #55 ✅ 머지로 F604/F605 unlock + Decode-X stub 우회로 F619 80% 자체.
+
+**P0 6/8 토대 ✅ 완결** (v0.4 4/8 → v0.5 6/8, +2건):
+- ✅ **P0-3 4대 진단** — v0.4 그대로 (F602 Sprint 357) + **F619 ✅ Sprint 392** (Multi-Evidence E1/E2/E3 통합 + Decode-X stub adapter, 80% 자체 — Phase 2-E unlock 시 swap)
+- ✅ **P0-4 Cross-Org default-deny** — v0.4 그대로 (F603 Sprint 363 + F626 Sprint 364)
+- ✅ **P0-5 KPI 대시보드 8개** — **NEW v0.5** (F604 ✅ Sprint 377 KpiCalculatorService 8 method + 4 위젯 KpiTile/Sparkline/MetricGrid/TrendArrow + F621 ✅ Sprint 393 /operations 4 본부 통합 화면, MVP W27 게이트 ✅)
+- ✅ **P0-6 HITL Console** — **NEW v0.5** (F605 ✅ Sprint 378 core/hitl/ + 3 source 통합 collector + HitlQueueTable/HitlDecisionForm/HitlMetricsTile/HitlEscalationBadge + RBAC 5역 mock + F621 4 본부 통합 모니터링)
+- ✅ **P0-7 Audit Log Bus** — v0.4 그대로 (F606 Sprint 351) + **F642 ✅ Sprint 379** (trace endpoint `GET /api/audit/log/by-trace` + audit chain enrichment)
+- ✅ **P0-8 AI 투명성** — v0.4 그대로 (F607 Sprint 359 confidence + FP + kill switch)
+
+**5 v2 docs 작성 완료** (S357+ 메타 세션):
+- ✅ **17_internal_dev_plan_with_besir_v2.md** — Tier 1~5 17건 ✅ 완결 매핑 + T6 외부 unlock 4건 ✅ (F604/F605/F619 stub/F621) + v1과 1:1 진척 비교
+- ✅ **18_conditional_gate_evidence_v2.md** — 4 게이트 D-2 진척: C-1 ✅ 57 sprint / C-2 안건 3건 축소 / C-3 17건 완결 / C-4 8/8 KPI ✅ + Q&A 8건 + 5/14 dry-run 통합 점검
+- ✅ **20_live_demo_scenario_v2.md** — 5 step → 7 step (Step 6 F619 코드 trace + Step 7 F621 `/operations` URL 시연 추가) + Q&A 5건 → 8건
+- ✅ **21_kpi_calculation_table_v2.md** — F621 4 본부 통합 시각화 매핑 + production API shape + graceful degradation + orgId filter 비대칭
+- ✅ **22_hitl_console_v2.md** — F605 ✅ MERGED 검증 + F621 4 본부 통합 모니터링 + source별 D1 UPDATE 실 구현 + F607 trace_id chain 통합
+
+**P1 누락 추가 해소** (v0.4 잔존 → v0.5 ✅):
+- ✅ **/ax:domain-init β** — F623 Sprint 362 MERGED (v0.4에선 idea 상태)
+- ✅ **§5.1 KPI 8개 산정-UI 매핑** — F604 + F621 ✅ (v0.4에선 잔존)
+
+**잔존 항목** (v0.5 W19 D-2 ~ W20+ BeSir 결정 따라):
+- 📋 **P0-1 5-Layer 통합** (F600) — 5 repo orchestration 의존, 5/15 BeSir 미팅 안건
+- 📋 **P0-2 Multi-Tenant PG + SSO** (F601) — PG 인프라 결정 + KT DS SSO 협의, 5/15 BeSir 미팅 안건 (골격 80% 자체 ✅)
+- 📋 오픈이슈 #5/#6/#9 — 별 docs / Marker.io (BeSir 미팅 후 일정 확정)
+
+**관련 문서 patch (S357+ 일괄)**:
+- INDEX.md v1.1 → v1.2 (commit `946bb8c6`)
+- 14_repo_status_audit_v1 → v1.2 patch (Sprint 376 → 393)
+- 16_validation_report_v1 → v1.2 patch (권고 10건 해소율 80% → 90%)
+- 18 v1 → v2 (commit `7946843a`)
+- 17/20/21/22 v2 신규 (commit `997bdb03`, `e631f87d`, `78de4551`)
+
+**v1.0 승급 조건** (v0.4와 동일):
+- 5월 W19 BeSir 차기 미팅에서 양사 기술 정합성 확인
+- KT DS 임원·코어 W18 합의 회의 sign-off
+
 ### v0.4 (2026-05-10, S346 patch) — W19 D-5 진척 반영, P1 누락 5건 ✅ 흡수
 
 **근거**: Foundry-X 41 sprint 연속 성공 (S306~S346, F560~F641) 결과 PRD §4.2 P1 누락 항목 + §6.4 윤리 + §5.3 core_diff + 24h 드리프트 사실상 해소.
@@ -1830,17 +1869,17 @@ AI Foundry 정의서 초안 (시스템 정의 + 5-Layer + 4대 진단 + Cross-Or
 
 ## 끝맺음 — 본 문서의 위상
 
-이 문서는 **AI Foundry 정의서 v0.4**입니다 (S346 patch — W19 D-5 진척 반영, P1 누락 5건 ✅ 흡수 + P0 4건 토대 ✅, 5월 W19 BeSir 5/15 D-day 사전판).
+이 문서는 **AI Foundry 정의서 v0.5**입니다 (S357+ patch — W19 D-2 진척 반영, P0 6/8 토대 ✅ + 5 v2 docs 완비 + MVP W27 게이트 사전 충족, 5월 W19 BeSir 5/15 D-2 입장 자료).
 
-v1.0이 아니라 v0.4로 둔 것은:
+v1.0이 아니라 v0.5로 둔 것은:
 
-v1.0이 아닌 v0.4 사유 (요약):
-1. 5 모듈 코어 미지정 (W18 결정 후 v1.0)
-2. 가상 도메인 1·2 사양 미작성
-3. 5월 W19 **BeSir 미팅 결과 미반영** (5/15 미팅 후 흡수 → v1.0 sign-off 가능)
-4. Phase 2 측정 결과 미통합 (6월 W26 별도)
-5. Phase 3 첫 실제 도메인 미확정 (7월 W29)
-6. Counterquestions Q1·Q2·Q3 미해소 (Q4·Q5는 인터뷰로 완료, S346 시점 P1 누락 5건은 ✅ 흡수)
+v1.0이 아닌 v0.5 사유 (요약):
+1. **5/15 BeSir 미팅 결과 미반영** (D-2, 미팅 후 흡수 → v1.0 sign-off 가능) — 핵심 미해소 사유
+2. 잔존 외부 의존 2건 (F600 5-Layer + F601 PG/SSO) — BeSir 미팅 안건 직결, sign-off 후 W20+ sprint
+3. Phase 2 측정 결과 미통합 (6월 W26 별도)
+4. Phase 3 첫 실제 도메인 미확정 (7월 W29)
+5. Counterquestions Q1·Q2·Q3 미해소 (Q4·Q5는 인터뷰로 완료. S346 P1 누락 5건 + S357+ P1 추가 2건 모두 ✅ 흡수)
+6. 본 v0.5는 W19 D-2 시점 정본 — v0.4(S346 D-5) 대비 P0 +2건, 5 v2 docs 작성, 외부 의존 4건 unlock(F604/F605/F619/F621) 추가
 
 본 문서는 Phase 3 1차 마감(8월 W34)까지 living document.
 
