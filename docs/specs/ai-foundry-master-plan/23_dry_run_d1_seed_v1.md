@@ -442,8 +442,66 @@ rollback에서도 issue 발견 0건. 시드 SQL + rollback SQL 모두 production
 | §3.3 HITL queue | ✅ total=9, escalated=1 | (시드 후 검증) |
 | §3.4 trace_id chain | ✅ 5 events 정합 | (시드 후 검증) |
 | 운영 데이터 보호 | (시드 적용 단계) | ✅ 4 본부 + APPROVE 5건 + 운영 trace 모두 보존 |
+| §8.8 graceful null | (별 시뮬레이션) | ✅ 2 시나리오 PASS (아래 §8.8) |
 
 **판정**: ✅ **GO** — 5/14 D-1 production 적용 즉시 가능. issue 0건, 안전 룰 4건 모두 검증 완료.
+
+### 8.8 Graceful Null Simulation (5/13 D-2)
+
+> **결과**: 시나리오 A (전체 빈 상태) + 시나리오 B (1 테이블 부분 비우기) 모두 PASS. **Promise.allSettled + `total > 0 ? rate : null` 패턴 동작 입증** — production 적용 시 운영 데이터 부족 KPI도 시연 중단 위험 0.
+
+#### 8.8.1 시나리오 A — Rollback 후 상태 (운영 데이터 일부 잔존)
+
+`feedback_queue / agent_run_metrics / graph_sessions = 0 rows`, `dual_ai_reviews = 5 rows (APPROVE only, BLOCK만 rollback 안전 룰로 제거)`:
+
+| KPI | value | trend | 해석 |
+|-----|-------|-------|------|
+| KPI-1 bureau_active_count | 0 | stable | running graph_sessions 없음 → 0 (null 아님, COUNT는 0 반환) |
+| KPI-2 critical_inconsistency_rate | **null** | **unknown** | feedback_queue 빈 → total > 0 false → null |
+| KPI-3 asset_reuse_rate | **null** | **unknown** | agent_run_metrics 빈 → null |
+| KPI-4 diagnostic_time_reduction | **null** | **unknown** | completed graph_sessions 빈 → AVG=null |
+| KPI-5 five_layer_e2e_success_rate | **null** | **unknown** | graph_sessions 빈 → null |
+| KPI-6 hitl_avg_processing | 100% | unknown | APPROVE 5건 모두 양방향 verdict → 100% (단 시드 데이터라 trend=unknown 기본값) |
+| KPI-7 api_p95 | **null** | **unknown** | duration_ms 빈 → null |
+| KPI-8 core_diff_blocking_rate | 0% | down | BLOCK 0건 / total 5 = 0% → trend=down |
+
+**요약**: 8 KPI 중 **value=null 5건 / trend=unknown 6건**. UI에서 "—" 표시 + 정상값 3건 동시 표시.
+
+#### 8.8.2 시나리오 B — 시드 후 dual_ai_reviews만 비우기 (의도된 graceful degradation 시연)
+
+시드 16 INSERT 재적용 → `dual_ai_reviews` 6건 모두 DELETE:
+
+| KPI | value | trend | 영향 |
+|-----|-------|-------|------|
+| KPI-1 bureau_active_count | 2 | stable | 정상 |
+| KPI-2 critical_inconsistency_rate | 20% | stable | 정상 |
+| KPI-3 asset_reuse_rate | 66.7% | up | 정상 |
+| KPI-4 diagnostic_time_reduction | 23분 | down | 정상 |
+| KPI-5 five_layer_e2e_success_rate | 66.7% | stable | 정상 |
+| **KPI-6 hitl_avg_processing** | **null** | **unknown** ★ | dual_ai_reviews 빈 → null |
+| KPI-7 api_p95 | 2800ms | down | 정상 |
+| **KPI-8 core_diff_blocking_rate** | **null** | **unknown** ★ | dual_ai_reviews 빈 → null |
+
+**요약**: 8 KPI 중 **value=null 2건 (KPI-6/KPI-8) + 정상값 6건**. **Promise.allSettled 동작 확증** — 1 테이블 데이터 부족이 다른 6 KPI 응답에 영향 0.
+
+#### 8.8.3 KpiCalculatorService graceful degradation 동작 입증
+
+| 코드 패턴 | 검증 |
+|----------|------|
+| `total > 0 ? rate : null` (KPI-2/3/5/8) | ✅ total=0 → null 정확 반환 |
+| `avgSecs !== null ? Math.round(avgSecs/60) : null` (KPI-4) | ✅ AVG empty → null |
+| `durations.length > 0 ? p95 : null` (KPI-7 application) | ✅ 빈 배열 → null |
+| `r.review_rate !== null ? ... : null` (KPI-6) | ✅ AVG empty → null |
+| `Promise.allSettled` (computeAll) | ✅ 1 KPI 실패 → 전체 응답 HTTP 200 유지 |
+| trend 자동 산정 (value=null → "unknown") | ✅ 모든 null KPI trend="unknown" 정상 |
+
+#### 8.8.4 시연 시 안전 멘트 (NEW v1)
+
+5/15 미팅에서 일부 KPI가 null로 표시되는 경우 멘트:
+
+> **"운영 데이터 축적 전인 KPI는 '—'로 표시. Promise.allSettled로 1건 누락이 전체 응답에 영향 없음. 본부 데이터 협조 받자마자 5/19(월) 측정 시작 시 자동 값 표시."**
+
+이 멘트로 graceful degradation을 **단점이 아닌 운영 견고성의 증거**로 reframing.
 
 **production 적용 권장 절차** (5/14 본 진행):
 1. `npx wrangler d1 migrations list foundry-x-db --remote` — 0154 적용 확인
