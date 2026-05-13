@@ -885,14 +885,74 @@ Step 1~4 라이브 호출 후 by-trace events count = 5 (시드 그대로 유지
 
 ---
 
-## 9. 이력
+## 9. F659 audit-bus 분리 설계 명세 (NEW v1.3, F659 ✅ docs 완결)
+
+> **사유**: F659 P2 부채 (S358+ 발견, S359 재확증) 진단 결과 — `audit_logs` (manual/seed)와 `audit_events` (audit-bus 라이브)는 **의도된 분리 설계**임이 확인됨. by-trace endpoint semantics + 시연자 안내 멘트 명세화로 docs only 완결. 잔존 통합 시도(by-trace cross-table query + endpoint별 traceId 전파)는 **F660 후속 등록**.
+
+### 9.1 두 테이블의 역할 분리 (의도 확정)
+
+| 항목 | `audit_logs` (0029, 2026-초) | `audit_events` (0140, F642 audit-bus) |
+|------|----------------------------|--------------------------------------|
+| **용도** | manual 감사 로그, 시드 데이터, approve/사용자 입력 흐름 | 분산 추적 (trace_id/span_id 기반), audit-bus emit, 라이브 endpoint 자동 emit |
+| **schema 핵심** | id TEXT PK, tenant_id, event_type, agent_id, model_id, prompt_hash, output_type, approved_by, metadata, **created_at TEXT** | id INTEGER PK AUTOINCREMENT, **trace_id**, span_id, parent_span_id, event_type, **timestamp INTEGER ms**, tenant_id, actor, payload, **hmac_signature**, created_at INTEGER ms |
+| **trace_id 컬럼 유무** | `trace_id` 컬럼 존재 (시드 INSERT 가능) | `trace_id` 필수 (NOT NULL) |
+| **PK 형식** | TEXT (시드는 `evt_diag_001`, `evt_cross_001` 등 명시적 ID) | INTEGER AUTOINCREMENT (audit-bus emit 시 자동 부여) |
+| **시간 형식** | TEXT (`'2026-05-13T...'`) | INTEGER (unix ms) |
+| **chain 검증** | `chainValid` (`audit-logger.ts:175 getByTraceId`)는 audit_logs row만 검사 | `hmac_signature` 기반 span-trace integrity (audit-bus 자체 검증) |
+| **대표 사용처** | 시드 데이터 (BeSir 시연 시각화), manual 승인 흐름, prompt-hash 보존 | F642 audit-bus 라이브 emit (cross-org, ethics, diagnostic, multi-evidence 등 4+ endpoint) |
+
+### 9.2 라이브 endpoint emit 동작 명세 (실측)
+
+D1 audit_events 테이블 query 결과 (5/14 08:33 KST):
+
+| event_type | trace_id 패턴 | 발생 endpoint |
+|-----------|---------------|---------------|
+| `diagnostic.completed` | 32자 random hex (e.g. `3d827f5013146102d558724867348486`) | `POST /api/diagnostic/run` |
+| `cross_org.group_assigned` | 32자 random hex | `POST /api/cross-org/assign-group` |
+| `cross_org.export_blocked` | 32자 random hex | `POST /api/cross-org/check-export` |
+| `ethics.threshold_violated` | 32자 random hex | `POST /api/ethics/check-confidence` |
+
+**중요**: 라이브 endpoint들이 audit-bus emit 시 `generateTraceId()`로 **새 trace_id 자동 생성**, 요청 body의 `traceId` 미전파. 코드 위치:
+- `packages/api/src/core/cross-org/services/cross-org-enforcer.service.ts:65,119`
+- (동등 패턴) ethics, diagnostic 핸들러
+
+이는 audit-bus의 **자체 분산 추적 컨텍스트**를 생성하기 위한 의도된 동작이지만, **시연 시 사용자가 명시한 traceId(`trc-dry-run-2026-05-14`)와 매칭 안 됨**.
+
+### 9.3 `/api/audit/log/by-trace` semantics 확정
+
+`audit-logger.ts:175 getByTraceId(traceId)` — **`SELECT * FROM audit_logs WHERE trace_id = ?`** (audit_logs 단일 테이블).
+
+→ **by-trace endpoint는 manual/seed 흐름의 trace chain만 응답**. 라이브 audit-bus emit은 별도 query/대시보드 필요. 이는 **의도된 분리 설계**이며 변경 시 회귀 영향 多 (F660 분석 필요).
+
+### 9.4 5/15 시연 안전 멘트 (시연자 cheatsheet)
+
+시각화 trace_id chain (5 events, by-trace 응답)은 **시드 데이터 기반** — manual 감사 흐름. 라이브 endpoint의 자동 audit-bus emit은 별도 audit_events 테이블에 분산 추적 형식으로 저장 (Q&A 시 명시):
+
+> **"Foundry-X는 두 가지 감사 레이어를 분리 운영합니다. 첫째 audit_logs는 manual 승인·시드·prompt-hash 보존용 — by-trace API로 chain validity 확인 가능. 둘째 audit_events는 F642 audit-bus의 분산 추적 — 라이브 endpoint 자동 emit, span-trace + HMAC 서명. 본 시연은 5 manual events의 chainValid 시각화로, 라이브 audit-bus는 운영 모니터링 대시보드에 별도 표시됩니다."**
+
+### 9.5 후속 F-item 등록 (F660 P2, S359 신규)
+
+본 분리 설계는 의도된 것이지만, 실 사용성 측면에서 **통합 view + traceId 전파**가 시연 친화적. SPEC §5 F660 idea 등록 (P3, 시연 영향 0, BeSir D-day 이후 처리):
+- (a) `audit-logger.ts:175 getByTraceId` cross-table query (audit_logs + audit_events 통합 응답)
+- (b) cross-org/ethics/diagnostic 4 endpoint가 요청 body의 traceId 수용 → audit-bus emit context로 전파
+- (c) by-trace 응답에 `source: 'audit_logs' | 'audit_events'` 메타 추가
+- 의존: 없음 (독립), 회귀 위험 多 (4 endpoint typecheck + 회귀 테스트 필수), 예상 1.5~2h
+
+### 9.6 F659 종결 판정
+
+**판정**: ✅ **F659 docs-only 완결** — 분리 설계 명세화 + 시연 멘트 명시 + F660 후속 등록. 코드 변경 0, 회귀 0, 시연 영향 0. task-promotion 기준 (D1 0 / 코드 0 / 사용자 관찰 변화 0) 미충족으로 **sprint 시동 부적합**, master 직접 docs patch 처리.
+
+---
+
+## 10. 이력
 
 | 버전 | 날짜 | 변경 | 작성자 |
 |------|------|------|--------|
 | v1 | 2026-05-13 | 최초 작성 (S357+ W19 D-2). 11 테이블 시드 + 검증 5 query + 실행/rollback 절차 + 안전 룰 4건 + **§8 사전 dry-run 결과 (local sqlite, 모든 검증 PASS)** | Sinclair |
 | v1.1 patch | 2026-05-13 | S358+ D-1 라이브 dry-run 결과 추가 (§8.11). production 시드 적용 + 7 endpoint 실측 + F619 multi-evidence test + KPI/HITL 안정. **20 v1 docs schema drift 2건 발견** (Step 2/3/4) + audit_logs 라이브 emit 0건 (별 fix 사이클). GO 판정 유지. | Sinclair (S358+) |
 | v1.2 patch | 2026-05-14 | **S359 D-1 라이브 재확증 결과 추가 (§8.12)**. JWT 재발급 + 7 endpoint 정정 enum 재실행 5/14 08:33 KST 모두 PASS + **3 시점 (14:23/20:23/08:33) KPI 0 variance** + HITL 동일. **enum drift 추가 발견** (`diagnosticTypes` + `groupType`) → 20 v1 cheatsheet patch 권고. F658/F659 P2 부채 진정성 재확증. **§5.2 자동 항목 (B/C/D/E/F) 전부 완료**, G/H/I 사람 수동 잔존. **최종 GO 확정**. | Sinclair (S359) |
+| v1.3 patch | 2026-05-14 | **S359 F659 audit-bus 분리 설계 명세 추가 (§9)**. audit_logs(manual/seed) vs audit_events(F642 audit-bus 라이브) 분리 설계 확정 + by-trace endpoint semantics 명시 + 5/15 시연 안전 멘트 cheatsheet + F660 후속 등록 (통합 query + traceId 전파). F659 docs-only 종결 ✅. | Sinclair (S359) |
 
 ---
 
-**Status**: v1.2 (S359, 2026-05-14 W19 D-1) — 5/14 D-1 라이브 재확증 + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 시뮬레이션 (§8.1~§8.10) + 라이브 production 3 시점 (§8.11 + §8.12) 모두 검증 완료** — 5/15 production 시연 **최종 GO 확정 ✅**. 단 시연자는 본 §8.12.1 정확 enum 사용 (20 v1 cheatsheet enum drift 별 patch 권고).
+**Status**: v1.3 (S359, 2026-05-14 W19 D-1) — 5/14 D-1 라이브 재확증 + audit-bus 분리 설계 명세 + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 시뮬레이션 (§8.1~§8.10) + 라이브 production 3 시점 (§8.11 + §8.12) + audit-bus 분리 설계 명세 (§9) 모두 완료** — 5/15 production 시연 **최종 GO 확정 ✅**. F659 ✅ docs 완결, F660 후속 등록.
