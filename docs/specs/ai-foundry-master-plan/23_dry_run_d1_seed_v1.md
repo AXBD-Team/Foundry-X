@@ -444,6 +444,7 @@ rollback에서도 issue 발견 0건. 시드 SQL + rollback SQL 모두 production
 | 운영 데이터 보호 | (시드 적용 단계) | ✅ 4 본부 + APPROVE 5건 + 운영 trace 모두 보존 |
 | §8.8 graceful null | (별 시뮬레이션) | ✅ 2 시나리오 PASS (아래 §8.8) |
 | §8.9 HITL 3 source | (별 시뮬레이션) | ✅ 4 시나리오 PASS (아래 §8.9) |
+| §8.10 multi-degradation | (별 시뮬레이션) | ✅ 3 시나리오 PASS — 극한 (7/8 null) 상황에서도 HTTP 200 (§8.10) |
 
 **판정**: ✅ **GO** — 5/14 D-1 production 적용 즉시 가능. issue 0건, 안전 룰 4건 모두 검증 완료.
 
@@ -655,6 +656,91 @@ VALUES ('rev-decode-001', 'cog-decode-001', 'Decode-X', 'pending', NULL, ...);
 | **§8.9.6 Balanced 보완 시드** | ✅ **4 본부 모두 pending=5 균형** |
 
 5/14 D-1 production 적용 즉시 가능, 5/15 미팅 시연 시 4 본부 시각적 균형 확보.
+
+### 8.10 Multi-Degradation Simulation (5/13 D-2)
+
+> **결과**: 3 시나리오(M1~M3) 모두 PASS. **dual_ai_reviews + HITL 3 source 동시 비우기에도 F604/F605/F621 모두 HTTP 200 유지**. graceful degradation 극한 신뢰성 입증.
+
+#### 8.10.1 시뮬레이션 매트릭스
+
+| 시나리오 | 비운 source | KPI null | trend unknown | HITL total | 4 본부 pending |
+|---------|-------------|----------|---------------|------------|-----------------|
+| **M0 baseline** | (없음, balanced 60 rows) | 0/8 | 0/8 | 10 | KOAMI/AXIS-DS/Decode-X/Foundry-X = 5/5/5/5 |
+| **M1** dual_ai + meta-approval | 2 tables | **2/8** (KPI-6/8) | 2/8 | **6** (expert 3 + artifact 3) | 모두 = 1/1/1/1 |
+| **M2** dual_ai + HITL 3 source | 4 tables | **2/8** (KPI-6/8) | 2/8 | **0** | 모두 = 0/0/0/0 |
+| **M3** 모든 운영 source + HITL | 7 tables | **7/8** (KPI-2~8) | 7/8 | **0** | 모두 = 0/0/0/0 |
+
+#### 8.10.2 시나리오 M1 상세 — 점진적 1단계 degradation
+
+`dual_ai_reviews` 6건 + `agent_improvement_proposals` 4건 DELETE:
+
+```
+KPI:    1=2  2=20  3=66.7  4=23  5=66.7  6=null  7=2800  8=null
+trend:  sta  sta   up      dow   sta     unk     dow     unk
+HITL:   total=6, escalated=0 (meta 빠진 영향 — 22 v2 §4 escalated 산정 비대칭)
+본부:   모두 pending=1 (expert 또는 artifact 1건씩 균등 분포)
+```
+
+**해석**: 운영 데이터 일부 정리(예: dual_ai_reviews 통계 리셋 + meta-approval 큐 비우기) 직후 시뮬레이션. KPI-6/8 + escalated만 null/0, **나머지 6 KPI + 4 본부 column 모두 정상 표시**.
+
+#### 8.10.3 시나리오 M2 상세 — "운영 시작 0일차" 시연
+
+M1 위에 expert-review + artifact-review까지 비우기:
+
+```
+KPI:    1=2  2=20  3=66.7  4=23  5=66.7  6=null  7=2800  8=null
+trend:  sta  sta   up      dow   sta     unk     dow     unk
+HITL:   total=0, escalated=0
+본부:   모두 pending=0
+```
+
+**해석**: HITL 큐 완전 비움. F605 `GET /api/hitl/queue` → `{items: [], total: 0, escalatedCount: 0}` HTTP 200. F621 4 본부 OrgHitlPanel은 모두 "0 pending, 0 escalated" 표시. **화면 crash 0건**.
+
+**시연 멘트**: "본부 데이터 협조 5/19(월) 시작 직전 운영 0일차 상태. KPI 일부 + HITL 화면 모두 graceful — 운영 데이터 축적과 함께 자동 활성화."
+
+#### 8.10.4 시나리오 M3 상세 — 극한 graceful degradation
+
+M2 위에 `agent_run_metrics` + `feedback_queue` + `graph_sessions`까지 비우기:
+
+```
+KPI:    1=0   2=null  3=null  4=null  5=null  6=null  7=null  8=null
+trend:  sta   unk     unk     unk     unk     unk     unk     unk
+HITL:   total=0
+본부:   모두 0
+```
+
+**해석**: 시드 직후 또는 운영 데이터 완전 리셋. **KPI-1만 0(COUNT은 빈 set에서 0 반환), 나머지 7개 모두 null + unknown**. F604 `Promise.allSettled` → HTTP 200 + 8 KPI 모두 응답 (value=null + trend=unknown).
+
+**5/15 미팅 시연 risk**: 본 M3 상태로 미팅 진입 시 화면이 "—" 위주 표시 → BeSir 측 의구심 가능. **5/14 dry-run에서 시드 적용 확인 후 production 진입 필수**.
+
+#### 8.10.5 통합 동작 입증 매트릭스
+
+| 검증 항목 | M1 | M2 | M3 |
+|----------|----|----|----|
+| F604 `GET /api/kpi` HTTP 200 | ✅ | ✅ | ✅ |
+| F604 Promise.allSettled — 응답 길이 8 유지 | ✅ | ✅ | ✅ |
+| F604 1+ KPI 정상값 동시 응답 | ✅ (6건) | ✅ (6건) | ⚠️ (1건 KPI-1=0) |
+| F605 `GET /api/hitl/queue` HTTP 200 | ✅ | ✅ | ✅ |
+| F605 빈 큐 graceful | (해당 없음) | ✅ total=0 | ✅ total=0 |
+| F621 `/operations` 4 본부 column 표시 | ✅ | ✅ | ✅ |
+| F621 빈 본부 column crash 없음 | ✅ | ✅ | ✅ |
+| trend "unknown" 적용 일관성 | ✅ | ✅ | ✅ |
+
+#### 8.10.6 핵심 인사이트
+
+**(1) graceful degradation 극한 신뢰성**: 7/8 KPI null + HITL=0 + 4 본부 모두 pending=0이라는 극한 상황에서도 시스템 정상 응답. **5/15 미팅 안전 baseline 확보** — 시연 중 외부 데이터 정리 발생해도 화면 정상.
+
+**(2) M2 = production 적용 직전 상태 시뮬레이션**: 만약 5/14 시드 적용이 실패하거나 일부만 적용되면 M2~M3 상태에 가까움. 미팅 안전 멘트로 reframing 가능.
+
+**(3) Foundry-X 시스템 견고성 입증**: `Promise.allSettled` (F604) + `Promise.all` (F605) + frontend filter (F621) 모두 빈 데이터에서 정상 동작. **22 v2 §11 잔존 후속 F-item 중 RBAC/avgConfidence quirk를 제외하면 모든 graceful 경로 검증**.
+
+#### 8.10.7 시연 안전 멘트 (NEW v1)
+
+극단적 데이터 부족 상황 (M2/M3 유사) 발생 시:
+
+> **"AI Foundry는 운영 데이터 축적 전에도 정상 동작. 모든 KPI/HITL endpoint가 빈 상태에서도 HTTP 200 응답 — '—' 표시 + 정상 화면 구조 유지. 본부 데이터 협조 시작 후 자동 활성화."**
+
+이 멘트로 multi-degradation을 **시스템 견고성의 증거**로 reframing.
 
 **production 적용 권장 절차** (5/14 본 진행):
 1. `npx wrangler d1 migrations list foundry-x-db --remote` — 0154 적용 확인
