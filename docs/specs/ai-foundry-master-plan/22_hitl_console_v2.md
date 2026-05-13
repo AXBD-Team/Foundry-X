@@ -306,15 +306,19 @@ function metricsFromQueue(data: HitlQueueResponse | null, orgId: string): HitlMe
 
 ### 10.2 5/14 dry-run 점검 항목 (20 demo v2 §5.2 E + F 추가)
 
-| # | 점검 | 기대 결과 |
-|---|------|----------|
-| 1 | `curl GET /api/hitl/queue` (JWT 있음) | 200 + items 3건 (3 source 각 1건) |
-| 2 | `escalatedCount` | 1 (meta-approval rubric_score=0.65) |
-| 3 | `curl POST /api/hitl/decision` meta-approval approve | 200 + D1 status='approved' 확인 |
-| 4 | `curl POST /api/hitl/decision` expert-review escalate | 200 + D1 status='in_review' 확인 |
-| 5 | `curl POST /api/hitl/decision` artifact-review approve | 200 (stub success) — D1 변화 없음 (TODO 명시) |
-| 6 | `/operations` 4 본부 column OrgHitlPanel pending count | 본부별 frontend filter 결과 표시 |
-| 7 | `/operations` HitlEscalationBadge | escalated > 0 본부만 빨간 배지 |
+> ⚠️ **5/13 D-2 production 실측 보강 (S358+)**: `/api/hitl/queue`는 **production D1 전체** 응답이라 시드 10건 + 운영 누적 ~34건 = **total 44** 표시됨. 단 escalatedCount=1만 정확히 시드(prop-demo-001 rubric_score=0)와 일치. 5/15 시연 시 escalated 배지만 강조 권장.
+
+| # | 점검 | 기대 결과 | 5/13 실측 |
+|---|------|----------|----------|
+| 1 | `curl GET /api/hitl/queue` (JWT 있음) | 200 + items 3 source 합산 | ✅ 200 + total=**44** (시드 10 + 운영 누적 ~34 discovery-stage-runner) |
+| 2 | `escalatedCount` | 1 (meta-approval rubric_score=0) | ✅ **1** (prop-demo-001 정확) |
+| 3 | `curl POST /api/hitl/decision` meta-approval approve | 200 + D1 status='approved' 확인 | (5/14 dry-run 실 호출) |
+| 4 | `curl POST /api/hitl/decision` expert-review escalate | 200 + D1 status='in_review' 확인 | (5/14 dry-run 실 호출) |
+| 5 | `curl POST /api/hitl/decision` artifact-review approve | 200 (stub success) — D1 변화 없음 (TODO 명시) | (5/14 dry-run 실 호출) |
+| 6 | `/operations` 4 본부 column OrgHitlPanel pending count | 본부별 frontend filter 결과 표시 | (5/14 브라우저 실 확인) |
+| 7 | `/operations` HitlEscalationBadge | escalated > 0 본부만 빨간 배지 | (5/14 브라우저 실 확인 — meta orgId=undefined로 4 본부 모두 1건 표시) |
+
+**시연 멘트 (5/15 미팅)**: total=44는 "운영 자동 제안 큐 누적 — discovery-stage-runner가 매 sprint마다 self-reflection / token-budget / context compression 제안 등록"으로 reframe. escalated=1 빨간 배지만 직접 가리키며 "BeSir demo 시나리오 rubric_score=0 제안이 자동 escalated 처리되어 본부장 결재 대기" 시연.
 
 ---
 

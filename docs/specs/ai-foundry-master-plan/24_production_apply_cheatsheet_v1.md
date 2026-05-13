@@ -115,32 +115,44 @@ related_docs:
 | 17:00 | **Q&A 모의 진행** | 18 v2 §7 8 Q&A 답변 시간 측정 (Sinclair + 서민원) |
 | 19:00 | **인쇄 페어 자료** | 9 docs (17+18+20+21+22 v2 + 02 v0.5 + 23 v1 + INDEX v1.2 + 24 v1) × 3부 |
 
-### 2.2 시드 적용 시 기대 KPI 값 (production smoke)
+### 2.2 시드 적용 시 KPI 값 — **5/13 D-2 production 실측 (시드 + 운영 누적 합산)**
 
 ```bash
 curl "https://foundry-x-api.ktds-axbd.workers.dev/api/kpi" \
   -H "Authorization: Bearer $JWT" | jq '.kpis | map({id, value, trend})'
 ```
 
-| KPI | value | trend |
-|-----|-------|-------|
-| bureau_active_count | 2 | stable |
-| critical_inconsistency_rate | 20 | stable |
-| asset_reuse_rate | 66.7 | up |
-| diagnostic_time_reduction | 23 | down |
-| five_layer_e2e_success_rate | 66.7 | stable |
-| hitl_avg_processing | 100 | stable |
-| api_p95 | 2800 | down |
-| core_diff_blocking_rate | 16.7 | down |
+> ⚠️ **중요**: `/api/kpi`는 production D1 **전체 면적** 산정 (orgId 필터 없음). 시드 60 rows 외에 **운영 누적 데이터**(graph_sessions, agent_run_metrics, dual_ai_reviews 등)가 모두 반영되므로 23 v1 §2.3 "시드 isolation 기대값"과 차이 발생. 아래 표는 **5/13 14:23 KST 실측값**.
 
-### 2.3 HITL queue 기대 응답
+| KPI | 5/13 실측 | 23 v1 시드 isolation 기대 | 차이 원인 |
+|-----|-----------|---------------------------|-----------|
+| bureau_active_count | **2** | 2 | ✅ 일치 (시드 + 운영 running 합산 2) |
+| critical_inconsistency_rate | **11.1%** | 20% | 운영 feedback_queue 누적 (시드 1/5 → 전체 1/9) |
+| asset_reuse_rate | **2.9%** | 66.7% | 운영 agent_run_metrics 대부분 cache_read=0 |
+| diagnostic_time_reduction | **9분** | 23분 | 운영 graph_sessions 평균이 시드 23분보다 짧음 |
+| five_layer_e2e_success_rate | **88.9%** | 66.7% | 운영 completed 비율 더 높음 |
+| hitl_avg_processing | **5.4%** | 100% | 운영 dual_ai_reviews 양방향 verdict 완료 비율 낮음 |
+| api_p95 | **38015ms** | 2800ms | ⚠️ **threshold 3000ms 13배 초과 — F658 P2 부채** |
+| core_diff_blocking_rate | **83%** | 16.7% | 운영 dual_ai_reviews BLOCK 비율 매우 높음 |
+
+**시연 멘트 (5/15 미팅)**: "production D1 누적 운영 데이터 기반 측정값. trend / threshold 기반 시연이 핵심 — 절대값 자체보다 'threshold 초과 여부' 의미."
+
+### 2.3 HITL queue — **5/13 D-2 production 실측**
 
 ```bash
 curl "https://foundry-x-api.ktds-axbd.workers.dev/api/hitl/queue" \
   -H "Authorization: Bearer $JWT" | jq '{total, escalatedCount}'
 ```
 
-기대: `{"total": 10, "escalatedCount": 1}` (Decode-X balanced 보완 후)
+**5/13 14:23 KST 실측**: `{"total": 44, "escalatedCount": 1}`
+
+| 항목 | 실측 | 23 v1 시드 isolation 기대 | 분석 |
+|------|------|---------------------------|------|
+| total | **44** | 10 | 시드 10건 + **운영 누적 ~34건** (discovery-stage-runner 자동 제안 — token-budget / self-reflection / context compression 등) |
+| escalatedCount | **1** | 1 | ✅ 정확 일치 — `prop-demo-001` rubric_score=0 |
+| sources | meta-approval(40+) / expert-review(3) / artifact-review(3) | meta(4)/expert(3)/artifact(3) | 메타 누적 외 시드 일치 |
+
+**시연 멘트 (5/15 미팅)**: "HITL 큐 escalated=1건 빨간 배지 (prop-demo-001 rubric_score=0)는 demo 시드 정확 시연. total 44는 운영 자동 제안 누적 — 운영 환경에서 실제로 큐가 활용되는 증거. 5/15에는 escalated 배지 + 1건 detail만 강조 시연 권장."
 
 ### 2.4 fallback (시드 적용 실패 시)
 
