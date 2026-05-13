@@ -355,6 +355,50 @@ v1 5 안건 그대로:
 
 v1 §6 Q1~Q5 본문은 v2에서도 유효 (외부 LLM / 본부 격리 / AI 신뢰성·책임 / Emergency Stop / 시연 단계 실패) — **v2 참조용 본문은 v1 §6 그대로**.
 
+### Q1~Q5 보강 (S358+ 5/13 D-1 라이브 dry-run 증거 추가)
+
+> **목적**: v1 §6 답변을 5/13 D-1 라이브 검증 결과로 강화. 같은 답변 본문에 **"5/13 실측"** 한 줄 삽입으로 BeSir 측 신뢰도 ↑.
+
+**Q1 (외부 LLM 비용·보안) — 압축 권고 1m30s → 1m**:
+- F627 entry-point + F624 정책 핵심만 강조
+- F628/F629 cost baseline은 "측정 인프라 갖춰짐, W20 베이스라인 시작" 1줄로 축약
+- **5/13 라이브 추가**: "F624 KV cache + audit 발행 — 5/13 D-1 라이브에서 `/api/kpi` 응답 시 KV cache 효과로 `asset_reuse_rate` 측정 KPI 활성 동작 확증"
+
+**Q2 (본부 자산 격리) — 라이브 증거 추가**:
+> v1 §6 답변 끝에 추가: "**5/13 D-1 라이브 실측**: Step 3 `/api/cross-org/check-export` 호출 시 production D1 `cross_org_export_blocks` 테이블에 `blockId=5f83fb0b-8a15-41f2-b461-678cf6e7df5c` 신규 row INSERT 확증 — append-only trigger로 사후 조작 불가 직접 실증. F603 default-deny + F642 trace_id chain 동시 동작 확인."
+
+**Q3 (AI 신뢰성·책임) — 압축 권고 2m → 1m30s + 라이브 증거**:
+- F624/F632/F607/F605/RBAC 5축 중 가장 강한 2축만 강조 (F619 + F607)
+- 사후 조작 불가 + RBAC 5역은 1문장 압축
+- **5/13 라이브 추가**: "Step 6 F619 multi-evidence pipeline test **10/10 PASS** (E1 수집 8건 + E2 검증 + E3 통합 + audit-bus integration 2건). E1/E2/E3 알고리즘이 production-grade 검증 완료 — AI 의사결정 신뢰도 도출 path 입증."
+
+**Q4 (Emergency Stop) — 라이브 증거 추가**:
+> v1 §6 답변 끝에 추가: "**5/13 D-1 라이브 실측**: Step 4 `/api/ethics/check-confidence` `{confidence: 0.65}` 호출 시 `{passed: false, escalated: true}` 즉시 응답 확증 — HITL escalation pipeline 실시간 동작 검증. ethics_violations append-only + F605 HitlEscalationBadge 빨간 배지 시각화 5/15 Step 7에서 직접 시연."
+
+**Q5 (시연 실패 대응) — 라이브 증거 핵심 추가**:
+> v1 §6 답변 끝에 추가: "**5/13 D-1 라이브 종합 검증 (시연 D-2 시점)**: 7 endpoint 모두 ✅ HTTP 200 + F619 test 10/10 PASS + production 시드 + KPI/HITL 6시간 안정. **docs schema drift 1건 발견·즉시 patch** (20 v1 Step 2/3/4 body — S350 갱신 미반영) — **시연 직전 24시간 내 라이브 검증 안전망** 작동 입증. 5/15 미팅 시연 중 실패 가능성 자체가 최소화됨."
+
+### Q&A 8건 시연 시간 조정 권고 (S358+, BeSir 미팅 Q&A 5분 가정)
+
+| Q | 원 시간 | 압축 시간 | 압축 방법 |
+|---|---------|-----------|----------|
+| Q1 | 1m30s | 1m | F627 + F624 핵심만, cost는 1줄 |
+| Q2 | 1m | 1m | 그대로 + 라이브 증거 (시간 동일) |
+| Q3 | 2m | 1m30s | F619 + F607 2축만, RBAC 1문장 |
+| Q4 | 1m | 1m | 그대로 + 라이브 증거 |
+| Q5 | 45s | 45s | 그대로 + 라이브 증거 핵심 |
+| Q6 | 1m | 1m | (그대로) |
+| Q7 | 45s | 45s | (그대로) |
+| Q8 | 1m | 1m | (그대로) |
+| **합계** | **9m** | **8m** | 1분 압축 (BeSir Q&A 5분이라면 우선순위 Q 4~5건만 답변 가능, 나머지는 보조 자료 안내) |
+
+**우선순위 가이드** (Q&A 5분 제한 시):
+1. **Q5** (시연 실패) — 5/15에서 가장 자주 나올 질문, D-1 라이브 증거 강력
+2. **Q2** (본부 격리) — 안건 1 직결, blockId 증거
+3. **Q3** (AI 신뢰성) — 의사결정 책임, F619 test 증거
+4. **Q4** (Emergency Stop) — escalated=true 라이브 증거
+5. (시간 있으면) Q1/Q6/Q7/Q8 답변
+
 ### Q6 — Multi-Evidence Decode-X 실 hook은 언제 가능한가? (NEW v2)
 
 **답변 본문** (1분):
