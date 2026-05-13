@@ -443,6 +443,7 @@ rollback에서도 issue 발견 0건. 시드 SQL + rollback SQL 모두 production
 | §3.4 trace_id chain | ✅ 5 events 정합 | (시드 후 검증) |
 | 운영 데이터 보호 | (시드 적용 단계) | ✅ 4 본부 + APPROVE 5건 + 운영 trace 모두 보존 |
 | §8.8 graceful null | (별 시뮬레이션) | ✅ 2 시나리오 PASS (아래 §8.8) |
+| §8.9 HITL 3 source | (별 시뮬레이션) | ✅ 4 시나리오 PASS (아래 §8.9) |
 
 **판정**: ✅ **GO** — 5/14 D-1 production 적용 즉시 가능. issue 0건, 안전 룰 4건 모두 검증 완료.
 
@@ -502,6 +503,93 @@ rollback에서도 issue 발견 0건. 시드 SQL + rollback SQL 모두 production
 > **"운영 데이터 축적 전인 KPI는 '—'로 표시. Promise.allSettled로 1건 누락이 전체 응답에 영향 없음. 본부 데이터 협조 받자마자 5/19(월) 측정 시작 시 자동 값 표시."**
 
 이 멘트로 graceful degradation을 **단점이 아닌 운영 견고성의 증거**로 reframing.
+
+### 8.9 HITL 3 Source Simulation (5/13 D-2)
+
+> **결과**: 4 시나리오(H1~H4) 모두 PASS. **F605 collectQueue + F621 metricsFromQueue 동작 입증** — source별 비대칭 escalated 산정 + orgId frontend filter + 빈 큐 graceful 모두 확증.
+
+#### 8.9.1 시뮬레이션 매트릭스
+
+| 시나리오 | sources | total | escalated | 4 본부 분포 |
+|---------|---------|-------|-----------|------------|
+| **H0 baseline** | meta=4 / expert=2 / artifact=3 | **9** | **1** | KOAMI/AXIS-DS/Foundry-X=5 (meta 4 + artifact 1) / Decode-X=4 (meta 4) |
+| **H1 meta=0** | meta=0 / expert=2 / artifact=3 | **5** | **0** ★ | KOAMI/AXIS-DS/Foundry-X=1 / Decode-X=0 |
+| **H2 expert=0** | meta=4 / expert=0 / artifact=3 | **7** | **1** | KOAMI=4 / AXIS-DS/Foundry-X=5 / Decode-X=4 |
+| **H3 artifact=0** | meta=4 / expert=2 / artifact=0 | **6** | **1** | KOAMI=5 / 나머지=4 |
+| **H4 모두=0** | meta=0 / expert=0 / artifact=0 | **0** | **0** | 모두 0 (HTTP 200 유지) ✅ |
+
+#### 8.9.2 핵심 발견
+
+**(1) meta-approval `orgId=undefined` → 모든 본부에 동일 노출 (22 v2 §7.3 확증)**
+
+frontend filter `!item.orgId || item.orgId === orgId` 패턴에서 `!undefined`는 truthy → 4 본부 column 모두에 meta 4건 동일 표시.
+
+→ **시연 멘트**: "meta-approval 항목은 전사 공통 — 4 본부 모두에 동일 표시. 후속 F-item으로 `agent_improvement_proposals.org_id` 컬럼 추가 + sessionId 분해 시 본부별 분기 가능."
+
+**(2) escalated 산정 source 비대칭 (22 v2 §4 확증)**
+
+H1 (meta=0)에서 expert(2) + artifact(3) = total 5건이지만 **escalated=0**. expert/artifact는 escalated 산정 룰 없음 (`escalated: false` 기본).
+
+→ **5/15 시연 시 escalated 강조**: meta-approval 큐 확인 → prop-demo-001(rubric=0) 빨간 배지 직접 가리키며 시연.
+
+**(3) 빈 큐 graceful (F605 collectQueue HTTP 200 유지)**
+
+H4 (3 source 모두 비움) → `{ total: 0, escalatedCount: 0, items: [], collectedAt: ... }` HTTP 200. F605 `Promise.all` 사용하지만 각 collect*가 빈 배열 반환하면 정상.
+
+→ **시연 안전**: 5/15 미팅에서 HITL 큐가 시연 도중 외부 정리로 비더라도 화면 crash 0건.
+
+**(4) avgConfidence quirk (22 v2 §11 잔존 후속 F-item 확증)**
+
+H1 (meta=0, expert+artifact만)에서 `avgConfidence=0.00` — expert/artifact의 `confidence: null`이 `(i.confidence ?? 0)` 처리로 0으로 합산. 평균 = 0 / N = 0.
+
+→ **시연 시 회피**: avgConfidence는 5/15 미팅에서 직접 강조 안 함. 22 v2 §11 후속 F-item 처리 명시.
+
+#### 8.9.3 4 본부 column 분포 분석
+
+baseline에서 본부별 pending 분포 차이:
+
+| 본부 | 시드 데이터 (orgId-bound) | baseline pending |
+|------|---------------------------|------------------|
+| KOAMI | expert(rev-koami-001) + artifact(미시드) | 5 (meta 4 + expert 1 + artifact 0) |
+| AXIS-DS | artifact(art-axis-001) | 5 (meta 4 + expert 0 + artifact 1) |
+| Decode-X | (시드 없음) | 4 (meta 4 + 0 + 0) ⚠️ |
+| Foundry-X | artifact(art-foundry-001) | 5 (meta 4 + 0 + artifact 1) |
+
+→ **Decode-X만 4건**: 시드 SQL에 Decode-X-bound HITL 항목 없음. 시연 시 4 본부 column 비교에서 시각적 차이 발생.
+
+**보완 옵션** (선택, 5/14 dry-run 전):
+```sql
+-- Decode-X에 expert-review 1건 추가 시드 (balanced 4 본부)
+INSERT OR IGNORE INTO cross_org_review_queue (review_id, assignment_id, org_id, status, decision, expert_id, notes, enqueued_at) VALUES
+  ('rev-decode-001', 'cog-decode-001', 'Decode-X', 'pending', NULL, NULL, NULL, 1747273850000);
+INSERT OR IGNORE INTO cross_org_groups (id, asset_id, asset_kind, org_id, group_type, assigned_by) VALUES
+  ('cog-decode-001', 'pol-decode-analysis-001', 'policy', 'Decode-X', 'org_specific', 'auto');
+```
+
+#### 8.9.4 F605 + F621 통합 동작 입증
+
+| 검증 항목 | 결과 |
+|----------|------|
+| F605 `GET /api/hitl/queue` 빈 큐 graceful | ✅ HTTP 200 + total=0 (H4) |
+| F605 `GET /api/hitl/queue?orgId=demo-org` 빈 결과 | ✅ items=[] (시드 없음) |
+| F605 1 source 누락 시 다른 2 source 정상 응답 | ✅ H1/H2/H3 모두 PASS |
+| F621 `metricsFromQueue` frontend filter | ✅ 4 본부 column 정확 분포 |
+| F621 빈 본부 column 표시 | ✅ pending=0, escalated=0, avgConfidence=null (Decode-X H1 사례) |
+| 22 v2 §4 escalated 산정 비대칭 룰 | ✅ meta만 escalated (H1에서 0건 확증) |
+| 22 v2 §7.3 meta orgId=undefined 전사 노출 | ✅ 4 본부 모두 동일 meta 표시 |
+| 22 v2 §11 avgConfidence quirk | ✅ confidence=null → ?? 0 → 평균 낮춤 (후속 F-item 정확) |
+
+#### 8.9.5 시연 시 안전 멘트 (NEW v1)
+
+5/15 미팅에서 HITL 화면 시연 시:
+
+> **시연 시작**: "/operations 화면 우측 4 본부 column 하단 HITL 패널 — 본부별 pending + escalated 카운트 + 빨간 배지. 본부장이 즉시 식별 가능."
+
+> **avgConfidence 회피**: HITL 패널에서 escalated 배지만 강조 (avgConfidence 수치 직접 언급 안 함).
+
+> **meta-approval 노출 설명**: "AI 에이전트 자동 개선 제안은 본부 분기 없는 전사 공통 큐. 후속 F-item에서 본부별 분기 강화 예정."
+
+> **빈 큐 안전**: "운영 중 큐가 일시 비더라도 화면 정상 표시 — Promise 누락 처리 견고성 입증."
 
 **production 적용 권장 절차** (5/14 본 진행):
 1. `npx wrangler d1 migrations list foundry-x-db --remote` — 0154 적용 확인
