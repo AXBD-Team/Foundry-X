@@ -383,6 +383,68 @@ DELETE FROM dual_ai_reviews WHERE sprint_id BETWEEN 388 AND 393;
 
 본 dry-run에서 시드 데이터 mismatch / KPI 응답 불일치 / HITL escalation 오작동 등 issue **0건**. 23 v1 §6 안전 룰 4건은 production 적용 시에도 그대로 유효.
 
+### 8.6 Rollback 검증 결과 (5/13 D-2, 동일 임시 db)
+
+> **결과**: rollback 16/16 PASS + 4 본부 보존 + 운영 데이터 보호 ✅. **5/14 production 적용 후 rollback 시 위험 0**.
+
+#### 8.6.1 Rollback row 수 검증 (16건 모두 0)
+
+| 테이블 (시드 ID) | actual | expected |
+|------------------|--------|----------|
+| organizations demo-org | 0 | 0 ✅ |
+| audit_logs (dry-run/demo trace) | 0 | 0 ✅ |
+| ethics_violations viol-001 | 0 | 0 ✅ |
+| cross_org_export_blocks blk-demo-001 | 0 | 0 ✅ |
+| diagnostic_runs diag-demo-001 | 0 | 0 ✅ |
+| diagnostic_findings (run_id=diag-demo) | 0 | 0 ✅ |
+| cross_org_groups cog-demo-001 | 0 | 0 ✅ |
+| agent_improvement_proposals (prop-%-001) | 0 | 0 ✅ |
+| cross_org_review_queue (rev-%-001) | 0 | 0 ✅ |
+| hitl_artifact_reviews (art-%-001) | 0 | 0 ✅ |
+| graph_sessions (gs-%-00%) | 0 | 0 ✅ |
+| agent_run_metrics (arm-00%) | 0 | 0 ✅ |
+| dual_ai_reviews demo BLOCK | 0 | 0 ✅ |
+| feedback_queue (fq-%-001|002) | 0 | 0 ✅ |
+| biz_items (biz-%-001) | 0 | 0 ✅ |
+| kill_switch_state ks-demo-001 | 0 | 0 ✅ |
+
+**16/16 PASS** — 모든 demo 시드 row 정확 제거.
+
+#### 8.6.2 운영 데이터 보존 검증 (안전 룰 동작)
+
+| 보존 대상 | 결과 | 의미 |
+|----------|------|------|
+| **4 본부 organizations** (KOAMI/AXIS-DS/Decode-X/Foundry-X) | ✅ 4/4 보존 | F621 화면 4 본부 column 표시 유지 |
+| **dual_ai_reviews APPROVE 5건** (sprint 389~393) | ✅ 5/5 보존 | 운영 누적 데이터 영향 0 (BLOCK 1건만 정확 식별 후 제거) |
+| **audit_logs 운영 trace_id** | ✅ 0건 영향 | trace_id 필터(`trc-dry-run-%` / `trc-demo-%`)로만 삭제, 운영 trace 보존 |
+
+#### 8.6.3 append-only trigger 우회 검증
+
+다음 테이블의 BEFORE UPDATE 차단 trigger는 **DELETE는 허용** — rollback이 정상 실행:
+
+- `cross_org_export_blocks` (F603) — DELETE OK ✅
+- `ethics_violations` (F607) — DELETE OK ✅
+- `audit_events` (F606) — DELETE OK ✅ (rollback SQL은 `audit_logs`만 건드림, `audit_events`는 trigger 영향 없음)
+- `cross_org_review_queue` (signed_off 후) — 시드는 status='pending'이라 trigger 미발동 ✅
+
+#### 8.6.4 발견 issue 0건
+
+rollback에서도 issue 발견 0건. 시드 SQL + rollback SQL 모두 production 적용 시 위험 0 확증.
+
+---
+
+### 8.7 dry-run 통합 결과 — production 적용 GO/NO-GO
+
+| 검증 영역 | 시드 결과 | Rollback 결과 |
+|----------|----------|---------------|
+| §3.1 row 수 정합성 | ✅ 16/16 PASS | ✅ 16/16 PASS (모두 0 확인) |
+| §3.2 KPI 8개 응답값 | ✅ 8/8 PASS | (시드 후 검증) |
+| §3.3 HITL queue | ✅ total=9, escalated=1 | (시드 후 검증) |
+| §3.4 trace_id chain | ✅ 5 events 정합 | (시드 후 검증) |
+| 운영 데이터 보호 | (시드 적용 단계) | ✅ 4 본부 + APPROVE 5건 + 운영 trace 모두 보존 |
+
+**판정**: ✅ **GO** — 5/14 D-1 production 적용 즉시 가능. issue 0건, 안전 룰 4건 모두 검증 완료.
+
 **production 적용 권장 절차** (5/14 본 진행):
 1. `npx wrangler d1 migrations list foundry-x-db --remote` — 0154 적용 확인
 2. `npx wrangler d1 execute foundry-x-db --remote --file=../../scripts/dry-run/d1-seed-demo.sql` — 시드 적용
@@ -399,4 +461,4 @@ DELETE FROM dual_ai_reviews WHERE sprint_id BETWEEN 388 AND 393;
 
 ---
 
-**Status**: v1.0 (S357+, 2026-05-13 W19 D-2) — 5/14 D-1 dry-run + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 dry-run 모든 검증 PASS (§8)** — 5/14 production 적용 시 위험 0.
+**Status**: v1.0 (S357+, 2026-05-13 W19 D-2) — 5/14 D-1 dry-run + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 dry-run 시드 + rollback 모두 검증 PASS (§8)** — 5/14 production 적용 GO 판정 ✅.
