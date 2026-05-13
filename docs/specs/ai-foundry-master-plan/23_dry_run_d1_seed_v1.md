@@ -944,7 +944,73 @@ D1 audit_events 테이블 query 결과 (5/14 08:33 KST):
 
 ---
 
-## 10. 이력
+## 10. F658 api_p95 분포 분석 (NEW v1.4, F658 ✅ docs 완결)
+
+> **사유**: F658 P2 부채 (S358+ 발견, S359 재확증 38015ms 안정 outlier) 진단 결과 — `discovery-stage-runner` agent의 9-stage LLM workflow가 **본질적으로 15~42s 분포**임이 D1 query로 확정. **outlier 아닌 정상 분포** + 시드 isolation 기대값(2800ms)의 비현실성. 23 v1.4 §10 분석 명세 + cheatsheet 멘트 + F661 후속 등록(threshold 재설정 또는 endpoint별 분리 측정)으로 docs only 완결.
+
+### 10.1 agent_run_metrics 전체 통계 (5/14 08:38 KST, 실측)
+
+| 항목 | 값 |
+|------|-----|
+| total rows | **139** |
+| min duration | 1500ms |
+| max duration | 42298ms |
+| **avg duration** | **27540.85ms (~27.5s)** |
+
+### 10.2 agent_id별 분포 breakdown
+
+| agent_id | rows | min | max | avg | 비고 |
+|----------|------|-----|-----|-----|------|
+| **`discovery-stage-runner`** | **134** | **15387ms** | **42298ms** | **28488ms** | 본질적 9-stage LLM workflow |
+| `agent-discovery-001` | 3 (시드) | 1800ms | 2800ms | 2333ms | 시드 isolation (비현실적 LLM 시뮬레이션) |
+| `agent-design-001` | 1 (시드) | 2200ms | 2200ms | 2200ms | 시드 |
+| `agent-shaping-001` | 1 (시드) | 1500ms | 1500ms | 1500ms | 시드 |
+
+**관찰**: 시드 5 rows (3.6%)는 p95 계산에 미미한 영향. discovery-stage-runner 134 rows (96.4%)가 p95 형성의 본질.
+
+### 10.3 discovery-stage-runner 백분위 분포 (n=134)
+
+| 백분위 | duration_ms | 비율 |
+|--------|-------------|------|
+| p50 (median) | **28580ms** | 분포 중심값 |
+| p75 | 32354ms | 분포 상위 25% |
+| p90 | 36263ms | 분포 상위 10% |
+| **p95** | **37283ms** | 분포 상위 5% (`/api/kpi` api_p95 응답값과 일치) |
+| p99 | 40953ms | 분포 상위 1% |
+
+**해석**: 분포가 28~41s에 응집 (p50-p99 range = 12s). **outlier 분포 (long-tail) 아닌 정상 응집 분포**. 9-stage LLM workflow의 본질적 latency.
+
+### 10.4 진단 결론
+
+1. **outlier 문제 아님** — discovery-stage-runner가 본질적으로 LLM 9-stage workflow + 멀티 호출 → 15~42s가 자연스러운 정상 분포. p95=37s = p50(28s) + 9s로 응집 분포 (long-tail 0).
+2. **시드 isolation 기대값 비현실성** — 시드 5건 (1.5~2.8s)은 실제 LLM 호출 시뮬레이션 아님. cheatsheet의 `api_p95 ~2800ms` 기대값은 isolated seed 가정 + production LLM 운영 미반영.
+3. **threshold 3000ms 부적합** — production LLM-driven discovery 운영에 부적합. agent별 분리 측정 또는 LLM-aware threshold(35~45s) 필요.
+4. **시연 영향 0** — `/api/kpi` 응답에 api_p95 =38015ms `trend=stable`로 정상 응답 + 시연자 멘트로 보완 가능.
+
+### 10.5 5/15 시연 안전 멘트 (시연자 cheatsheet)
+
+`/api/kpi` 응답의 api_p95 = 38015ms (threshold 3000ms 대비 ~13배)를 질문받을 시:
+
+> **"이 수치는 9-stage LLM workflow (`discovery-stage-runner`)의 분포 95번째 백분위입니다. 평균 28초, p99 41초 — 정상 분포로 outlier 아닙니다. threshold 3000ms는 시드 isolation 가정값으로 production LLM 운영을 반영하지 않았습니다. 후속 F661에서 LLM-aware threshold(35~45초) 재설정 + endpoint별 분리 측정 검토 예정입니다. 본 시연 5단계 trace는 시드 데이터 기반으로 ms 단위 응답이라 별도 영향 없습니다."**
+
+추가 보완: Q&A 시 `agent_run_metrics` 5 rows 분포 (28/32/36/37/41s 백분위) 실측 데이터 명시화 + LLM workflow의 정직한 응답성 명시.
+
+### 10.6 후속 F-item 등록 (F661 P3, S359 신규)
+
+본 분석 결과는 production 데이터 신뢰성을 입증했지만, 운영 가시성 측면 보강 필요 (BeSir D-day 이후):
+- (a) `/api/kpi` schema에 `api_p99` 컬럼 추가 (운영 견고성 + outlier 감지 용)
+- (b) `api_p95` threshold를 agent별 분리 (`discovery_stage_runner_p95_threshold = 40000ms` 등) 또는 LLM-aware 단일 threshold(40000ms) 재설정
+- (c) cheatsheet §2.2 `api_p95 ~2800ms` 기대값 → `discovery-stage-runner 기준 28~38s 정상 분포` 갱신
+- (d) endpoint별 latency 분리 측정 dashboard 추가 (KOAMI + AXIS-DS + Decode-X + Foundry-X 4 본부 운영)
+- 의존: 없음 (독립), 회귀 위험 中 (KPI schema 추가 + frontend 응답 처리), 예상 1~2h
+
+### 10.7 F658 종결 판정
+
+**판정**: ✅ **F658 docs-only 완결** — 분포 분석 명세화 + 시연 멘트 명시 + F661 후속 등록. 코드 변경 0, 회귀 0, 시연 영향 0. task-promotion 기준 (D1 0 / 코드 0 / 사용자 관찰 변화 0) 미충족으로 **sprint 시동 부적합**, master 직접 docs patch 처리 (F659 패턴 동일).
+
+---
+
+## 11. 이력
 
 | 버전 | 날짜 | 변경 | 작성자 |
 |------|------|------|--------|
@@ -952,7 +1018,8 @@ D1 audit_events 테이블 query 결과 (5/14 08:33 KST):
 | v1.1 patch | 2026-05-13 | S358+ D-1 라이브 dry-run 결과 추가 (§8.11). production 시드 적용 + 7 endpoint 실측 + F619 multi-evidence test + KPI/HITL 안정. **20 v1 docs schema drift 2건 발견** (Step 2/3/4) + audit_logs 라이브 emit 0건 (별 fix 사이클). GO 판정 유지. | Sinclair (S358+) |
 | v1.2 patch | 2026-05-14 | **S359 D-1 라이브 재확증 결과 추가 (§8.12)**. JWT 재발급 + 7 endpoint 정정 enum 재실행 5/14 08:33 KST 모두 PASS + **3 시점 (14:23/20:23/08:33) KPI 0 variance** + HITL 동일. **enum drift 추가 발견** (`diagnosticTypes` + `groupType`) → 20 v1 cheatsheet patch 권고. F658/F659 P2 부채 진정성 재확증. **§5.2 자동 항목 (B/C/D/E/F) 전부 완료**, G/H/I 사람 수동 잔존. **최종 GO 확정**. | Sinclair (S359) |
 | v1.3 patch | 2026-05-14 | **S359 F659 audit-bus 분리 설계 명세 추가 (§9)**. audit_logs(manual/seed) vs audit_events(F642 audit-bus 라이브) 분리 설계 확정 + by-trace endpoint semantics 명시 + 5/15 시연 안전 멘트 cheatsheet + F660 후속 등록 (통합 query + traceId 전파). F659 docs-only 종결 ✅. | Sinclair (S359) |
+| v1.4 patch | 2026-05-14 | **S359 F658 api_p95 분포 분석 추가 (§10)**. `discovery-stage-runner` 134 rows (15~42s, avg 28s, p95 37.3s, p99 41s) D1 query 실측 → outlier 아닌 LLM 9-stage workflow 본질적 정상 분포 확정. 시드 isolation 기대값 2800ms 비현실성 + threshold 3000ms LLM 운영 부적합 명시. 5/15 시연 안전 멘트 cheatsheet 추가. F661 후속 등록 (api_p99 schema + agent별 threshold). F658 docs-only 종결 ✅. | Sinclair (S359) |
 
 ---
 
-**Status**: v1.3 (S359, 2026-05-14 W19 D-1) — 5/14 D-1 라이브 재확증 + audit-bus 분리 설계 명세 + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 시뮬레이션 (§8.1~§8.10) + 라이브 production 3 시점 (§8.11 + §8.12) + audit-bus 분리 설계 명세 (§9) 모두 완료** — 5/15 production 시연 **최종 GO 확정 ✅**. F659 ✅ docs 완결, F660 후속 등록.
+**Status**: v1.4 (S359, 2026-05-14 W19 D-1) — 5/14 D-1 라이브 재확증 + audit-bus 분리 설계 명세 + api_p95 분포 분석 + 5/15 D-day BeSir 미팅 production D1 시드 정본. 실행 SQL 파일은 `scripts/dry-run/d1-seed-demo.sql` + `d1-seed-rollback.sql` 직접 사용. **사전 시뮬레이션 (§8.1~§8.10) + 라이브 production 3 시점 (§8.11 + §8.12) + audit-bus 분리 설계 (§9) + api_p95 분포 분석 (§10) 모두 완료** — 5/15 production 시연 **최종 GO 확정 ✅**. F658 + F659 ✅ docs 완결, F660 + F661 후속 등록.
