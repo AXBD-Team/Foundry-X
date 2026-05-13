@@ -93,97 +93,108 @@ curl -X POST https://foundry-x-api.ktds-axbd.workers.dev/api/diagnostic/run \
 
 ### Step 2 — F603 core_differentiator 그룹 분류
 
-**curl**:
+> **S358+ schema patch (2026-05-13 D-1 dry-run 발견)**: S350 cross-org schema 갱신 반영. `assetId/assetKind/groupType` 명시 필수 (이전 `policyId/trace_id` body는 HTTP 400).
+
+**curl** (실 schema):
 ```bash
 curl -X POST https://foundry-x-api.ktds-axbd.workers.dev/api/cross-org/assign-group \
   -H "Authorization: Bearer ${JWT}" \
   -H "Content-Type: application/json" \
   -d '{
+    "assetId": "pol-rpa-pension-claim-001",
+    "assetKind": "policy",
     "orgId": "demo-org",
-    "policyId": "pol-rpa-pension-claim-001",
-    "trace_id": "trc-demo-2026-05-15"
+    "groupType": "core_differentiator"
   }'
 ```
 
-**기대 응답**:
+**기대 응답** (5/13 라이브 실측):
 ```json
 {
-  "policy_id": "pol-rpa-pension-claim-001",
-  "group": "core_differentiator",
-  "rationale": "domain-specific automation revealing internal operational pattern",
-  "assigned_at": "2026-05-15T05:00:00Z",
-  "audit_event_id": "evt_cross_001"
+  "id": "cog-demo-001",
+  "assetId": "pol-rpa-pension-claim-001",
+  "assetKind": "policy",
+  "orgId": "demo-org",
+  "groupType": "core_differentiator",
+  "commonality": null,
+  "variance": null,
+  "documentationRate": null,
+  "businessImpact": null,
+  "assignedBy": "manual",
+  "assignedAt": 1778676353000
 }
 ```
 
 **포인트**:
-- ✅ 4그룹 (`core_differentiator` / `industry_standard` / `internal_only` / `public_safe`) 분류
-- ✅ 자동화 (LLM 룰 기반) — Sinclair 개입 0%
-- ✅ trace_id로 Step 1 audit chain 연속
+- ✅ 4그룹 (`common_standard` / `org_specific` / `tacit_knowledge` / `core_differentiator`) 분류 — `CrossOrgGroupSchema` enum
+- ✅ assetKind 4종 (`policy` / `ontology` / `skill` / `system_knowledge`) — `AssetKindSchema` enum
+- ✅ optional `signals` (commonality / variance / documentationRate / businessImpact) — 자동 분류 룰 입력 후보
+- ✅ assignedBy=`manual` (현재) — 자동 룰 LLM 호출은 F603 후속 (sprint 시동 시)
 
 ### Step 3 — F603 export 차단 검사 (default-deny 강제)
 
-**curl**:
+> **S358+ schema patch (2026-05-13 D-1 dry-run 발견)**: S350 cross-org schema 갱신 반영. `assetId` 명시 필수, `targetOrgId/policyId` 제거. `traceId` (camelCase, optional).
+
+**curl** (실 schema):
 ```bash
 curl -X POST https://foundry-x-api.ktds-axbd.workers.dev/api/cross-org/check-export \
   -H "Authorization: Bearer ${JWT}" \
   -H "Content-Type: application/json" \
   -d '{
-    "orgId": "demo-org",
-    "policyId": "pol-rpa-pension-claim-001",
-    "targetOrgId": "hr-bonbu",
-    "trace_id": "trc-demo-2026-05-15"
+    "assetId": "pol-rpa-pension-claim-001",
+    "attemptedAction": "export",
+    "traceId": "trc-demo-2026-05-15"
   }'
 ```
 
-**기대 응답**:
+**기대 응답** (5/13 라이브 실측):
 ```json
 {
-  "decision": "deny",
-  "reason": "core_differentiator group: cross-bonbu export blocked by default policy",
-  "policy_group": "core_differentiator",
-  "audit_event_id": "evt_cross_002",
-  "blocked_at": "2026-05-15T05:01:00Z"
+  "allowed": false,
+  "groupType": "core_differentiator",
+  "reason": "export_blocked",
+  "blockId": "5f83fb0b-8a15-41f2-b461-678cf6e7df5c"
 }
 ```
 
 **포인트** (이게 핵심):
 - ✅ **default-deny 코드로 강제** (PRD P0-4 골격 100%)
-- ✅ 응답 자체가 "거부 사유 + 그룹 + 차단 시각" 명시
+- ✅ 응답 `allowed=false` + `blockId` (UUID) — D1 `cross_org_export_blocks` row 신규 INSERT (append-only)
 - ✅ F626 차단율 KPI 측정 코드 ✅ (W20 베이스라인 측정 가능)
 - ⚠️ **데모 클라이맥스**: "본부장이 정책 자산을 마음대로 빼낼 수 없다"
 
 ### Step 4 — F607 윤리 임계 검증 (HITL escalation 가능)
 
-**curl**:
+> **S358+ schema patch (2026-05-13 D-1 dry-run 발견)**: ethics schema 갱신 반영. `callMeta` 객체 nesting (confidence/callId/traceId), top-level `decision/confidence/trace_id` 제거.
+
+**curl** (실 schema):
 ```bash
 curl -X POST https://foundry-x-api.ktds-axbd.workers.dev/api/ethics/check-confidence \
   -H "Authorization: Bearer ${JWT}" \
   -H "Content-Type: application/json" \
   -d '{
-    "agentId": "agent-decision-pension-001",
     "orgId": "demo-org",
-    "decision": "auto-claim-trigger",
-    "confidence": 0.65,
-    "trace_id": "trc-demo-2026-05-15"
+    "agentId": "agent-decision-pension-001",
+    "callMeta": {
+      "confidence": 0.65,
+      "callId": "call-demo-2026-05-15-001",
+      "traceId": "trc-demo-2026-05-15"
+    }
   }'
 ```
 
-**기대 응답**:
+**기대 응답** (5/13 라이브 실측):
 ```json
 {
-  "action": "escalate_to_hitl",
-  "reason": "confidence 0.65 < threshold 0.7 (PRD §6.4)",
-  "violation_id": "viol-001",
-  "kill_switch_state": "active",
-  "audit_event_id": "evt_ethics_001"
+  "passed": false,
+  "escalated": true
 }
 ```
 
 **포인트**:
-- ✅ confidence < 0.7 → HITL escalation 자동 (PRD §6.4 윤리 임계)
-- ✅ kill_switch_state로 운영자가 즉시 정지 가능 (F605 HITL Console과 통합 예정)
-- ✅ ethics_violations 테이블 영구 기록
+- ✅ confidence 0.65 < threshold 0.7 → `escalated=true` (PRD §6.4 윤리 임계)
+- ✅ `passed=false`로 운영자 즉시 식별 + F605 HITL Console과 통합 (5/15 시연 Step 7 `/operations` HitlEscalationBadge에서 빨간 배지로 시각화)
+- ✅ ethics_violations 테이블 영구 기록 (append-only, BEFORE UPDATE trigger 차단)
 
 ### Step 5 — F642 Audit Bus T2 회수 (trace_id chain 검증, F642 ✅ Sprint 379 신규)
 
