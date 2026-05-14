@@ -9,7 +9,6 @@ import type {
   ExportCheckResult,
   GroupStats,
 } from "../types.js";
-import { CROSS_ORG_GROUPS } from "../types.js";
 
 export class CrossOrgEnforcer {
   constructor(
