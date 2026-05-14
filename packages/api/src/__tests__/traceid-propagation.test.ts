@@ -124,7 +124,7 @@ describe("traceId 전파 — 4 endpoint (F660)", () => {
 
     await enforcer.assignGroup({
       assetId: "asset-tg-001",
-      assetKind: "process",
+      assetKind: "policy",
       orgId: "org_test",
       groupType: "org_specific",
       traceId: "external-trace-001",
@@ -140,7 +140,7 @@ describe("traceId 전파 — 4 endpoint (F660)", () => {
 
     await enforcer.assignGroup({
       assetId: "asset-tg-002",
-      assetKind: "process",
+      assetKind: "policy",
       orgId: "org_test",
       groupType: "org_specific",
     });
@@ -156,7 +156,7 @@ describe("traceId 전파 — 4 endpoint (F660)", () => {
 
     await db
       .prepare("INSERT INTO cross_org_groups (id, asset_id, asset_kind, org_id, group_type, assigned_by) VALUES (?, ?, ?, ?, ?, ?)")
-      .bind("grp-1", "asset-block-001", "process", "org_test", "core_differentiator", "manual")
+      .bind("grp-1", "asset-block-001", "policy", "org_test", "core_differentiator", "manual")
       .run();
 
     await enforcer.checkExport({ assetId: "asset-block-001", traceId: "external-trace-002" });
@@ -172,7 +172,7 @@ describe("traceId 전파 — 4 endpoint (F660)", () => {
 
     await db
       .prepare("INSERT INTO cross_org_groups (id, asset_id, asset_kind, org_id, group_type, assigned_by) VALUES (?, ?, ?, ?, ?, ?)")
-      .bind("grp-2", "asset-block-002", "process", "org_test", "core_differentiator", "manual")
+      .bind("grp-2", "asset-block-002", "policy", "org_test", "core_differentiator", "manual")
       .run();
 
     await enforcer.checkExport({ assetId: "asset-block-002" });

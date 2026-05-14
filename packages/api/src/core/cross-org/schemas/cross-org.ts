@@ -20,6 +20,7 @@ export const AssignGroupSchema = z.object({
     })
     .optional(),
   assignedBy: z.enum(["auto", "sme", "manual"]).default("manual"),
+  traceId: z.string().optional(),
 });
 
 export const CheckExportSchema = z.object({

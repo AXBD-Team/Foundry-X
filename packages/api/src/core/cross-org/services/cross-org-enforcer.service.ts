@@ -29,6 +29,7 @@ export class CrossOrgEnforcer {
       businessImpact?: "low" | "medium" | "high";
     };
     assignedBy?: "auto" | "sme" | "manual";
+    traceId?: string;
   }): Promise<GroupAssignment> {
     const id = crypto.randomUUID();
     const assignedBy = input.assignedBy ?? "manual";
@@ -62,7 +63,7 @@ export class CrossOrgEnforcer {
       )
       .run();
 
-    const ctx = { traceId: generateTraceId(), spanId: generateSpanId(), sampled: true };
+    const ctx = { traceId: input.traceId ?? generateTraceId(), spanId: generateSpanId(), sampled: true };
     await this.auditBus.emit(
       "cross_org.group_assigned",
       {
@@ -116,7 +117,7 @@ export class CrossOrgEnforcer {
         )
         .run();
 
-      const ctx = { traceId: generateTraceId(), spanId: generateSpanId(), sampled: true };
+      const ctx = { traceId: input.traceId ?? generateTraceId(), spanId: generateSpanId(), sampled: true };
       await this.auditBus.emit(
         "cross_org.export_blocked",
         { blockId, assetId: input.assetId, orgId: row.org_id, reason },

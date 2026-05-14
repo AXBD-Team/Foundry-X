@@ -48,6 +48,7 @@ export const AuditLogSchema = z
     traceId: z.string().nullable(),
     metadata: z.record(z.unknown()),
     createdAt: z.string(),
+    source: z.enum(["manual", "live"]).optional(),
   })
   .openapi("AuditLog");
 

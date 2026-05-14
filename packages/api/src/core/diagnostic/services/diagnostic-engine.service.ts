@@ -87,7 +87,7 @@ export class DiagnosticEngine {
     return rows.results?.length ?? 0;
   }
 
-  async runAll(orgId: string, types: DiagnosticType[]): Promise<DiagnosticReport> {
+  async runAll(orgId: string, types: DiagnosticType[], traceId?: string): Promise<DiagnosticReport> {
     const runId = crypto.randomUUID();
     const startedAt = Date.now();
 
@@ -121,7 +121,7 @@ export class DiagnosticEngine {
       .bind(JSON.stringify(summary), completedAt, runId)
       .run();
 
-    const ctx = { traceId: generateTraceId(), spanId: generateSpanId(), sampled: true };
+    const ctx = { traceId: traceId ?? generateTraceId(), spanId: generateSpanId(), sampled: true };
     await this.auditBus.emit("diagnostic.completed", { runId, orgId, summary }, ctx);
 
     const findings = await this.getFindings(runId);

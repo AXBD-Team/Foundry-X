@@ -8,6 +8,7 @@ export const SeveritySchema = z.enum(SEVERITIES);
 export const RunDiagnosticSchema = z.object({
   orgId: z.string().min(1),
   diagnosticTypes: z.array(DiagnosticTypeSchema).default([...DIAGNOSTIC_TYPES]),
+  traceId: z.string().optional(),
 });
 
 export const DiagnosticFindingResponseSchema = z.object({
