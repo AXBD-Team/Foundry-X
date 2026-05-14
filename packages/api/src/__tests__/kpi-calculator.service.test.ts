@@ -125,11 +125,12 @@ describe("KpiCalculatorService — F604", () => {
     expect(result.value).toBeNull();
   });
 
-  it("computeAll returns 8 KPI results", async () => {
+  it("computeAll returns 9 KPI results (F661 api_p99 추가)", async () => {
     const results = await svc.computeAll();
-    expect(results).toHaveLength(8);
+    expect(results).toHaveLength(9);
     const ids = results.map((r) => r.id);
     expect(ids).toContain("bureau_active_count");
+    expect(ids).toContain("api_p99");
     expect(ids).toContain("core_diff_blocking_rate");
   });
 });

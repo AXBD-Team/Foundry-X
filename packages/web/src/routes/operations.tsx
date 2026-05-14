@@ -7,6 +7,7 @@ import {
   OrgSelector,
   OrgKpiPanel,
   OrgHitlPanel,
+  AgentLatencyPanel,
   ORG_UNITS,
 } from "@/components/operations";
 import type { OrgFilter } from "@/components/operations";
@@ -148,8 +149,13 @@ export function Component() {
         ))}
       </div>
 
+      {/* Agent Latency Dashboard (F661) */}
+      <div className="mt-6">
+        <AgentLatencyPanel />
+      </div>
+
       <footer className="mt-6 text-xs text-muted-foreground">
-        F621 · MVP W27 게이트 · 본부 RBAC(F601 외부 unlock 후 활성화) · backend 변경 0
+        F621 · F661 · MVP W27 게이트 · 본부 RBAC(F601 외부 unlock 후 활성화)
       </footer>
     </div>
   );

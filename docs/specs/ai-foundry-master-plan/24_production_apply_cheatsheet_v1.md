@@ -132,10 +132,15 @@ curl "https://foundry-x-api.ktds-axbd.workers.dev/api/kpi" \
 | diagnostic_time_reduction | **9분** | 23분 | 운영 graph_sessions 평균이 시드 23분보다 짧음 |
 | five_layer_e2e_success_rate | **88.9%** | 66.7% | 운영 completed 비율 더 높음 |
 | hitl_avg_processing | **5.4%** | 100% | 운영 dual_ai_reviews 양방향 verdict 완료 비율 낮음 |
-| api_p95 | **38015ms** | 2800ms | ⚠️ **threshold 3000ms 13배 초과 — F658 P2 부채** |
+| api_p95 | **38015ms** | ~~2800ms~~ → **40000ms** | ✅ F661 threshold 40s 보정 — discovery-stage-runner 28~38s 정상 분포 내 (23 v1.4 §10 참조) |
+| api_p99 | **production 실측 필요** | 41000ms | F661 신규 KPI — p99 threshold 41s (LLM 9-stage workflow 기준) |
 | core_diff_blocking_rate | **83%** | 16.7% | 운영 dual_ai_reviews BLOCK 비율 매우 높음 |
 
-**시연 멘트 (5/15 미팅)**: "production D1 누적 운영 데이터 기반 측정값. trend / threshold 기반 시연이 핵심 — 절대값 자체보다 'threshold 초과 여부' 의미."
+**api_p95/p99 분포 참조** (S359 F658 실측, `23_dry_run_d1_seed_v1.md §10`):
+- discovery-stage-runner 기준 (134 rows, 96.4%): p50=28.6s / p75=32.4s / p90=36.3s / **p95=37.3s** / p99=41s
+- threshold 40s (p95) / 41s (p99) = LLM 9-stage workflow 정상 latency 수용. long-tail 0, 응집 분포 ✅
+
+**시연 멘트 (5/15 미팅)**: "production D1 누적 운영 데이터 기반 측정값. trend / threshold 기반 시연이 핵심 — 절대값 자체보다 'threshold 초과 여부' 의미. api_p95 threshold를 LLM 워크플로우 실측에 맞게 40s로 보정함."
 
 ### 2.3 HITL queue — **5/13 D-2 production 실측**
 

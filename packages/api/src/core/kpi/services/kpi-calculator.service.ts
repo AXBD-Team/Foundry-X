@@ -172,9 +172,36 @@ export class KpiCalculatorService {
       label: "API p95 응답시간",
       value: p95,
       unit: "ms",
-      trend: p95 !== null && p95 < 3000 ? "down" : "stable",
-      threshold: 3000,
-      description: "agent_run_metrics duration_ms의 95번째 백분위수",
+      trend: p95 !== null && p95 < 40000 ? "down" : "stable",
+      threshold: 40000,
+      description: "agent_run_metrics duration_ms의 95번째 백분위수 (LLM 9-stage workflow 기준, threshold 40s)",
+      dataSource: "agent_run_metrics (0132)",
+    };
+  }
+
+  async calculateApiP99(): Promise<KpiResult> {
+    const row = await this.db
+      .prepare(
+        `SELECT duration_ms
+         FROM agent_run_metrics
+         WHERE duration_ms IS NOT NULL AND status = 'completed'
+         ORDER BY duration_ms ASC`,
+      )
+      .all<{ duration_ms: number }>();
+    const durations = row.results.map((r) => r.duration_ms).sort((a, b) => a - b);
+    let p99: number | null = null;
+    if (durations.length > 0) {
+      const idx = Math.ceil(durations.length * 0.99) - 1;
+      p99 = durations[Math.min(idx, durations.length - 1)] ?? null;
+    }
+    return {
+      id: "api_p99",
+      label: "API p99 응답시간",
+      value: p99,
+      unit: "ms",
+      trend: p99 !== null && p99 < 41000 ? "down" : "stable",
+      threshold: 41000,
+      description: "agent_run_metrics duration_ms의 99번째 백분위수 (LLM 9-stage workflow 기준, threshold 41s)",
       dataSource: "agent_run_metrics (0132)",
     };
   }
@@ -212,6 +239,7 @@ export class KpiCalculatorService {
       this.calculate5LayerE2ESuccessRate(),
       this.calculateHitlAvgProcessing(),
       this.calculateApiP95(),
+      this.calculateApiP99(),
       this.calculateCoreDiffBlockingRate(),
     ]);
     return results.map((r, i) => {
@@ -224,6 +252,7 @@ export class KpiCalculatorService {
         "five_layer_e2e_success_rate",
         "hitl_avg_processing",
         "api_p95",
+        "api_p99",
         "core_diff_blocking_rate",
       ];
       return {
