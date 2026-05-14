@@ -6,6 +6,7 @@ export type KpiId =
   | "five_layer_e2e_success_rate"
   | "hitl_avg_processing"
   | "api_p95"
+  | "api_p99"
   | "core_diff_blocking_rate";
 
 export interface KpiResult {

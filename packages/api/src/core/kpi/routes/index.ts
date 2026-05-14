@@ -1,9 +1,17 @@
 import { Hono } from "hono";
 import { KpiCalculatorService } from "../services/kpi-calculator.service.js";
+import { LatencyByAgentService } from "../services/latency-by-agent.service.js";
 import { KPI_IDS } from "../types.js";
 import type { Env } from "../../../env.js";
 
 export const kpiApp = new Hono<{ Bindings: Env }>();
+
+kpiApp.get("/latency-by-agent", async (c) => {
+  const since = c.req.query("since");
+  const svc = new LatencyByAgentService(c.env.DB);
+  const result = await svc.calculateByAgent(since);
+  return c.json(result, 200);
+});
 
 kpiApp.get("/", async (c) => {
   const orgId = c.req.query("orgId");

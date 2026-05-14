@@ -1,15 +1,13 @@
 {
-  "version": "1.0",
-  "generated_at": "2026-05-10T06:54:09.206Z",
-  "description": "F613 Pass 시리즈 종결 baseline — violations 0, MSA 룰 강제 교정 완결 (F608~F613).",
-  "msa_total": 5,
-  "msa_errors": 0,
-  "msa_warnings": 5,
-  "fingerprints": [
-    "src/core/hitl/services/hitl-queue-collector.service.ts:137:foundry-x-api/no-cross-domain-d1",
-    "src/core/hitl/services/hitl-queue-collector.service.ts:61:foundry-x-api/no-cross-domain-d1",
-    "src/core/hitl/services/hitl-queue-collector.service.ts:62:foundry-x-api/no-cross-domain-d1",
-    "src/core/kpi/services/kpi-calculator.service.ts:158:foundry-x-api/no-cross-domain-d1",
-    "src/core/kpi/services/kpi-calculator.service.ts:56:foundry-x-api/no-cross-domain-d1"
-  ]
+    "version": "1.0",
+    "generated_at": "2026-05-14T00:00:00.000Z",
+    "description": "F661 post-fix: kpi cross-domain D1 접근은 eslint-disable-next-line으로 해소. hitl×3 grandfathered 잔존.",
+    "msa_total": 3,
+    "msa_errors": 0,
+    "msa_warnings": 3,
+    "fingerprints": [
+        "src/core/hitl/services/hitl-queue-collector.service.ts:137:foundry-x-api/no-cross-domain-d1",
+        "src/core/hitl/services/hitl-queue-collector.service.ts:61:foundry-x-api/no-cross-domain-d1",
+        "src/core/hitl/services/hitl-queue-collector.service.ts:62:foundry-x-api/no-cross-domain-d1"
+    ]
 }

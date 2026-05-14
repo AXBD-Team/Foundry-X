@@ -47,11 +47,11 @@ beforeEach(async () => {
 });
 
 describe("GET /api/kpi — F604", () => {
-  it("returns 200 with 8 kpis", async () => {
+  it("returns 200 with 9 kpis (F661 api_p99 추가)", async () => {
     const res = await kpiApp.request("/", {}, makeEnv());
     expect(res.status).toBe(200);
     const body = await res.json() as { kpis: unknown[]; computedAt: string };
-    expect(body.kpis).toHaveLength(8);
+    expect(body.kpis).toHaveLength(9);
     expect(typeof body.computedAt).toBe("string");
   });
 });
