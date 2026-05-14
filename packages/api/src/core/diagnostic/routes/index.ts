@@ -20,7 +20,7 @@ diagnosticApp.post("/run", async (c) => {
   if (!parsed.success) return c.json({ error: parsed.error.issues }, 400);
 
   const engine = getEngine(c.env);
-  const report = await engine.runAll(parsed.data.orgId, parsed.data.diagnosticTypes);
+  const report = await engine.runAll(parsed.data.orgId, parsed.data.diagnosticTypes, parsed.data.traceId);
   return c.json(report, 200);
 });
 

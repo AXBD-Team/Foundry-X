@@ -29,6 +29,7 @@ export interface AuditLog {
   traceId: string | null;
   metadata: Record<string, unknown>;
   createdAt: string;
+  source?: "manual" | "live";
 }
 
 export interface TraceChainResult {
@@ -175,39 +176,58 @@ export class AuditLogService {
   async getByTraceId(traceId: string): Promise<TraceChainResult> {
     const rows = await this.db
       .prepare(
-        `SELECT * FROM audit_logs WHERE trace_id = ? ORDER BY created_at ASC`,
+        `SELECT
+           CAST(id AS TEXT) as id,
+           trace_id,
+           event_type,
+           agent_id,
+           tenant_id,
+           created_at,
+           metadata,
+           'manual' as source
+         FROM audit_logs
+         WHERE trace_id = ?
+         UNION ALL
+         SELECT
+           CAST(id AS TEXT) as id,
+           trace_id,
+           event_type,
+           actor as agent_id,
+           tenant_id,
+           datetime(created_at / 1000, 'unixepoch') as created_at,
+           payload as metadata,
+           'live' as source
+         FROM audit_events
+         WHERE trace_id = ?
+         ORDER BY created_at ASC`,
       )
-      .bind(traceId)
+      .bind(traceId, traceId)
       .all<{
         id: string;
-        tenant_id: string;
+        trace_id: string | null;
         event_type: string;
         agent_id: string | null;
-        model_id: string | null;
-        prompt_hash: string | null;
-        input_classification: string;
-        output_type: string | null;
-        approved_by: string | null;
-        approved_at: string | null;
-        trace_id: string | null;
-        metadata: string;
+        tenant_id: string | null;
         created_at: string;
+        metadata: string;
+        source: "manual" | "live";
       }>();
 
     const events: AuditLog[] = (rows.results ?? []).map((r) => ({
       id: r.id,
-      tenantId: r.tenant_id,
+      tenantId: r.tenant_id ?? "",
       eventType: r.event_type,
       agentId: r.agent_id,
-      modelId: r.model_id,
-      promptHash: r.prompt_hash,
-      inputClassification: r.input_classification,
-      outputType: r.output_type,
-      approvedBy: r.approved_by,
-      approvedAt: r.approved_at,
+      modelId: null,
+      promptHash: null,
+      inputClassification: "internal",
+      outputType: null,
+      approvedBy: null,
+      approvedAt: null,
       traceId: r.trace_id,
       metadata: JSON.parse(r.metadata || "{}"),
       createdAt: r.created_at,
+      source: r.source,
     }));
 
     return { traceId, events, chainValid: events.length > 0 };

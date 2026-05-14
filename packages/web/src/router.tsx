@@ -135,6 +135,9 @@ export const router = createBrowserRouter([
       // ── Sprint 393: F621 AI Foundry 운영 통합 대시보드 ──
       { path: "operations", lazy: () => import("@/routes/operations") },
 
+      // ── Sprint 394: F660 Audit Trace Chain View ──
+      { path: "audit/by-trace", lazy: () => import("@/routes/audit-by-trace") },
+
       // ── Redirects ──
       { path: "ax-bd/discovery", element: <Navigate to="/discovery/items" replace /> },
       { path: "ax-bd/discovery/:id", element: <RedirectDiscoveryDetail /> },

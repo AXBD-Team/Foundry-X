@@ -28,6 +28,20 @@ describe("AuditLogService — trace_id chain (F642)", () => {
     await db.exec(
       "CREATE INDEX IF NOT EXISTS idx_audit_trace_id ON audit_logs(trace_id) WHERE trace_id IS NOT NULL",
     );
+    // F660: add audit_events table so UNION query does not error in existing tests
+    await db.exec(`CREATE TABLE IF NOT EXISTS audit_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      trace_id TEXT NOT NULL,
+      span_id TEXT NOT NULL,
+      parent_span_id TEXT,
+      event_type TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      tenant_id TEXT,
+      actor TEXT,
+      payload TEXT NOT NULL DEFAULT '{}',
+      hmac_signature TEXT NOT NULL DEFAULT '',
+      created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+    )`);
     service = new AuditLogService(db as unknown as D1Database);
   });
 

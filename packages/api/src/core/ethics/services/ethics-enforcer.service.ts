@@ -11,8 +11,8 @@ import {
   type FPRateResult,
 } from "../types.js";
 
-function makeCtx() {
-  return { traceId: generateTraceId(), spanId: generateSpanId(), sampled: true };
+function makeCtx(traceId?: string) {
+  return { traceId: traceId ?? generateTraceId(), spanId: generateSpanId(), sampled: true };
 }
 
 function mapViolationRow(row: Record<string, unknown>): EthicsViolation {
@@ -58,7 +58,7 @@ export class EthicsEnforcer {
     }
 
     const id = crypto.randomUUID();
-    const ctx = makeCtx();
+    const ctx = makeCtx(input.callMeta.traceId);
 
     await this.db
       .prepare(
