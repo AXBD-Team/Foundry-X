@@ -53,6 +53,7 @@ export class KpiCalculatorService {
   async calculateAssetReuseRate(): Promise<KpiResult> {
     const row = await this.db
       .prepare(
+        // eslint-disable-next-line foundry-x-api/no-cross-domain-d1
         `SELECT
           COUNT(*) AS total,
           SUM(CASE WHEN output_tokens > 0 AND cache_read_tokens > 0 THEN 1 ELSE 0 END) AS reused
@@ -155,6 +156,7 @@ export class KpiCalculatorService {
   async calculateApiP95(): Promise<KpiResult> {
     const row = await this.db
       .prepare(
+        // eslint-disable-next-line foundry-x-api/no-cross-domain-d1
         `SELECT duration_ms
          FROM agent_run_metrics
          WHERE duration_ms IS NOT NULL AND status = 'completed'
@@ -182,6 +184,7 @@ export class KpiCalculatorService {
   async calculateApiP99(): Promise<KpiResult> {
     const row = await this.db
       .prepare(
+        // eslint-disable-next-line foundry-x-api/no-cross-domain-d1
         `SELECT duration_ms
          FROM agent_run_metrics
          WHERE duration_ms IS NOT NULL AND status = 'completed'

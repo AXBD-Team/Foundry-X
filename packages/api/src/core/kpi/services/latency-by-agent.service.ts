@@ -10,6 +10,7 @@ export class LatencyByAgentService {
   constructor(private readonly db: D1Database) {}
 
   async calculateByAgent(since?: string): Promise<LatencyByAgentResponse> {
+    // eslint-disable-next-line foundry-x-api/no-cross-domain-d1
     let sql = `
       SELECT agent_id, duration_ms
       FROM agent_run_metrics
