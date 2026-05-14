@@ -27,7 +27,7 @@ turbo test / lint / typecheck  # 전체 검증
 
 ## Current Phase
 
-Phase 1~46 완료 + Phase 47 진행 (Sprint 1~393, **57 sprint 연속 성공** S306~S357, F560~F621). 직전 S358+ (2026-05-13 W19 D-2) **AI Foundry BeSir 5/15 D-day 준비 본 진행**: 5/13 14:23 production D1 시드 적용(16 INSERT / 60 rows) + 7 endpoint 라이브 dry-run 2회(14:23/20:23) HTTP 200 PASS + F619 multi-evidence test 10/10 PASS + 20 v1 docs Step 2/3/4 schema drift 즉시 fix + 18 v2 §7 Q&A 보강(Q2/Q4/Q5 라이브 증거) + F658/F659 P2 부채 신규 등록 + 9 docs PDF 변환(177p / 5MB) + 18 v2 §8.2 cosmetic patch. master commits 5건(493d61a3 → 862c2494 → 3f05bb94 → 2e667240 → f86da590). 직전 (S357) Sprint 392+393 F619+F621 ✅ MERGED. 상세: SPEC.md §5
+Phase 1~46 완료 + Phase 47 진행 (Sprint 1~395, **59 sprint 연속 성공** S306~S360, F560~F661). **S360 (2026-05-14 D-1) 단일 세션 2 sprint 연속 완결** — Sprint 394 F660 ✅ (audit-bus 통합 view + traceId 전파, PR #817 24분 + hotfix #818 + daily-check #819) + Sprint 395 F661 ✅ (api_p99 + threshold + AgentLatencyPanel, PR #820 29분 + session-end content sync #821) = 5 PR 묶음 완결, 본격 작업 ~53분. msa-lint PASS ✅ (S360 hallucination 회피 학습 효과 — F660 hotfix-forward 19회차 변종 차단). F643 fix 효과 3회차 검증 ✅ (.sprint-context 부재 + signal F_ITEMS 정확). 직전 S358+ (2026-05-13 W19 D-2) AI Foundry BeSir 5/15 D-day 준비 본 진행 (production D1 시드 + 7 endpoint dry-run HTTP 200 PASS + F619 multi-evidence test 10/10 + 9 docs PDF 변환). 직전 (S357) Sprint 392+393 F619+F621 ✅ MERGED. 상세: SPEC.md §5
 - **Phase 37: Work Lifecycle Platform** ✅ (F516~F518, Sprint 273~275). PRD: `docs/specs/fx-work-lifecycle-platform/prd-final.md`
 - **Phase 38: Dashboard Overhaul** ✅ (F519, Sprint 276 PR #543)
 - **Phase 39: MSA Walking Skeleton** ✅ (F520~F523). F520/F521 Sprint 268, F522/F523 Sprint 277 PR #544. PRD: `docs/specs/fx-msa-roadmap/prd-final.md`
