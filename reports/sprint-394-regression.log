@@ -1,0 +1,15 @@
+Sprint 394 F660 — Full Regression Test Results
+Run: 2026-05-14 09:33:57
+
+Test Files  264 passed | 1 skipped (265)
+      Tests  2456 passed | 2 skipped (2458)
+   Start at  09:33:57
+   Duration  18.31s (transform 5.72s, setup 0ms, collect 50.41s, tests 27.54s)
+
+New tests:
+  audit-trace-chain-bus.test.ts: 3/3 PASS
+  traceid-propagation.test.ts: 8/8 PASS
+
+Regression:
+  audit-trace-chain.test.ts: 6/6 PASS (0 regression)
+  All other 261 files: PASS (0 regression)
