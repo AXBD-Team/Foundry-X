@@ -1,6 +1,6 @@
 // F602: core/diagnostic sub-app — POST /diagnostic/run + GET /diagnostic/findings
 import { Hono } from "hono";
-import { AuditBus, generateTraceId, generateSpanId } from "../../infra/types.js";
+import { AuditBus } from "../../infra/types.js";
 import { DiagnosticEngine } from "../services/diagnostic-engine.service.js";
 import { RunDiagnosticSchema } from "../schemas/diagnostic.js";
 import type { Env } from "../../../env.js";

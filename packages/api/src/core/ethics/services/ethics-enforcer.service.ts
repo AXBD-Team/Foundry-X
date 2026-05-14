@@ -1,33 +1,13 @@
-import {
-  AuditBus,
-  generateTraceId,
-  generateSpanId,
-} from "../../infra/types.js";
+import type { AuditBus } from "../../infra/types.js";
+import { generateTraceId, generateSpanId } from "../../infra/types.js";
 import {
   CONFIDENCE_THRESHOLD,
-  type EthicsViolationType,
-  type EthicsViolation,
   type KillSwitchState,
   type FPRateResult,
 } from "../types.js";
 
 function makeCtx(traceId?: string) {
   return { traceId: traceId ?? generateTraceId(), spanId: generateSpanId(), sampled: true };
-}
-
-function mapViolationRow(row: Record<string, unknown>): EthicsViolation {
-  return {
-    id: row.id as string,
-    orgId: row.org_id as string,
-    agentId: row.agent_id as string,
-    violationType: row.violation_type as EthicsViolationType,
-    thresholdValue: row.threshold_value as number,
-    actualValue: row.actual_value as number,
-    traceId: (row.trace_id as string | null) ?? null,
-    escalatedToHuman: row.escalated_to_human === 1,
-    metadata: row.metadata ? JSON.parse(row.metadata as string) : null,
-    createdAt: row.created_at as number,
-  };
 }
 
 function mapKillSwitchRow(row: Record<string, unknown>): KillSwitchState {
