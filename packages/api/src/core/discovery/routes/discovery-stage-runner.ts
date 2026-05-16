@@ -9,6 +9,8 @@ import type { Env } from "../../../env.js";
 import { MODEL_SONNET } from "@foundry-x/shared";
 import type { TenantVariables } from "../../../middleware/tenant.js";
 import { DiagnosticCollector, MetaAgent, MetaApprovalService, ProposalRubric, createAgentRunner, createRoutedRunner } from "../../agent/types.js";
+import { AuditBus, LLMService } from "../../infra/types.js";
+import { CQEvaluator } from "../../cq/types.js";
 import { StageRunnerService } from "../services/stage-runner-service.js";
 import { DiscoveryGraphService } from "../services/discovery-graph-service.js";
 import type { DiscoveryType } from "../services/analysis-path-v82.js";
@@ -63,6 +65,42 @@ export async function autoTriggerMetaAgent(
   }
 
   console.log("[F544] autoTrigger saved", { saved: proposals.length, sessionId });
+}
+
+/**
+ * F662: graph_session 종결 후 CQ 5축 자동 평가 hook.
+ * autoTriggerMetaAgent 패턴 재사용 — fire-and-forget, 에러 시 조용히 처리.
+ * synthetic questionId(auto-cq-{sessionId})로 cq_questions 미등록 상태에서도 동작.
+ */
+export async function autoTriggerCQEvaluator(
+  db: D1Database,
+  graphSessionId: string,
+  orgId: string,
+  apiKey: string,
+  graphResult: unknown,
+): Promise<void> {
+  const bus = new AuditBus(db, "default-hmac-key-32chars-pad");
+  const llm = new LLMService(undefined, apiKey);
+  const evaluator = new CQEvaluator(db, llm, bus);
+
+  const questionId = `auto-cq-${graphSessionId}`;
+  const responseText = JSON.stringify(graphResult).slice(0, 4000);
+
+  console.log("[F662] autoTriggerCQEvaluator start", { graphSessionId, orgId });
+
+  const result = await evaluator.evaluate({
+    orgId,
+    questionId,
+    llmCallContext: { sessionId: graphSessionId, response: responseText },
+    graphSessionId,
+  });
+
+  console.log("[F662] autoTriggerCQEvaluator complete", {
+    graphSessionId,
+    totalScore: result.totalScore,
+    handoffDecision: result.handoffDecision,
+    failureReason: result.failureReason,
+  });
 }
 
 const StageRunSchema = z.object({
@@ -267,11 +305,15 @@ discoveryStageRunnerRoute.post("/biz-items/:id/discovery-graph/run-all", async (
     });
     await sessionService.updateStatus(sessionId, "completed");
     // F544: waitUntil로 Workers 응답 후에도 완료 보장 (void fire-and-forget → 컨텍스트 종료 위험 해소)
-    const triggerTask = autoTriggerMetaAgent(
+    const metaTask = autoTriggerMetaAgent(
       c.env.DB, sessionId, apiKey, bizItemId, c.env.META_AGENT_MODEL,
     ).catch((e) => console.error("[F544] MetaAgent auto-trigger failed:", e));
+    // F662: graph_session 종결 → CQ 5축 자동 평가 hook
+    const cqTask = autoTriggerCQEvaluator(
+      c.env.DB, sessionId, orgId, apiKey, result,
+    ).catch((e) => console.error("[F662] CQ auto-trigger failed:", e));
     try {
-      c.executionCtx.waitUntil(triggerTask);
+      c.executionCtx.waitUntil(Promise.all([metaTask, cqTask]));
     } catch {
       // non-Worker 환경(테스트 등)에서는 waitUntil 없음 — fire-and-forget fallback
     }

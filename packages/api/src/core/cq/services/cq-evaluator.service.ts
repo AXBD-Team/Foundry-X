@@ -1,4 +1,5 @@
-import { AuditBus, generateTraceId, generateSpanId } from "../../infra/types.js";
+import type { AuditBus } from "../../infra/types.js";
+import { generateTraceId, generateSpanId } from "../../infra/types.js";
 import {
   CQ_AXES,
   CQ_AXIS_WEIGHTS,
@@ -6,6 +7,7 @@ import {
   type AxisScore,
   type CQEvaluationResult,
   type CQHandoffDecision,
+  type FailureReason,
 } from "../types.js";
 
 const CQ_EVAL_SYSTEM_PROMPT = `You are a quality evaluation agent. Evaluate the given LLM response on 5 axes.
@@ -71,6 +73,7 @@ export class CQEvaluator {
     orgId: string;
     questionId: string;
     llmCallContext: { sessionId: string; response: string; toolCalls?: unknown[] };
+    graphSessionId?: string;
   }): Promise<CQEvaluationResult> {
     const question = await this.db
       .prepare("SELECT id, question_text, answer_text FROM cq_questions WHERE id = ?")
@@ -86,7 +89,9 @@ export class CQEvaluator {
     const userPrompt = buildCQEvalPrompt(questionData, input.llmCallContext);
     const llmResponse = await this.llm.generate(CQ_EVAL_SYSTEM_PROMPT, userPrompt);
 
-    let axisScores = parseAxisScores(llmResponse.content) ?? defaultAxisScores();
+    const parsedScores = parseAxisScores(llmResponse.content);
+    const usedDefault = parsedScores === null;
+    const axisScores = parsedScores ?? defaultAxisScores();
 
     let total = 0;
     for (const axis of CQ_AXES) {
@@ -97,24 +102,45 @@ export class CQEvaluator {
     const totalScore = Math.round(total);
 
     const handoffDecision: CQHandoffDecision = totalScore >= 90 ? "handoff" : "human_review";
+    // F662: <90점 자동 분류 — LLM 파싱 실패면 infra_issue, 파싱 성공이지만 낮으면 human_error
+    const failureReason: FailureReason = totalScore < 90
+      ? (usedDefault ? "infra_issue" : "human_error")
+      : null;
+
     const id = crypto.randomUUID();
     const evaluatedAt = Date.now();
+    const graphSessionId = input.graphSessionId ?? null;
 
     await this.db
       .prepare(
-        `INSERT INTO cq_evaluations (id, org_id, question_id, axis_scores, total_score, handoff_decision, evaluated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO cq_evaluations
+           (id, org_id, question_id, axis_scores, total_score, handoff_decision, evaluated_at, graph_session_id, failure_reason)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(id, input.orgId, input.questionId, JSON.stringify(axisScores), totalScore, handoffDecision, evaluatedAt)
+      .bind(id, input.orgId, input.questionId, JSON.stringify(axisScores), totalScore, handoffDecision, evaluatedAt, graphSessionId, failureReason)
       .run();
 
     const ctx = { traceId: generateTraceId(), spanId: generateSpanId(), sampled: true };
-    await this.auditBus.emit("cq.evaluated", { id, orgId: input.orgId, totalScore, handoffDecision }, ctx);
+    await this.auditBus.emit(
+      "cq.evaluated",
+      { id, orgId: input.orgId, totalScore, handoffDecision, graphSessionId, failureReason },
+      ctx,
+    );
 
     if (handoffDecision === "handoff") {
-      await this.auditBus.emit("cq.handoff", { evaluationId: id, orgId: input.orgId, totalScore }, ctx);
+      await this.auditBus.emit("cq.handoff", { evaluationId: id, orgId: input.orgId, totalScore, graphSessionId }, ctx);
     }
 
-    return { id, orgId: input.orgId, questionId: input.questionId, axisScores, totalScore, handoffDecision, evaluatedAt };
+    return {
+      id,
+      orgId: input.orgId,
+      questionId: input.questionId,
+      axisScores,
+      totalScore,
+      handoffDecision,
+      evaluatedAt,
+      graphSessionId: graphSessionId ?? undefined,
+      failureReason: failureReason ?? undefined,
+    };
   }
 }

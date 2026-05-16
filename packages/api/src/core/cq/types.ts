@@ -25,6 +25,11 @@ export interface AxisScore {
 
 export type CQHandoffDecision = "handoff" | "human_review";
 
+// F662: <90점 자동 실패 분류
+// human_error — LLM 파싱 정상이지만 콘텐츠 품질 미달
+// infra_issue — LLM 응답 파싱 실패 (빈 응답, 포맷 오류)
+export type FailureReason = "human_error" | "infra_issue" | null;
+
 export interface CQEvaluationResult {
   id: string;
   orgId: string;
@@ -33,6 +38,8 @@ export interface CQEvaluationResult {
   totalScore: number;
   handoffDecision: CQHandoffDecision;
   evaluatedAt: number;
+  graphSessionId?: string;
+  failureReason?: FailureReason;
 }
 
 export const REVIEW_CYCLE_STAGES = [
