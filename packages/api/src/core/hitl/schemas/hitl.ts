@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { HITL_STATES } from "../types.js";
 
 export const HitlSourceSchema = z.enum([
   "meta-approval",
@@ -21,3 +22,14 @@ export const HitlQueueQuerySchema = z.object({
 });
 
 export type HitlDecisionInput = z.infer<typeof HitlDecisionSchema>;
+
+// F663: 5-state 머신 transition endpoint 스키마
+export const HitlTransitionSchema = z.object({
+  queueItemId: z.string().uuid(),
+  fromState: z.enum(HITL_STATES),
+  toState: z.enum(HITL_STATES),
+  role: z.enum(["Admin", "Reviewer", "Approver", "Operator", "Auditor"]),
+  reviewerId: z.string().optional(),
+});
+
+export type HitlTransitionRequest = z.infer<typeof HitlTransitionSchema>;
