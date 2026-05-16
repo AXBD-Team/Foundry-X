@@ -1,0 +1,18 @@
+{
+  "sprint": 396,
+  "f_items": ["F662"],
+  "branch": "sprint/396",
+  "pr_number": 822,
+  "match_rate": 100,
+  "test_result": "pass",
+  "tests_total": 2466,
+  "tests_skipped": 2,
+  "typecheck_errors": 0,
+  "lint_errors": 0,
+  "duration_minutes": 25,
+  "files_changed": 9,
+  "insertions": 453,
+  "deletions": 11,
+  "session": "S362",
+  "date": "2026-05-16"
+}
