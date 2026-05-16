@@ -1,11 +1,18 @@
 {
   "sprint": 398,
   "phase": 47,
-  "f_items": "F642",
+  "f_items": "F664",
   "f_count": 1,
   "match_rate": 98,
-  "duration_minutes": 4,
+  "duration_minutes": 13,
   "test_result": "pass",
   "created": "2026-05-16T15:28:00+09:00",
-  "recorded_at": "2026-05-16T15:29:58+09:00"
+  "recorded_at": "2026-05-16T15:29:58+09:00",
+  "session_end_patched_at": "2026-05-16T15:31:00+09:00",
+  "session_end_patch_note": "S362 hallucination 회피 4회차 재현 — autopilot velocity f_items 'F642' stale + duration 4 → 13 (squash merge git log 오계산). 4회 누적 (S360-F660 + S362-F662 + S362-F663 + S362-F664) → rules 즉시 승격 임계 도달. 시동 15:17:06 → MERGED 15:30:11 = ~13분 05초 실측",
+  "pr_number": 825,
+  "merge_commit": "a38258cf",
+  "additions": 1357,
+  "deletions": 28,
+  "changed_files": 13
 }
