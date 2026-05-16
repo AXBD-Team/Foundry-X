@@ -1,0 +1,239 @@
+{
+  "generated": "2026-05-16T02:52:41.121Z",
+  "totalItems": 38,
+  "byType": {
+    "flaw": 4,
+    "gap": 10,
+    "risk": 21
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**CQ 5축 평가의 “온톨로지 활용도” 축 정의 미흡**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**80-20-80 HITL 워크플로우의 업무 실제 흐름/역할 분장이 부족**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**Phase 2/백로그와 Core MVP의 경계가 흐림**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "착수 판단\n\n**착수 판단: Conditional**\n\n**조건**\n- 오픈 이슈(특히 “온톨로지 활용도” 5축 정의, HITL 워크플로우 내 구체 역할/권한/입력 흐름, 핸드오프 후 처리 범위)에 대해 최소한 MVP 기준의 명확한 결정이 선행되어야 함.\n- “프롬프트 설계/검증”, “프론트엔드 담당”, “DB 구조 담당” 등 역할 분장이 명확해야 함.\n-",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 체계 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**프롬프트 관리/버전 관리 체계 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 업무 프로세스와의 정합성 확인 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**장애/예외 처리**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터 거버넌스/이력 관리**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**보안/컴플라이언스 세부 정책**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**2~3 sprint(2~3주) 내 Core MVP 완결**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 소요는 3~5주(3 sprint+)가 더 현실적**.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**AX BD팀 7명+admin 3명**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부/내부 의존**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 체계 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**프롬프트 관리/버전 관리 체계 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 업무 프로세스와의 정합성 확인 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**장애/예외 처리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터 거버넌스/이력 관리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안/컴플라이언스 세부 정책**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**핵심 기능 정의 미확정(온톨로지 활용도/역할 분리/핸드오프 범위 등)**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**LLM 평가 정확도 불확실**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**인력/역할 미정 및 실전 경험 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**기존 시스템 회귀/호환성 리스크**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정 과소평가**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/QA 및 롤백 계획 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**개선 필요 부분**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**평가 에이전트 격리**: 현재 설계는 \"문맥 분리\"만 언급되었으나, 실제로는 별도 Worker 격리 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**HITL Console UI 통합**: 기존 admin-portal과의 라우팅 충돌 가능성 (React Router 7 동적 라우팅 검토 필요)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Audit Log 전파**: F606 연동 시 trace_id chainValid 검증 로직 누락",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**긍정적 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**CQ 5축 평가 정확도 80% 달성**: 단일 LLM(Sonnet 4.6)로 구현 시 실제 정확도가 요구사항을 충족할지 검증 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**60초 응답시간 제약**: 복잡한 CQ 평가 시 Cloudflare Workers의 10ms~50ms CPU 시간 제한과 충돌 가능성",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**D1 schema 확장**: 기존 graph_sessions 테이블과의 FK 관계 설계 미비 (부록 A-5 오픈 이슈)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**최우선 리스크**:",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}

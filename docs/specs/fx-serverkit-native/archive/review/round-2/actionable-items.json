@@ -1,0 +1,419 @@
+{
+  "generated": "2026-05-16T02:58:03.082Z",
+  "totalItems": 68,
+  "byType": {
+    "flaw": 2,
+    "gap": 25,
+    "risk": 38
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**MVP 범위의 경계가 실제로 어디까지인지** 다소 모호함. 예를 들어, “핸드오프 알림/트리거”까지만 구현하고 “실제 데이터 상태 변경”은 Phase2로 분리한다고 하나, 실제 업무흐름에서 이 분리의 실효성이 떨어질 수 있음.",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**교육/온보딩, 모니터링, 피드백 수집** 등 운영/사용자측 지원계획이 1차라도 명시되어야 함.",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 사용자 교육/온보딩 플랜 부재**: 새로운 CQ 5축, 80-20-80 룰, HITL Console UI는 기존 컨설턴트/운영자들에게 익숙하지 않음. 온보딩 가이드, FAQ, 실습 및 피드백 라운드가 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실시간 모니터링/운영 대시보드**: HITL 큐 현황, CQ 평가 현황, 에러/장애 즉시 감지 및 대응 시스템 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**에러/예외 플로우 상세 설계**: LLM 평가 실패, API rate limit, DB deadlock, UI 입력 지연 등 실운영에서 빈번히 발생할 수 있는 예외상황별 대응 시나리오/플로우 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**사용자 피드백 채널**: Dogfood 이후 실제 사용자의 피드백을 체계적으로 수집/반영하는 구조 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**현업 현장 검증 계획**: Dogfood 1회가 아니라, 여러 케이스/도메인별 반복적 현장 검증을 통한 개선 루프 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**데이터/프롬프트 보안감사 체계**: PRD에 감사 로그 기록은 있으나, 실제로 “누가/언제/어떻게” 감사할지 명확한 담당/프로세스 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**MVP 범위의 경계가 실제로 어디까지인지** 다소 모호함. 예를 들어, “핸드오프 알림/트리거”까지만 구현하고 “실제 데이터 상태 변경”은 Phase2로 분리한다고 하나, 실제 업무흐름에서 이 분리의 실효성이 떨어질 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정이 과소평가**: HITL Console UI 신규 개발, CQ 평가 엔진, 프롬프트 설계/테스트/피드백, D1 schema 신규 + 마이그레이션, 교육/온보딩, QA/회귀, Dogfood까지 실제로는 3주 내 불가능할 확률이 높음(기존 시스템과의 통합, 사용자 저항 등 고려 시 4~6주 예상).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**프롬프트 관리/버전 관리**: 현업에서 요구하는 프롬프트 품질 확보 및 버전 체계 안정화에 상당한 시간이 필요할 것(특히 LLM 평가 품질 검증, 프롬프트 실험 및 롤백 플랜 등).",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**DB 마이그레이션 및 FK 설계**: 기존 D1 schema에 신규 테이블/관계 추가 시 회귀 위험이 높으므로, 별도의 staging 환경과 충분한 사전 테스트가 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/QA/롤백 정책**이 아직 미정(오픈이슈 #7). 실패시 롤백 플랜, 장애/예외처리, 데이터 일관성 보장 방안이 선행되어야 실질적 착수가 가능.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 사용자 교육/온보딩 플랜 부재**: 새로운 CQ 5축, 80-20-80 룰, HITL Console UI는 기존 컨설턴트/운영자들에게 익숙하지 않음. 온보딩 가이드, FAQ, 실습 및 피드백 라운드가 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실시간 모니터링/운영 대시보드**: HITL 큐 현황, CQ 평가 현황, 에러/장애 즉시 감지 및 대응 시스템 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**에러/예외 플로우 상세 설계**: LLM 평가 실패, API rate limit, DB deadlock, UI 입력 지연 등 실운영에서 빈번히 발생할 수 있는 예외상황별 대응 시나리오/플로우 미흡.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**사용자 피드백 채널**: Dogfood 이후 실제 사용자의 피드백을 체계적으로 수집/반영하는 구조 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**현업 현장 검증 계획**: Dogfood 1회가 아니라, 여러 케이스/도메인별 반복적 현장 검증을 통한 개선 루프 필요.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**데이터/프롬프트 보안감사 체계**: PRD에 감사 로그 기록은 있으나, 실제로 “누가/언제/어떻게” 감사할지 명확한 담당/프로세스 없음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**“온톨로지 활용도” 평가의 실효성/정확도 부족**: 임시정의가 현업에서 납득되지 않거나, 실제로 변별력이 떨어질 경우, CQ 자동평가 신뢰도 하락 → 전체 자동화의 의미 약화.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**LLM 자동평가 품질 미달 및 반복적인 프롬프트 튜닝 필요**: LLM 모델의 평가 정확도가 낮거나, prompt engineering에 반복적 리소스가 소요될 때, 일정/예산/성과 모두 악화 가능성 높음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**HITL Console UI의 실사용성 저하**: 컨설턴트가 실제 검수/입력 과정에서 불편하거나, 업무 흐름이 맞지 않을 경우, 형식적 사용에 그치거나 업무 반발 가능.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**기존 시스템과의 통합/회귀 위험**: D1 schema, F606/F607 등과의 연동에서 미세한 schema/이벤트 설계 차이로 예상치 못한 장애/회귀가 발생할 수 있음.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트/QA/롤백 체계 미비**: 문제가 발생했을 때 신속히 복구/롤백할 수 없다면, 전체 시스템 신뢰도 저하 및 장애 장기화 위험.",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**일정 초과 및 범위 creep**: MVP 범위 불명확 + 오픈이슈 다수로 인해 일정이 계속 늘어질 가능성.",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "사용자 관점\n\n목표 사용자(AX BD 컨설턴트, AX BD admin)가 이 솔루션을 실제로 받아들일 가능성은 높지만, 몇 가지 도입 장벽이 존재할 수 있습니다.\n\n**긍정적인 요소**:\n*   **업무 효율성 증대**: 컨설팅 워크플로우의 자동 평가, 검수, 핸드오프는 컨설턴트의 수동 작업 부하를 줄이고, 일관된 품질을 유지하는 데 기여할 수 있습니다. ",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "누락된 시장 관점\n\nPRD는 내부 자체 구축에 초점을 맞추고 있어 시장/경쟁/트렌드 측면에서 몇 가지 고려되지 않은 부분이 있습니다.\n\n*   **잠재적 외부 확장성/수익 모델**: 현재는 AX BD팀 내부 컨설팅 워크플로우에 한정되어 있지만, 향후 이 검증 엔진이 KT DS의 다른 본부나 심지어 외부 고객에게 서비스로 제공될 가능성에 대한 장기적인 비전이",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**긍정적 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Cloudflare Workers CPU 제한**(10-50ms)과 CQ 평가 시간(목표 60s)의 괴리",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**D1 schema FK 설계 미결정**(오픈 이슈 #5)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Anthropic API Rate Limit**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**개선 필요 항목**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**평가 에이전트 격리 부족**: 단일 Worker에서 CQ 평가 수행 시 장애 전파 리스크",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**프롬프트 버전 관리**: D1 schema에 기록하지만 롤백 메커니즘 미비",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**HITL Console UI 라우팅**: 동적 라우팅 시 CSR 초기 로딩 지연",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**저평가된 복잡도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**CQ 5축 평가의 축간 의존성**: 온톨로지 활용도(임시정의)와 다른 축의 점수 상관관계 고려 안 됨",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**80-20-80 워크플로우 상태 머신**: 5단계 전이 조건에 대한 예외 케이스(역행/점프) 처리 누락",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**audit_events 트레이스 체인**: 분산 평가 시 trace_id 연결 보장 불확실(F606 한계)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**최우선 리스크 3가지**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**Cloudflare Workers CPU 제한 초과**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**D1 schema FK 관리 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**LLM 평가 정확도 변동성**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "Cloudflare Workers CPU 제한 회피 방안 확정(비동기 큐 설계 완료)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "D1 schema FK 설계 검증 완료(오픈 이슈 #5 해결)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "평가 에이전트 장애 전파 차단 아키텍처 확립(전용 Worker Pool 설계도)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**긍정적 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Cloudflare Workers CPU 제한**(10-50ms)과 CQ 평가 시간(목표 60s)의 괴리",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**D1 schema FK 설계 미결정**(오픈 이슈 #5)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Anthropic API Rate Limit**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**개선 필요 항목**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**평가 에이전트 격리 부족**: 단일 Worker에서 CQ 평가 수행 시 장애 전파 리스크",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**프롬프트 버전 관리**: D1 schema에 기록하지만 롤백 메커니즘 미비",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**HITL Console UI 라우팅**: 동적 라우팅 시 CSR 초기 로딩 지연",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**저평가된 복잡도**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**CQ 5축 평가의 축간 의존성**: 온톨로지 활용도(임시정의)와 다른 축의 점수 상관관계 고려 안 됨",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**80-20-80 워크플로우 상태 머신**: 5단계 전이 조건에 대한 예외 케이스(역행/점프) 처리 누락",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**audit_events 트레이스 체인**: 분산 평가 시 trace_id 연결 보장 불확실(F606 한계)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**최우선 리스크 3가지**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**Cloudflare Workers CPU 제한 초과**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**D1 schema FK 관리 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**LLM 평가 정확도 변동성**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "Cloudflare Workers CPU 제한 회피 방안 확정(비동기 큐 설계 완료)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "D1 schema FK 설계 검증 완료(오픈 이슈 #5 해결)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "평가 에이전트 장애 전파 차단 아키텍처 확립(전용 Worker Pool 설계도)",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
