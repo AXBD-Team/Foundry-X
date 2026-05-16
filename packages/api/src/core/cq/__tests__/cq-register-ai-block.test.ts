@@ -63,9 +63,6 @@ describe("F665 /register AI 차단 가드", () => {
 
   it("T2: 정상 author ('Sinclair Seo') → 201 + id 반환", async () => {
     const env = makeEnv();
-    vi.stubGlobal("crypto", {
-      randomUUID: () => "test-uuid-f665",
-    });
     const res = await cqApp.request(
       "/register",
       {
