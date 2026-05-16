@@ -1,12 +1,11 @@
 {
   "sprint": 398,
   "phase": 47,
-  "f_items": "F664",
+  "f_items": "F642",
   "f_count": 1,
   "match_rate": 98,
-  "duration_minutes": 45,
+  "duration_minutes": 4,
   "test_result": "pass",
-  "created": "2026-05-16T15:27:00+09:00",
-  "recorded_at": "2026-05-16T15:27:00+09:00",
-  "notes": "S362 gap fill 5회차 — F605 web baseline 활용 (4 widgets + route + 2-tab e2e 이미 존재). HitlStateDiagram + HitlAuditDrawer + DecisionForm transition mode + 3-tab 통합. typecheck PASS (--force 0 cached S337) + 66 files 430 tests PASS + msa-lint PASS. Codex BLOCK false positive (FX-REQ-587~590 wrong PRD, F664=FX-REQ-726). Match 98%."
+  "created": "2026-05-16T15:28:00+09:00",
+  "recorded_at": "2026-05-16T15:29:58+09:00"
 }
