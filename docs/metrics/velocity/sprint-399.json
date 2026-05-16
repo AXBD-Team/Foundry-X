@@ -1,0 +1,20 @@
+{
+  "sprint": 399,
+  "f_items": "F665",
+  "branch": "sprint/399",
+  "session": "S362",
+  "started_at": "2026-05-16T18:21:51+09:00",
+  "completed_at": "2026-05-16T18:35:00+09:00",
+  "duration_minutes": 13,
+  "match_rate": 100,
+  "test_result": "pass",
+  "tests_total": 11,
+  "tests_passed": 11,
+  "files_changed": 7,
+  "lines_added": 583,
+  "streak": 63,
+  "gap_fill": true,
+  "gap_fill_count": 6,
+  "phase": "47",
+  "milestone": "ServerKit Native MVP complete (F662-F665)"
+}
