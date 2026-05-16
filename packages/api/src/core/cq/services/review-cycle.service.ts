@@ -1,4 +1,5 @@
-import { AuditBus, generateTraceId, generateSpanId } from "../../infra/types.js";
+import type { AuditBus } from "../../infra/types.js";
+import { generateTraceId, generateSpanId } from "../../infra/types.js";
 import { type ReviewCycleResult, type ReviewCycleStage } from "../types.js";
 
 interface LLMProvider {
