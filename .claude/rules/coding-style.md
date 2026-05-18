@@ -3,7 +3,7 @@
 ## TypeScript 공통
 - 패키지 매니저: pnpm (npm/yarn 금지)
 - 빌드: Turborepo (`turbo build/test/lint/typecheck`)
-- Node.js 20, TypeScript strict mode
+- Node.js 22, TypeScript strict mode
 
 ## API (Hono + Cloudflare Workers)
 - 라우트: Zod 스키마 필수 — ESLint `require-zod-schema` 룰 적용
