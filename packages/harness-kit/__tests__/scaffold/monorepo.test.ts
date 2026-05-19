@@ -259,4 +259,109 @@ describe("generateMonorepoScaffold", () => {
     expect(content).toContain("proj-z");
     expect(content).toContain("test-account-id");
   });
+
+  // T11: F668 — .claude/rules/ 9개 파일 생성 확인
+  it("T11: should generate .claude/rules/ directory with 9 rule files", async () => {
+    const outputDir = path.join(createTmpDir(), "rules-test");
+    await generateMonorepoScaffold({
+      projectName: "rules-test",
+      githubOrg: "TEST-ORG",
+      githubRepo: "rules-test",
+      description: "Rules Test",
+      outputDir,
+    });
+
+    const rulesDir = path.join(outputDir, ".claude", "rules");
+    expect(fs.existsSync(rulesDir)).toBe(true);
+
+    const EXPECTED_RULES = [
+      "coding-style.md",
+      "sdd-triangle.md",
+      "git-workflow.md",
+      "tdd-workflow.md",
+      "testing.md",
+      "security.md",
+      "serverkit-cq.md",
+      "process-lifecycle.md",
+      "task-promotion.md",
+    ];
+    for (const f of EXPECTED_RULES) {
+      expect(fs.existsSync(path.join(rulesDir, f))).toBe(true);
+    }
+  });
+
+  // T12: F668 — Handlebars .hbs 파일에서 projectName 치환, "Foundry-X" 0건
+  it("T12: should replace projectName in hbs rules files and remove Foundry-X identifiers", async () => {
+    const projectName = "my-new-proj";
+    const outputDir = path.join(createTmpDir(), projectName);
+    await generateMonorepoScaffold({
+      projectName,
+      githubOrg: "MY-ORG",
+      githubRepo: "my-new-proj",
+      description: "My New Project",
+      outputDir,
+    });
+
+    const rulesDir = path.join(outputDir, ".claude", "rules");
+    const HBS_FILES = [
+      "coding-style.md",
+      "sdd-triangle.md",
+      "git-workflow.md",
+      "tdd-workflow.md",
+      "testing.md",
+      "security.md",
+      "serverkit-cq.md",
+    ];
+    for (const f of HBS_FILES) {
+      const content = fs.readFileSync(path.join(rulesDir, f), "utf-8");
+      expect(content, `${f} should not contain 'Foundry-X'`).not.toContain("Foundry-X");
+      expect(content, `${f} should contain projectName`).toContain(projectName);
+    }
+  });
+
+  // T13: F668 — security.md workerSubdomain + pages.dev 치환
+  it("T13: should replace workerSubdomain and pages URL in security.md", async () => {
+    const projectName = "sec-proj";
+    const workerSubdomain = "sec-worker";
+    const outputDir = path.join(createTmpDir(), projectName);
+    await generateMonorepoScaffold({
+      projectName,
+      githubOrg: "TEST-ORG",
+      githubRepo: projectName,
+      description: "Sec Proj",
+      workerSubdomain,
+      outputDir,
+    });
+
+    const content = fs.readFileSync(
+      path.join(outputDir, ".claude", "rules", "security.md"),
+      "utf-8"
+    );
+    expect(content).not.toContain("foundry-x-api");
+    expect(content).not.toContain("fx.minu.best");
+    expect(content).toContain(`${workerSubdomain}-api`);
+    expect(content).toContain(`${projectName}.pages.dev`);
+  });
+
+  // T14: F668 — SPEC.md.hbs → SPEC.md 생성 + projectName 치환
+  it("T14: should generate SPEC.md with project variables and no Foundry-X identifiers", async () => {
+    const projectName = "spec-proj";
+    const outputDir = path.join(createTmpDir(), projectName);
+    await generateMonorepoScaffold({
+      projectName,
+      githubOrg: "SPEC-ORG",
+      githubRepo: "spec-proj",
+      description: "Spec Project",
+      outputDir,
+    });
+
+    const specPath = path.join(outputDir, "SPEC.md");
+    expect(fs.existsSync(specPath)).toBe(true);
+
+    const content = fs.readFileSync(specPath, "utf-8");
+    expect(content).toContain(projectName);
+    expect(content).not.toContain("Foundry-X");
+    expect(content).not.toContain("foundry-x");
+    expect(content).not.toContain("ktds-axbd");
+  });
 });
