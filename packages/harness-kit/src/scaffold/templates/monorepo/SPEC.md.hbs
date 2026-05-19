@@ -1,0 +1,90 @@
+# {{projectName}} SPEC
+
+> **GitHub**: [{{githubOrg}}/{{githubRepo}}](https://github.com/{{githubOrg}}/{{githubRepo}})
+> **철학**: Git이 진실, {{projectName}}는 렌즈
+
+---
+
+## §1. 프로젝트 개요
+
+**{{projectName}}** — {{description}}
+
+---
+
+## §2. 현황 지표
+
+> 수치 하드코딩 금지 — `/ax:daily-check`가 실측
+
+| 지표 | 값 |
+|------|-----|
+| F-item 총계 | — |
+| Sprint 총계 | — |
+| 완료 | — |
+| 진행 중 | — |
+
+---
+
+## §3. 아키텍처
+
+모노리포 (pnpm workspace + Turborepo), 4개 패키지:
+- **cli** — CLI 도구
+- **api** — Hono + Cloudflare Workers + D1
+- **web** — Vite + React
+- **shared** — 공유 타입
+
+---
+
+## §4. 배포
+
+- **자동**: master push → CI/CD
+- **Workers**: `{{workerSubdomain}}.{{githubOrgLower}}.workers.dev`
+- **Pages**: `{{projectName}}.pages.dev`
+
+---
+
+## §5. F-item 목록
+
+| F# | 제목 (REQ, Priority) | Sprint | 상태 | 비고 |
+|----|---------------------|--------|------|------|
+| F001 | 초기 셋업 ({{projectName}}-REQ-001, P0) | Sprint 1 | 📋(plan) | |
+
+---
+
+## §6. Sprint 배정
+
+| Sprint | F-item | 상태 | 비고 |
+|--------|--------|------|------|
+| Sprint 1 | F001 | 📋(plan) | 초기 셋업 |
+
+---
+
+## §7. 요구사항 (REQ)
+
+| REQ | 제목 | Status | 연결 F-item |
+|-----|------|--------|------------|
+| {{projectName}}-REQ-001 | 초기 셋업 | PLANNED | F001 |
+
+---
+
+## §8. 리스크 / 기술 부채
+
+| ID | 내용 | 등록일 | 해소 |
+|----|------|--------|------|
+| TD-001 | 초기 리스크 미정 | {{projectName}} v0.1.0 | — |
+
+---
+
+## §9. 변경 이력
+
+| 날짜 | Sprint | 변경 내용 |
+|------|--------|----------|
+| — | — | 프로젝트 초기 생성 |
+
+---
+
+## §10. 참고 문서
+
+- `docs/01-plan/` — Plan 문서
+- `docs/02-design/` — Design 문서
+- `docs/04-report/` — Sprint Report
+- `.claude/rules/` — 개발 규칙
