@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-20
+
+### Added
+
+- `createMultiTenantMiddleware` — JWT-based org membership guard with bypass paths and custom error handler
+- `createRateLimitMiddleware` — Configurable rate limiting (in-memory fallback + optional KV-backed distributed counter)
+- `createRequestLoggerMiddleware` — Structured JSON / human-readable request logging with header redaction
+- `createTraceIdMiddleware` — Trace ID propagation (header-based passthrough + custom generator)
+- New types: `TenantVariables`, `MultiTenantConfig`, `RateLimitConfig`, `RequestLoggerConfig`, `TraceIdConfig`
+- 28 new tests (4 middleware test files)
+
+### Changed
+
+- Total tests: 112 → 140
+- `package.json version`: 0.1.0 → 0.2.0
+
 ## [0.1.0] - 2026-05-19
 
 ### Added

@@ -1,7 +1,7 @@
 {
   "name": "@ktds-axbd/harness-kit",
-  "version": "0.1.0",
-  "description": "AX BD Cloudflare Workers MSA scaffold + harness CLI (auth/CORS/D1/event-bus)",
+  "version": "0.2.0",
+  "description": "AX BD Cloudflare Workers MSA scaffold + harness CLI (auth/CORS/D1/event-bus/middleware)",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
