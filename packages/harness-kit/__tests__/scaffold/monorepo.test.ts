@@ -688,4 +688,95 @@ describe("generateMonorepoScaffold", () => {
     expect(testContent).toContain("toBeLessThan(500)");
     expect(testContent).toContain('import { app }');
   });
+
+  // T28(F673): --d1-database-id 시 wrangler.toml의 <RUN: placeholder 0건
+  it("T28(F673): should replace <RUN: placeholder with d1DatabaseId in wrangler.toml", async () => {
+    const outputDir = path.join(createTmpDir(), "d1-id-proj");
+    await generateMonorepoScaffold({
+      projectName: "d1-id-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "d1-id-proj",
+      description: "D1 ID Test",
+      d1DatabaseId: "test-db-uuid-1234",
+      outputDir,
+    });
+
+    const wrangler = fs.readFileSync(
+      path.join(outputDir, "packages", "api", "wrangler.toml"),
+      "utf-8"
+    );
+    expect(wrangler).not.toContain("<RUN:");
+    expect(wrangler).not.toContain("<SAME_DATABASE_ID_AS_ABOVE>");
+  });
+
+  // T29(F673): --d1-database-id ID 값이 wrangler.toml에 inject됨
+  it("T29(F673): should inject d1DatabaseId into wrangler.toml database_id fields", async () => {
+    const outputDir = path.join(createTmpDir(), "d1-inject-proj");
+    await generateMonorepoScaffold({
+      projectName: "d1-inject-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "d1-inject-proj",
+      description: "D1 Inject Test",
+      d1DatabaseId: "my-unique-db-id-5678",
+      outputDir,
+    });
+
+    const wrangler = fs.readFileSync(
+      path.join(outputDir, "packages", "api", "wrangler.toml"),
+      "utf-8"
+    );
+    const matches = (wrangler.match(/my-unique-db-id-5678/g) ?? []).length;
+    expect(matches).toBeGreaterThanOrEqual(3);
+  });
+
+  // T30(F673): SETUP.md 생성 + d1Created=false 시 수동 안내 텍스트 포함
+  it("T30(F673): should generate SETUP.md with manual d1 guide when d1Created is false", async () => {
+    const outputDir = path.join(createTmpDir(), "setup-md-proj");
+    await generateMonorepoScaffold({
+      projectName: "setup-md-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "setup-md-proj",
+      description: "Setup MD Test",
+      outputDir,
+    });
+
+    const setupMd = path.join(outputDir, "SETUP.md");
+    expect(fs.existsSync(setupMd)).toBe(true);
+
+    const content = fs.readFileSync(setupMd, "utf-8");
+    // 5 섹션 이상
+    const sections = (content.match(/^## /gm) ?? []).length;
+    expect(sections).toBeGreaterThanOrEqual(5);
+    // d1Created=false이므로 수동 안내 포함
+    expect(content).toContain("wrangler d1 create");
+  });
+
+  // T31(F673): --with-git-init 시 .git 디렉토리 생성
+  it("T31(F673): should create .git directory when withGitInit is true", async () => {
+    const outputDir = path.join(createTmpDir(), "git-init-proj");
+    await generateMonorepoScaffold({
+      projectName: "git-init-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "git-init-proj",
+      description: "Git Init Test",
+      withGitInit: true,
+      outputDir,
+    });
+
+    expect(fs.existsSync(path.join(outputDir, ".git"))).toBe(true);
+  });
+
+  // T32(F673): scaffold 반환 file list에 SETUP.md 포함
+  it("T32(F673): should include SETUP.md in returned file list", async () => {
+    const outputDir = path.join(createTmpDir(), "filelist-proj");
+    const files = await generateMonorepoScaffold({
+      projectName: "filelist-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "filelist-proj",
+      description: "File List Test",
+      outputDir,
+    });
+
+    expect(files.some((f) => f.endsWith("SETUP.md"))).toBe(true);
+  });
 });
