@@ -1,0 +1,95 @@
+# {{projectName}} — Setup Guide
+
+이 파일은 ax-harness-kit scaffold 후 프로젝트를 **5분 내 deploy-ready** 상태로 만드는 단계별 가이드예요.
+
+## 1. 의존성 설치
+
+```bash
+pnpm install
+```
+
+## 2. Cloudflare 자원 준비
+
+### D1 데이터베이스 생성
+{{#if d1Created}}
+✅ **D1 database가 자동 생성됐어요.** `packages/api/wrangler.toml`의 `database_id` 필드에 이미 inject됐어요.
+{{else}}
+아직 D1 database를 생성해야 해요:
+
+```bash
+wrangler d1 create {{projectName}}-db
+```
+
+출력된 `database_id` 값을 `packages/api/wrangler.toml`의 `database_id` 필드 3곳에 복붙하세요.
+{{/if}}
+
+### Wrangler Secret 등록
+
+```bash
+# 필수 secrets
+wrangler secret put JWT_SECRET
+wrangler secret put GITHUB_TOKEN
+wrangler secret put WEBHOOK_SECRET
+wrangler secret put ANTHROPIC_API_KEY
+```
+
+> 각 환경에 모두 등록하세요: default + `--env production` + `--env staging`
+
+## 3. Git 초기화
+{{#if gitInitialized}}
+✅ **git init + initial commit이 자동으로 완료됐어요.**
+
+GitHub 원격 저장소를 연결하세요:
+
+```bash
+gh repo create {{githubOrg}}/{{githubRepo}} --private
+git remote add origin https://github.com/{{githubOrg}}/{{githubRepo}}.git
+git push -u origin master
+```
+{{else}}
+```bash
+git init
+git add .
+git commit -m "chore: initial scaffold (harness-kit)"
+
+# GitHub 저장소 생성 및 연결
+gh repo create {{githubOrg}}/{{githubRepo}} --private
+git remote add origin https://github.com/{{githubOrg}}/{{githubRepo}}.git
+git push -u origin master
+```
+{{/if}}
+
+## 4. 첫 배포
+
+```bash
+# D1 migrations 적용
+cd packages/api
+npx wrangler d1 migrations apply {{projectName}}-db --remote
+
+# 빌드
+cd ../..
+pnpm build
+
+# Workers 배포
+cd packages/api
+npx wrangler deploy
+
+# Pages 배포
+cd ../web
+pnpm build
+npx wrangler pages deploy dist --project-name={{projectName}}-web
+```
+
+## 5. 다음 단계
+
+```bash
+# 로컬 개발 서버 시작
+pnpm dev
+
+# SPEC.md에 첫 F-item 등록 후 Sprint 시작
+sprint 1
+```
+
+- `SPEC.md` — 프로젝트 명세 (F-item 관리)
+- `.claude/rules/` — Claude Code 규칙
+- `packages/api/src/core/` — MSA 도메인 코드 위치

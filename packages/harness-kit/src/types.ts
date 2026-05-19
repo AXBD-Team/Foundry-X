@@ -48,4 +48,9 @@ export interface MonorepoScaffoldOptions {
   withScripts?: boolean; // M10: scripts/task/ + git-orphan 스크립트 생성
   // F670 Phase 3 opt-in flag
   withClaudeHooks?: boolean; // M7: .claude/settings.json hooks 4종 + hook scripts 생성
+  // F673 I-1 D1 auto-create
+  withD1Create?: boolean; // wrangler d1 create 자동 실행 후 wrangler.toml inject
+  d1DatabaseId?: string; // 수동 ID 주입 (wrangler 호출 없이 직접 inject)
+  // F673 I-3 git init
+  withGitInit?: boolean; // git init + initial commit 자동
 }
