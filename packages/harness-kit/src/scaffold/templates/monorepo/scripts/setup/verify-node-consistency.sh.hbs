@@ -1,0 +1,44 @@
+#!/bin/bash
+# Node version 3-way consistency check
+# Verifies: .nvmrc == package.json engines.node == .github/workflows/*.yml node-version
+# Exit 0: consistent / Exit 1: drift detected or missing values
+
+NVMRC=$(cat .nvmrc 2>/dev/null | tr -d '[:space:]')
+ENGINES=$(grep -o '"node":[[:space:]]*"[^"]*"' package.json 2>/dev/null | grep -oE '[0-9]+' | head -1)
+WORKFLOW_NODES=$(grep -hE 'node-version:[[:space:]]*[0-9]+' .github/workflows/*.yml 2>/dev/null | grep -oE '[0-9]+' | sort -u)
+
+EXIT=0
+
+if [ -z "$NVMRC" ]; then
+  echo "⚠️  .nvmrc missing or empty"
+  EXIT=1
+fi
+
+if [ -z "$ENGINES" ]; then
+  echo "⚠️  package.json engines.node missing"
+  EXIT=1
+fi
+
+if [ -z "$WORKFLOW_NODES" ]; then
+  echo "⚠️  .github/workflows/*.yml node-version missing"
+  EXIT=1
+fi
+
+if [ -n "$NVMRC" ] && [ -n "$ENGINES" ] && [ "$NVMRC" != "$ENGINES" ]; then
+  echo "❌ .nvmrc=$NVMRC != package.json engines.node=$ENGINES"
+  EXIT=1
+fi
+
+if [ -n "$NVMRC" ] && [ -n "$WORKFLOW_NODES" ]; then
+  while IFS= read -r wn; do
+    if [ "$wn" != "$NVMRC" ]; then
+      echo "❌ .nvmrc=$NVMRC != workflow node-version=$wn (.github/workflows/)"
+      EXIT=1
+    fi
+  done <<< "$WORKFLOW_NODES"
+fi
+
+if [ "$EXIT" = "0" ]; then
+  echo "✅ Node version 3-way consistency OK (v$NVMRC)"
+fi
+exit $EXIT

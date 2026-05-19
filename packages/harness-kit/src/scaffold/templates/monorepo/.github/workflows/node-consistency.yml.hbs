@@ -1,0 +1,20 @@
+name: Node Version Consistency
+on:
+  push:
+    paths:
+      - '.nvmrc'
+      - 'package.json'
+      - '.github/workflows/*.yml'
+  pull_request:
+    paths:
+      - '.nvmrc'
+      - 'package.json'
+      - '.github/workflows/*.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Node version 3-way consistency
+        run: bash scripts/setup/verify-node-consistency.sh
