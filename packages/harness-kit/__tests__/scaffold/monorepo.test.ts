@@ -1,4 +1,4 @@
-// F666+F667 TDD — generateMonorepoScaffold() 4-package monorepo scaffold + Cloudflare deploy infra
+// F666+F667+F668+F669 TDD — generateMonorepoScaffold() 4-package monorepo scaffold + opt-in flags
 import { describe, it, expect, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -363,5 +363,168 @@ describe("generateMonorepoScaffold", () => {
     expect(content).not.toContain("Foundry-X");
     expect(content).not.toContain("foundry-x");
     expect(content).not.toContain("ktds-axbd");
+  });
+
+  // T15: F669 — withBashrcPatch:true → scripts/setup/patch-bashrc.sh 생성
+  it("T15: should generate patch-bashrc.sh when withBashrcPatch is true", async () => {
+    const outputDir = path.join(createTmpDir(), "bashrc-proj");
+    await generateMonorepoScaffold({
+      projectName: "bashrc-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "bashrc-proj",
+      description: "Bashrc Test",
+      withBashrcPatch: true,
+      outputDir,
+    });
+    expect(fs.existsSync(path.join(outputDir, "scripts", "setup", "patch-bashrc.sh"))).toBe(true);
+  });
+
+  // T16: F669 — patch-bashrc.sh에 ax-harness markers + 13 함수명 포함
+  it("T16: should include ax-harness markers and all 13 function names in patch-bashrc.sh", async () => {
+    const outputDir = path.join(createTmpDir(), "bashrc-fns");
+    await generateMonorepoScaffold({
+      projectName: "bashrc-fns",
+      githubOrg: "TEST-ORG",
+      githubRepo: "bashrc-fns",
+      description: "Bashrc Functions",
+      withBashrcPatch: true,
+      outputDir,
+    });
+    const content = fs.readFileSync(
+      path.join(outputDir, "scripts", "setup", "patch-bashrc.sh"),
+      "utf-8"
+    );
+    expect(content).toContain("# ax-harness BEGIN");
+    expect(content).toContain("# ax-harness END");
+    const expectedFunctions = [
+      "wtsplit", "_cc_billing_guard", "_cc_remove_api_key",
+      "ccs", "ccw", "_sprint_ensure_monitor",
+      "sprint()", "sprint-review", "sprint-pr", "sprint-done",
+      "ccw-sprint", "ccw-auto", "sprints",
+    ];
+    for (const fn of expectedFunctions) {
+      expect(content, `patch-bashrc.sh should contain '${fn}'`).toContain(fn);
+    }
+  });
+
+  // T17: F669 — patch-bashrc.sh에 AX_TARGET_HOME 감지 패턴 포함
+  it("T17: should include AX_TARGET_HOME detection in patch-bashrc.sh", async () => {
+    const outputDir = path.join(createTmpDir(), "bashrc-env");
+    await generateMonorepoScaffold({
+      projectName: "bashrc-env",
+      githubOrg: "TEST-ORG",
+      githubRepo: "bashrc-env",
+      description: "Bashrc Env",
+      withBashrcPatch: true,
+      outputDir,
+    });
+    const content = fs.readFileSync(
+      path.join(outputDir, "scripts", "setup", "patch-bashrc.sh"),
+      "utf-8"
+    );
+    expect(content).toContain("AX_TARGET_HOME");
+    expect(content).toContain("getent passwd");
+  });
+
+  // T18: F669 — withTmuxPatch:true → scripts/setup/patch-tmux.sh 생성
+  it("T18: should generate patch-tmux.sh when withTmuxPatch is true", async () => {
+    const outputDir = path.join(createTmpDir(), "tmux-proj");
+    await generateMonorepoScaffold({
+      projectName: "tmux-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "tmux-proj",
+      description: "Tmux Test",
+      withTmuxPatch: true,
+      outputDir,
+    });
+    expect(fs.existsSync(path.join(outputDir, "scripts", "setup", "patch-tmux.sh"))).toBe(true);
+  });
+
+  // T19: F669 — withScripts:true → scripts/task/ 필수 파일 생성
+  it("T19: should generate scripts/task/ with required files when withScripts is true", async () => {
+    const outputDir = path.join(createTmpDir(), "scripts-proj");
+    await generateMonorepoScaffold({
+      projectName: "scripts-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "scripts-proj",
+      description: "Scripts Test",
+      withScripts: true,
+      outputDir,
+    });
+    const taskDir = path.join(outputDir, "scripts", "task");
+    expect(fs.existsSync(path.join(taskDir, "task-daemon.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(taskDir, "lib.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(taskDir, "sprint-merge-monitor.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(taskDir, "git-orphan-scan.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(taskDir, "git-orphan-clean.sh"))).toBe(true);
+  });
+
+  // T20: F669 — task-daemon.sh에 'KTDS-AXBD/Foundry-X' literal 없음
+  it("T20: task-daemon.sh should not contain KTDS-AXBD/Foundry-X literals", async () => {
+    const outputDir = path.join(createTmpDir(), "no-fx-proj");
+    await generateMonorepoScaffold({
+      projectName: "no-fx-proj",
+      githubOrg: "MY-ORG",
+      githubRepo: "my-project",
+      description: "No FX Test",
+      withScripts: true,
+      outputDir,
+    });
+    const content = fs.readFileSync(
+      path.join(outputDir, "scripts", "task", "task-daemon.sh"),
+      "utf-8"
+    );
+    expect(content).not.toContain("KTDS-AXBD/Foundry-X");
+    expect(content).toContain("MY-ORG/my-project");
+  });
+
+  // T21: F669 — lib.sh에 '~/.foundry-x' literal 없음
+  it("T21: lib.sh should not contain ~/.foundry-x literal in FX_HOME", async () => {
+    const outputDir = path.join(createTmpDir(), "no-fxhome-proj");
+    await generateMonorepoScaffold({
+      projectName: "no-fxhome-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "no-fxhome-proj",
+      description: "No FX Home Test",
+      withScripts: true,
+      outputDir,
+    });
+    const content = fs.readFileSync(
+      path.join(outputDir, "scripts", "task", "lib.sh"),
+      "utf-8"
+    );
+    expect(content).not.toContain("~/.foundry-x");
+    expect(content).toContain("no-fxhome-proj");
+  });
+
+  // T22: F669 — 플래그 없으면 opt-in 파일 미생성
+  it("T22: should not generate opt-in files when no flags are set", async () => {
+    const outputDir = path.join(createTmpDir(), "no-flags-proj");
+    await generateMonorepoScaffold({
+      projectName: "no-flags-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "no-flags-proj",
+      description: "No Flags Test",
+      outputDir,
+    });
+    expect(fs.existsSync(path.join(outputDir, "scripts", "setup", "patch-bashrc.sh"))).toBe(false);
+    expect(fs.existsSync(path.join(outputDir, "scripts", "setup", "patch-tmux.sh"))).toBe(false);
+    expect(fs.existsSync(path.join(outputDir, "scripts", "task", "task-daemon.sh"))).toBe(false);
+  });
+
+  // T23: F669 — patch-bashrc.sh 실행 권한(0o755)
+  it("T23: patch-bashrc.sh should be executable (chmod 755)", async () => {
+    const outputDir = path.join(createTmpDir(), "chmod-proj");
+    await generateMonorepoScaffold({
+      projectName: "chmod-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "chmod-proj",
+      description: "Chmod Test",
+      withBashrcPatch: true,
+      outputDir,
+    });
+    const scriptPath = path.join(outputDir, "scripts", "setup", "patch-bashrc.sh");
+    const stat = fs.statSync(scriptPath);
+    expect(stat.mode & 0o755).toBe(0o755);
   });
 });

@@ -42,4 +42,8 @@ export interface MonorepoScaffoldOptions {
   cloudflareAccount?: string; // Cloudflare account ID
   workerSubdomain?: string; // Workers sub-name (default: projectName)
   outputDir?: string; // 출력 디렉토리 (default: cwd/{projectName})
+  // F669 Tier 2-B opt-in flags
+  withBashrcPatch?: boolean; // M9: ~/.bashrc 13함수 패치 스크립트 생성
+  withTmuxPatch?: boolean; // S3: tmux + resurrect 설치 스크립트 생성
+  withScripts?: boolean; // M10: scripts/task/ + git-orphan 스크립트 생성
 }
