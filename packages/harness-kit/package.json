@@ -16,7 +16,7 @@
     "./scaffold": "./dist/scaffold/generator.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/scaffold/templates dist/scaffold/",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

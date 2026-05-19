@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# {{projectName}} Post-Deploy Smoke Test
+# Usage: API_URL=... WEB_URL=... bash scripts/smoke-test.sh
+
+set -uo pipefail
+
+API_URL="${API_URL:-https://{{projectName}}-api.{{workerSubdomain}}.workers.dev}"
+WEB_URL="${WEB_URL:-https://{{projectName}}-web.pages.dev}"
+PASS=0
+FAIL=0
+
+check_http() {
+  local name="$1"
+  local url="$2"
+  local method="${3:-GET}"
+  local expected="${4:-200}"
+  local code
+  code=$(curl -sL -o /dev/null -w '%{http_code}' --max-time 10 -X "$method" "$url" 2>/dev/null || echo "000")
+  if echo "$expected" | grep -q "$code"; then
+    echo "  ✅ $name (HTTP $code)"
+    PASS=$((PASS + 1))
+  else
+    echo "  ❌ $name (HTTP $code, expected $expected)"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
+echo "🔥 {{projectName}} Smoke Test — $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "   API: $API_URL"
+echo "   Web: $WEB_URL"
+echo "─────────────────────────────────────"
+
+echo ""
+echo "API Checks:"
+check_http "GET / (health)"  "$API_URL/"  GET "200"
+check_http "GET /healthz"    "$API_URL/healthz"  GET "200"
+
+echo ""
+echo "Web Checks:"
+check_http "Landing page"    "$WEB_URL/"  GET "200"
+
+echo ""
+echo "─────────────────────────────────────"
+echo "Results: $PASS passed, $FAIL failed"
+
+[ "$FAIL" -gt 0 ] && exit 1
+echo "✅ All smoke checks passed"

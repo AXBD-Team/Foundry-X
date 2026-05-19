@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# D1 마이그레이션 원격 적용 — wrangler 없이 Cloudflare REST API 직접 호출
+# Project: {{projectName}}
+# Usage: ./scripts/d1-migrate-remote.sh [migration_file.sql]
+#   인자 없으면: 미적용 마이그레이션 자동 감지 + 순차 적용
+#   인자 있으면: 특정 SQL 파일만 실행
+
+set -euo pipefail
+
+ACCOUNT_ID="{{cloudflareAccount}}"
+# DATABASE_ID: wrangler d1 create {{projectName}}-db 실행 후 출력된 값을 아래에 입력
+DATABASE_ID="${CLOUDFLARE_D1_DATABASE_ID:-<FILL_IN_DATABASE_ID>}"
+MIGRATIONS_DIR="packages/api/src/db/migrations"
+
+if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+  TOKEN="$CLOUDFLARE_API_TOKEN"
+elif [ -f "$HOME/.wrangler/config/default.toml" ]; then
+  TOKEN=$(grep -oP 'oauth_token\s*=\s*"\K[^"]+' "$HOME/.wrangler/config/default.toml" 2>/dev/null || true)
+fi
+
+if [ -z "${TOKEN:-}" ]; then
+  echo "❌ CLOUDFLARE_API_TOKEN 환경변수를 설정하거나 wrangler login을 실행해주세요"
+  echo "   export CLOUDFLARE_API_TOKEN=your_token"
+  exit 1
+fi
+
+API_BASE="https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/d1/database/${DATABASE_ID}"
+
+d1_query() {
+  local sql="$1"
+  curl -s -X POST "${API_BASE}/query" \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d "{\"sql\": $(printf '%s' "$sql" | jq -Rs .)}" 2>/dev/null
+}
+
+if [ -n "${1:-}" ]; then
+  SQL_FILE="$1"
+  [ ! -f "$SQL_FILE" ] && SQL_FILE="${MIGRATIONS_DIR}/$1"
+  if [ ! -f "$SQL_FILE" ]; then
+    echo "❌ 파일을 찾을 수 없어요: $1"
+    exit 1
+  fi
+
+  echo "📋 실행할 파일: $SQL_FILE"
+  STMT_COUNT=0
+  FAIL_COUNT=0
+  while IFS= read -r stmt; do
+    stmt=$(echo "$stmt" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    [ -z "$stmt" ] && continue
+    echo "$stmt" | grep -qE '^--' && continue
+    RESULT=$(d1_query "$stmt")
+    if echo "$RESULT" | grep -q '"success":true'; then
+      STMT_COUNT=$((STMT_COUNT + 1))
+    else
+      echo "❌ 실패: $stmt"
+      FAIL_COUNT=$((FAIL_COUNT + 1))
+    fi
+  done < <(cat "$SQL_FILE" | tr ';' '\n')
+
+  echo "완료: ${STMT_COUNT}개 성공, ${FAIL_COUNT}개 실패"
+  [ "$FAIL_COUNT" -gt 0 ] && exit 1
+  exit 0
+fi
+
+echo "🔍 {{projectName}} D1 마이그레이션 적용 중..."
+APPLIED=$(d1_query "SELECT name FROM d1_migrations ORDER BY id;" | jq -r '.result[0].results[].name' 2>/dev/null || true)
+
+PENDING=0
+for sql_file in $(ls "${MIGRATIONS_DIR}"/*.sql 2>/dev/null | sort); do
+  name=$(basename "$sql_file")
+  if echo "$APPLIED" | grep -qF "$name"; then
+    echo "  ✅ $name (이미 적용됨)"
+  else
+    echo "  ⏳ $name → 적용 중..."
+    RESULT=$(d1_query "$(cat "$sql_file")")
+    if echo "$RESULT" | grep -q '"success":true'; then
+      d1_query "INSERT INTO d1_migrations (name) VALUES ('$name');" > /dev/null 2>&1 || true
+      echo "     ✅ 완료"
+      PENDING=$((PENDING + 1))
+    else
+      echo "     ❌ 실패"
+      exit 1
+    fi
+  fi
+done
+
+echo "✅ {{projectName}}-db 마이그레이션 완료 (신규: ${PENDING}건)"
