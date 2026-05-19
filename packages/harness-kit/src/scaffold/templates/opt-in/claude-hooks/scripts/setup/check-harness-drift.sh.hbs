@@ -1,0 +1,75 @@
+#!/bin/bash
+# Drift monitor: compare .claude/rules/ against ax-harness-kit reference
+# Usage: bash scripts/setup/check-harness-drift.sh [reference-rules-dir]
+#
+# Run monthly or after Sprint completion to detect rules that drifted
+# from the ax-harness-kit baseline.
+#
+# Example:
+#   bash scripts/setup/check-harness-drift.sh ~/work/axbd/Foundry-X/.claude/rules
+
+PROJECT_NAME="{{projectName}}"
+PROJECT_RULES_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/.claude/rules"
+REFERENCE_DIR="${1:-}"
+
+if [ -z "$REFERENCE_DIR" ]; then
+  echo "Usage: bash scripts/setup/check-harness-drift.sh <reference-rules-dir>"
+  echo ""
+  echo "Example:"
+  echo "  bash scripts/setup/check-harness-drift.sh ~/work/axbd/Foundry-X/.claude/rules"
+  echo ""
+  echo "This script compares ${PROJECT_NAME}/.claude/rules/ against the reference"
+  echo "to detect drift from the ax-harness-kit baseline."
+  exit 1
+fi
+
+if [ ! -d "$REFERENCE_DIR" ]; then
+  echo "❌ Reference directory not found: $REFERENCE_DIR"
+  exit 1
+fi
+
+if [ ! -d "$PROJECT_RULES_DIR" ]; then
+  echo "❌ Project rules directory not found: $PROJECT_RULES_DIR"
+  exit 1
+fi
+
+echo "=== ax-harness-kit Drift Check: ${PROJECT_NAME} ==="
+echo "Reference : $REFERENCE_DIR"
+echo "Project   : $PROJECT_RULES_DIR"
+echo ""
+
+DRIFT_COUNT=0
+
+for ref_file in "$REFERENCE_DIR"/*.md; do
+  filename=$(basename "$ref_file")
+  proj_file="$PROJECT_RULES_DIR/$filename"
+
+  # Skip files not in project (project may have fewer rules)
+  if [ ! -f "$proj_file" ]; then
+    echo "⚠️  MISSING in project: $filename"
+    DRIFT_COUNT=$((DRIFT_COUNT + 1))
+    continue
+  fi
+
+  # Diff ignoring project-name substitutions
+  DIFF=$(diff <(sed "s/Foundry-X/${PROJECT_NAME}/g; s/foundry-x/${PROJECT_NAME}/g" "$ref_file") "$proj_file" 2>/dev/null)
+  if [ -n "$DIFF" ]; then
+    echo "⚡ DRIFT: $filename"
+    echo "$DIFF" | head -20
+    echo ""
+    DRIFT_COUNT=$((DRIFT_COUNT + 1))
+  fi
+done
+
+echo "---"
+if [ "$DRIFT_COUNT" -eq 0 ]; then
+  echo "✅ No drift detected — ${PROJECT_NAME}/.claude/rules/ is in sync with reference"
+else
+  echo "⚠️  $DRIFT_COUNT file(s) drifted — review and cherry-pick ax-harness-kit updates as needed"
+  echo ""
+  echo "To apply a specific rule update:"
+  echo "  cp $REFERENCE_DIR/<filename> $PROJECT_RULES_DIR/<filename>"
+  echo "  # Then review and adjust project-specific values"
+fi
+
+exit $DRIFT_COUNT

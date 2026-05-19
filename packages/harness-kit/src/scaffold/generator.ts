@@ -56,6 +56,10 @@ export async function generateMonorepoScaffold(
   if (options.withScripts) {
     await walkTemplates(path.join(OPT_IN_DIR, "scripts"), outputDir, context, createdFiles);
   }
+  // F670 Phase 3 — .claude/settings.json hooks 4종 + hook scripts
+  if (options.withClaudeHooks) {
+    await walkTemplates(path.join(OPT_IN_DIR, "claude-hooks"), outputDir, context, createdFiles);
+  }
 
   return createdFiles;
 }
