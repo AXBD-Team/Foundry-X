@@ -1,0 +1,10 @@
+import { Hono } from "hono";
+
+type Env = {
+  DB: D1Database;
+  JWT_SECRET: string;
+};
+
+export const app = new Hono<{ Bindings: Env }>();
+
+app.get("/healthz", (c) => c.json({ status: "ok", service: "{{projectName}}-api" }));
