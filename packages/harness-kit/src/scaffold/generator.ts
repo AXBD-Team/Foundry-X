@@ -39,7 +39,7 @@ export async function generateMonorepoScaffold(
     githubOrgLower: options.githubOrg.toLowerCase(),
     githubRepo: options.githubRepo,
     description: options.description,
-    cloudflareAccount: options.cloudflareAccount ?? "<YOUR_CLOUDFLARE_ACCOUNT_ID>",
+    cloudflareAccount: options.cloudflareAccount ?? "b6c06059b413892a92f150e5ca496236",
     workerSubdomain: options.workerSubdomain ?? options.projectName,
   };
 
@@ -67,6 +67,7 @@ async function walkTemplates(
       const compiled = Handlebars.compile(templateSrc);
       fs.mkdirSync(path.dirname(destPath), { recursive: true });
       fs.writeFileSync(destPath, compiled(context));
+      if (destName.endsWith(".sh")) fs.chmodSync(destPath, 0o755);
       createdFiles.push(destPath);
     } else {
       // plain file — copy as-is

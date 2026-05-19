@@ -1,0 +1,121 @@
+name: Deploy {{projectName}}
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - 'SPEC.md'
+      - 'CHANGELOG.md'
+      - 'docs/**'
+      - '.claude/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ "{{" }} github.ref {{ "}}" }}
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ "{{" }} steps.filter.outputs.api {{ "}}" }}
+      web: ${{ "{{" }} steps.filter.outputs.web {{ "}}" }}
+      code: ${{ "{{" }} steps.filter.outputs.code {{ "}}" }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'packages/**/*.ts'
+              - 'packages/**/*.tsx'
+              - 'packages/**/package.json'
+              - 'pnpm-lock.yaml'
+            api:
+              - 'packages/api/**'
+              - 'packages/shared/**'
+            web:
+              - 'packages/web/**'
+              - 'packages/shared/**'
+
+  test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @{{githubOrgLower}}/{{projectName}}-shared build
+      - run: pnpm turbo typecheck lint test
+
+  deploy-api:
+    if: |
+      always() &&
+      (needs.changes.outputs.api == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
+    needs: [test, changes]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @{{githubOrgLower}}/{{projectName}}-shared build
+      - name: Apply D1 migrations (remote)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ "{{" }} secrets.CLOUDFLARE_API_TOKEN {{ "}}" }}
+          workingDirectory: packages/api
+          command: d1 migrations apply {{projectName}}-db --remote
+      - name: Deploy Workers API
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ "{{" }} secrets.CLOUDFLARE_API_TOKEN {{ "}}" }}
+          workingDirectory: packages/api
+
+  deploy-web:
+    if: |
+      always() &&
+      (needs.changes.outputs.web == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
+    needs: [test, changes]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @{{githubOrgLower}}/{{projectName}}-shared build
+      - run: pnpm --filter @{{githubOrgLower}}/{{projectName}}-web build
+      - name: Deploy Pages (Web)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ "{{" }} secrets.CLOUDFLARE_API_TOKEN {{ "}}" }}
+          workingDirectory: packages/web
+          command: pages deploy dist --project-name={{projectName}}-web --commit-dirty=true --commit-message="deploy"
+          packageManager: pnpm
+
+  smoke-test:
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure')
+    needs: [deploy-api, deploy-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run smoke tests
+        run: bash scripts/smoke-test.sh
+        env:
+          API_URL: https://{{projectName}}-api.{{workerSubdomain}}.workers.dev
+          WEB_URL: https://{{projectName}}-web.pages.dev

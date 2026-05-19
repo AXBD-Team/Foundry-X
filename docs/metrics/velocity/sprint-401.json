@@ -1,0 +1,18 @@
+{
+  "sprint_num": 401,
+  "f_items": "F667",
+  "title": "ax-harness-kit Tier 1 — Cloudflare 배포 인프라 + Dogfood",
+  "branch": "sprint/401",
+  "match_rate": 100,
+  "tdd": {
+    "red_tests": 4,
+    "green_tests": 4,
+    "total_tests": 71,
+    "pass": 71
+  },
+  "files_changed": 6,
+  "dogfood_axes": 4,
+  "codex_verdict": "BLOCK-false-positive",
+  "duration_minutes": 0,
+  "session": "S364"
+}

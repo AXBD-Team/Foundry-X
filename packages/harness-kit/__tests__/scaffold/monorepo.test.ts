@@ -1,4 +1,4 @@
-// F666 TDD Red — generateMonorepoScaffold() 4-package monorepo scaffold
+// F666+F667 TDD — generateMonorepoScaffold() 4-package monorepo scaffold + Cloudflare deploy infra
 import { describe, it, expect, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -178,5 +178,85 @@ describe("generateMonorepoScaffold", () => {
 
     const violations = checkDir(outputDir);
     expect(violations).toEqual([]);
+  });
+
+  // T7: F667 — wrangler.toml [env.dev] + [env.production] sub-name 분리
+  it("T7: should include [env.dev] and [env.production] sub-name sections in wrangler.toml", async () => {
+    const outputDir = path.join(createTmpDir(), "proj-x");
+    await generateMonorepoScaffold({
+      projectName: "proj-x",
+      githubOrg: "TEST-ORG",
+      githubRepo: "proj-x",
+      description: "Proj X",
+      cloudflareAccount: "abc123",
+      outputDir,
+    });
+
+    const wrangler = fs.readFileSync(
+      path.join(outputDir, "packages", "api", "wrangler.toml"),
+      "utf-8"
+    );
+    expect(wrangler).toContain('[env.dev]');
+    expect(wrangler).toContain('name = "proj-x-api-dev"');
+    expect(wrangler).toContain('[env.production]');
+    expect(wrangler).toContain('name = "proj-x-api-production"');
+  });
+
+  // T8: F667 — .github/workflows/deploy.yml 생성 + D1 migration step
+  it("T8: should generate .github/workflows/deploy.yml with D1 migration step", async () => {
+    const outputDir = path.join(createTmpDir(), "proj-x");
+    await generateMonorepoScaffold({
+      projectName: "proj-x",
+      githubOrg: "TEST-ORG",
+      githubRepo: "proj-x",
+      description: "Proj X",
+      outputDir,
+    });
+
+    const deployYml = path.join(outputDir, ".github", "workflows", "deploy.yml");
+    expect(fs.existsSync(deployYml)).toBe(true);
+
+    const content = fs.readFileSync(deployYml, "utf-8");
+    expect(content).toContain("d1 migrations apply");
+    expect(content).toContain("proj-x-db");
+    expect(content).toContain("node-version: 22");
+  });
+
+  // T9: F667 — deploy.yml smoke-test job 존재
+  it("T9: should generate deploy.yml with smoke-test job", async () => {
+    const outputDir = path.join(createTmpDir(), "proj-y");
+    await generateMonorepoScaffold({
+      projectName: "proj-y",
+      githubOrg: "TEST-ORG",
+      githubRepo: "proj-y",
+      description: "Proj Y",
+      outputDir,
+    });
+
+    const content = fs.readFileSync(
+      path.join(outputDir, ".github", "workflows", "deploy.yml"),
+      "utf-8"
+    );
+    expect(content).toContain("smoke-test:");
+  });
+
+  // T10: F667 — scripts/d1-migrate-remote.sh 생성 + 프로젝트 변수 치환
+  it("T10: should generate scripts/d1-migrate-remote.sh with project variables", async () => {
+    const outputDir = path.join(createTmpDir(), "proj-z");
+    await generateMonorepoScaffold({
+      projectName: "proj-z",
+      githubOrg: "TEST-ORG",
+      githubRepo: "proj-z",
+      description: "Proj Z",
+      cloudflareAccount: "test-account-id",
+      outputDir,
+    });
+
+    const migrateScript = path.join(outputDir, "scripts", "d1-migrate-remote.sh");
+    expect(fs.existsSync(migrateScript)).toBe(true);
+
+    const content = fs.readFileSync(migrateScript, "utf-8");
+    expect(content).toContain("proj-z");
+    expect(content).toContain("test-account-id");
   });
 });
