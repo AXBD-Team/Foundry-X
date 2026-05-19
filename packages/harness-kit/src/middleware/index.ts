@@ -7,3 +7,12 @@ export { errorHandler, HarnessError } from "./error-handler.js";
 // F399: Strangler Fig 프록시 미들웨어 (Sprint 186)
 export { createStranglerMiddleware } from "./strangler.js";
 export type { StranglerRoute, StranglerConfig } from "./strangler.js";
+// F676: v0.2.0 middleware additions
+export { createMultiTenantMiddleware } from "./multi-tenant.js";
+export type { MultiTenantConfig, TenantVariables } from "./multi-tenant.js";
+export { createRateLimitMiddleware } from "./rate-limit.js";
+export type { RateLimitConfig } from "./rate-limit.js";
+export { createRequestLoggerMiddleware } from "./request-logger.js";
+export type { RequestLoggerConfig } from "./request-logger.js";
+export { createTraceIdMiddleware } from "./trace-id.js";
+export type { TraceIdConfig } from "./trace-id.js";

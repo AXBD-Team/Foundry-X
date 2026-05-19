@@ -6,8 +6,22 @@ export {
   errorHandler,
   HarnessError,
   createStranglerMiddleware,
+  createMultiTenantMiddleware,
+  createRateLimitMiddleware,
+  createRequestLoggerMiddleware,
+  createTraceIdMiddleware,
 } from "./middleware/index.js";
-export type { JwtPayload, Role, StranglerRoute, StranglerConfig } from "./middleware/index.js";
+export type {
+  JwtPayload,
+  Role,
+  StranglerRoute,
+  StranglerConfig,
+  MultiTenantConfig,
+  TenantVariables,
+  RateLimitConfig,
+  RequestLoggerConfig,
+  TraceIdConfig,
+} from "./middleware/index.js";
 
 // Types
 export type {

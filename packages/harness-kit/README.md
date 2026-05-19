@@ -190,6 +190,89 @@ app.use("*", createStranglerMiddleware({
 
 ---
 
+#### `createMultiTenantMiddleware(config?)` — v0.2.0
+
+JWT payload의 `orgId`를 검증하고 컨텍스트에 테넌트 정보를 주입해요.
+
+```typescript
+import { createMultiTenantMiddleware } from "@ktds-axbd/harness-kit";
+
+app.use("*", createMultiTenantMiddleware({
+  bypassPaths: ["/health", "/api/public"],
+  onMissingOrgId: (c) => c.json({ error: "Org required" }, 403),
+}));
+
+// 이후 핸들러에서
+app.get("/api/data", (c) => {
+  const orgId = c.get("orgId");     // string
+  const orgRole = c.get("orgRole"); // string (default: "member")
+  const userId = c.get("userId");   // string (= payload.sub)
+  return c.json({ orgId, orgRole, userId });
+});
+```
+
+**Config options**: `bypassPaths?`, `d1Binding?`, `onMissingOrgId?`
+
+---
+
+#### `createRateLimitMiddleware(config)` — v0.2.0
+
+요청 수를 제한해요. KV namespace가 없으면 in-memory fallback을 사용해요.
+
+```typescript
+import { createRateLimitMiddleware } from "@ktds-axbd/harness-kit";
+
+app.use("*", createRateLimitMiddleware({
+  limit: 100,        // 최대 요청 수
+  windowSec: 60,     // 윈도우 (초)
+  keyFn: (c) => c.req.header("CF-Connecting-IP") ?? "anon",
+  kvBinding: "RATE_LIMIT_KV",  // optional: 분산 카운터
+}));
+```
+
+**Config options**: `limit` (required), `windowSec` (required), `keyFn?`, `kvBinding?`
+
+---
+
+#### `createRequestLoggerMiddleware(config?)` — v0.2.0
+
+요청/응답을 구조화된 JSON 또는 텍스트로 로깅해요. 민감 헤더는 자동 redact돼요.
+
+```typescript
+import { createRequestLoggerMiddleware } from "@ktds-axbd/harness-kit";
+
+app.use("*", createRequestLoggerMiddleware({
+  format: "json",   // "json" | "text"
+  logger: console.log,
+  redactHeaders: ["authorization", "cookie", "x-api-key"],
+}));
+// 출력: {"method":"GET","path":"/api","status":200,"duration":12,"traceId":"...","timestamp":"..."}
+```
+
+**Config options**: `format?`, `logger?`, `redactHeaders?`
+
+---
+
+#### `createTraceIdMiddleware(config?)` — v0.2.0
+
+요청 ID를 전파해요. 인입 헤더가 있으면 재사용하고, 없으면 UUID를 생성해요.
+
+```typescript
+import { createTraceIdMiddleware } from "@ktds-axbd/harness-kit";
+
+// 권장 ordering: traceId → logger → auth → tenant
+app.use("*", createTraceIdMiddleware({ header: "x-trace-id" }));
+
+app.get("/api", (c) => {
+  const traceId = c.get("traceId"); // string
+  return c.json({ traceId });
+});
+```
+
+**Config options**: `header?` (default: `"x-trace-id"`), `generator?`
+
+---
+
 ### D1 유틸리티
 
 ```typescript
