@@ -1,0 +1,9 @@
+import { describe, expect, it } from "vitest";
+import { app } from "../app.js";
+
+describe("{{projectName}} api smoke", () => {
+  it("GET /health responds without server error", async () => {
+    const res = await app.request("/health");
+    expect(res.status).toBeLessThan(500);
+  });
+});
