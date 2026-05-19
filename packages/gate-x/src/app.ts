@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import {
   createCorsMiddleware,
   errorHandler,
-} from "@foundry-x/harness-kit";
-import type { HarnessConfig } from "@foundry-x/harness-kit";
+} from "@ktds-axbd/harness-kit";
+import type { HarnessConfig } from "@ktds-axbd/harness-kit";
 import type { GateEnv } from "./env.js";
 import type { TenantVariables } from "./middleware/tenant.js";
 import { tenantGuard } from "./middleware/tenant.js";

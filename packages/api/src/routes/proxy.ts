@@ -4,8 +4,8 @@
 // 이관 예정 서비스(gate, launch, auth, portal): mode:'local' → 이관 완료 후 mode:'proxy'로 전환
 
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { createStranglerMiddleware } from "@foundry-x/harness-kit";
-import type { StranglerRoute } from "@foundry-x/harness-kit";
+import { createStranglerMiddleware } from "@ktds-axbd/harness-kit";
+import type { StranglerRoute } from "@ktds-axbd/harness-kit";
 import { SsoService } from "../modules/auth/services/sso.js";
 import { ServiceProxy } from "../core/infra/types.js";
 import type { Env } from "../env.js";

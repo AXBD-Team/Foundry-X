@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { sign } from "hono/jwt";
 import { createGateAuthMiddleware } from "../middleware/auth.js";
 import type { GateEnv } from "../env.js";
-import type { HarnessConfig } from "@foundry-x/harness-kit";
+import type { HarnessConfig } from "@ktds-axbd/harness-kit";
 
 const SECRET = "test-secret";
 

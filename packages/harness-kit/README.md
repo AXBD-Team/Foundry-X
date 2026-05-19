@@ -1,4 +1,4 @@
-# @foundry-x/harness-kit
+# @ktds-axbd/harness-kit
 
 AX BD MSA 서비스 그룹의 공통 기반 패키지. 새 Cloudflare Workers 서비스를 **1분 내** 생성하고, 인증/CORS/이벤트/ESLint를 일관되게 설정해요.
 
@@ -21,7 +21,7 @@ import {
   createCorsMiddleware,
   errorHandler,
   rbac,
-} from "@foundry-x/harness-kit";
+} from "@ktds-axbd/harness-kit";
 
 const config = {
   serviceName: "gate-x",
@@ -101,7 +101,7 @@ Options:
 JWT 검증 미들웨어. `publicPaths`에 등록된 경로는 건너뛰어요.
 
 ```typescript
-import { createAuthMiddleware } from "@foundry-x/harness-kit";
+import { createAuthMiddleware } from "@ktds-axbd/harness-kit";
 
 app.use("*", createAuthMiddleware({
   serviceName: "gate-x",
@@ -160,7 +160,7 @@ app.post("/api/resource", rbac("member"), handler);
 app.use("*", errorHandler());
 
 // HarnessError 직접 사용
-import { HarnessError } from "@foundry-x/harness-kit";
+import { HarnessError } from "@ktds-axbd/harness-kit";
 throw new HarnessError("NOT_FOUND", "Resource not found", 404);
 ```
 
@@ -169,7 +169,7 @@ throw new HarnessError("NOT_FOUND", "Resource not found", 404);
 Strangler Fig 패턴 라우터. 서비스 이관 전/후 트래픽을 분기해요.
 
 ```typescript
-import { createStranglerMiddleware } from "@foundry-x/harness-kit";
+import { createStranglerMiddleware } from "@ktds-axbd/harness-kit";
 
 app.use("*", createStranglerMiddleware({
   routes: [
@@ -193,7 +193,7 @@ app.use("*", createStranglerMiddleware({
 ### D1 유틸리티
 
 ```typescript
-import { getDb, runQuery, runExec } from "@foundry-x/harness-kit/d1";
+import { getDb, runQuery, runExec } from "@ktds-axbd/harness-kit/d1";
 
 // Workers fetch handler에서
 export default {
@@ -212,7 +212,7 @@ export default {
 D1 기반 도메인 이벤트 발행/구독이에요.
 
 ```typescript
-import { D1EventBus, NoopEventBus, createEvent } from "@foundry-x/harness-kit/events";
+import { D1EventBus, NoopEventBus, createEvent } from "@ktds-axbd/harness-kit/events";
 
 // 이벤트 발행
 const bus = new D1EventBus(env.DB);
@@ -255,7 +255,7 @@ CREATE TABLE IF NOT EXISTS domain_events (
 
 ```javascript
 // eslint.config.mjs
-import { harnessKitPlugin } from "@foundry-x/harness-kit/eslint";
+import { harnessKitPlugin } from "@ktds-axbd/harness-kit/eslint";
 
 export default [
   {

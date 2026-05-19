@@ -22,7 +22,7 @@
     "lint:ci": "pnpm lint:rules && pnpm lint:msa-new && pnpm lint:msa-baseline"
   },
   "dependencies": {
-    "@foundry-x/harness-kit": "workspace:*",
+    "@ktds-axbd/harness-kit": "workspace:*",
     "@foundry-x/shared": "workspace:*",
     "@hono/swagger-ui": "^0.4.0",
     "@hono/zod-openapi": "^0.18.4",

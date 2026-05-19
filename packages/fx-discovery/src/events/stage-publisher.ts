@@ -3,7 +3,7 @@
  * Fire-and-forget: 발행 실패가 API 응답에 영향 없음
  */
 import type { D1Database } from "@cloudflare/workers-types";
-import { D1EventBus, type D1LikeDatabase } from "@foundry-x/harness-kit";
+import { D1EventBus, type D1LikeDatabase } from "@ktds-axbd/harness-kit";
 import { randomUUID } from "crypto";
 
 export class StagePublisher {

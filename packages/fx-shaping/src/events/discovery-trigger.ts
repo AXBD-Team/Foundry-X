@@ -4,7 +4,7 @@
  * 실전 전환(Phase 46+): 실제 shaping API 호출로 교체
  */
 import type { D1Database } from "@cloudflare/workers-types";
-import { D1EventBus, type D1LikeDatabase } from "@foundry-x/harness-kit";
+import { D1EventBus, type D1LikeDatabase } from "@ktds-axbd/harness-kit";
 
 export interface TriggerResult {
   triggered: number;

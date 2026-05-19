@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { rbac } from "@foundry-x/harness-kit";
+import { rbac } from "@ktds-axbd/harness-kit";
 import type { GateEnv } from "../env.js";
 import type { TenantVariables } from "../middleware/tenant.js";
 import { ApiKeyService } from "../services/api-key-service.js";

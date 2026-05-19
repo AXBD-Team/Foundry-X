@@ -1,7 +1,7 @@
 {
-  "name": "@foundry-x/harness-kit",
+  "name": "@ktds-axbd/harness-kit",
   "version": "0.1.0",
-  "private": true,
+  "description": "AX BD Cloudflare Workers MSA scaffold + harness CLI (auth/CORS/D1/event-bus)",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,6 +15,39 @@
     "./d1": "./dist/d1/index.js",
     "./scaffold": "./dist/scaffold/generator.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KTDS-AXBD/Foundry-X.git",
+    "directory": "packages/harness-kit"
+  },
+  "bugs": {
+    "url": "https://github.com/KTDS-AXBD/Foundry-X/issues"
+  },
+  "homepage": "https://github.com/KTDS-AXBD/Foundry-X/tree/master/packages/harness-kit",
+  "author": "KTDS AX BD <ktds.axbd@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "cloudflare-workers",
+    "scaffold",
+    "monorepo",
+    "hono",
+    "ax-bd",
+    "harness",
+    "d1",
+    "msa"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "tsc && cp -r src/scaffold/templates dist/scaffold/",
     "test": "vitest run",
@@ -27,7 +60,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.0.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^22.0.0",
     "typescript": "^5.9.3",
     "vitest": "^3.0.0"
   },
