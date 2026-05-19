@@ -193,10 +193,15 @@ describe("generateMonorepoScaffold", () => {
 
 ### verify.sh
 
+> **구현 역동기화 주석 (S365)**: Design 초안은 "2차 dry-run diff 0건"을 명세했으나,
+> 실제 구현은 3-check 방식으로 변경됨 (T5 unit test가 멱등성을 더 정확히 검증).
+
 ```bash
-# 1. grep -r "ktds-axbd\|Foundry-X\|foundry-x" -- 0건 확인
-# 2. 2차 실행 (dry-run) + diff 0건 확인
-# 출력: ✅ verify PASS / ❌ + 잔존 목록
+# [1/3] grep -r "ktds-axbd|Foundry-X|foundry-x" -- 0건 확인 (식별자 잔존)
+# [2/3] 4-package 구조 확인 (packages/api|web|cli|shared 디렉토리 존재)
+# [3/3] .nvmrc = "22" 확인
+# 출력: ✅ Verify PASS / ❌ + 항목별 실패 목록
+# 멱등성: unit test T5 (generateMonorepoScaffold 2회 실행 동일 결과) 로 검증
 ```
 
 ---
