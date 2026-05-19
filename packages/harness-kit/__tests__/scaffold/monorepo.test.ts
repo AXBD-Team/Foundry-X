@@ -616,4 +616,75 @@ describe("generateMonorepoScaffold", () => {
     const stat = fs.statSync(scriptPath);
     expect(stat.mode & 0o755).toBe(0o755);
   });
+
+  // T24: F672 D-1 — root package.json에 pnpm.overrides.esbuild 존재
+  it("T24: root package.json should have pnpm.overrides.esbuild (D-1 fix)", async () => {
+    const outputDir = path.join(createTmpDir(), "esbuild-proj");
+    await generateMonorepoScaffold({
+      projectName: "esbuild-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "esbuild-proj",
+      description: "EsBuild Test",
+      outputDir,
+    });
+    const rootPkg = JSON.parse(
+      fs.readFileSync(path.join(outputDir, "package.json"), "utf-8")
+    );
+    expect(rootPkg.pnpm).toBeDefined();
+    expect(rootPkg.pnpm.overrides).toBeDefined();
+    expect(rootPkg.pnpm.overrides.esbuild).toBeDefined();
+  });
+
+  // T25: F672 D-2 — cli/web/api package.json에 eslint devDep 존재
+  it("T25: cli/web/api package.json should have eslint devDependencies (D-2 fix)", async () => {
+    const outputDir = path.join(createTmpDir(), "eslint-proj");
+    await generateMonorepoScaffold({
+      projectName: "eslint-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "eslint-proj",
+      description: "ESLint Test",
+      outputDir,
+    });
+    for (const pkg of ["cli", "web", "api"]) {
+      const pkgJson = JSON.parse(
+        fs.readFileSync(path.join(outputDir, "packages", pkg, "package.json"), "utf-8")
+      );
+      expect(pkgJson.devDependencies["eslint"], `${pkg} should have eslint`).toBeDefined();
+      expect(pkgJson.devDependencies["@typescript-eslint/eslint-plugin"], `${pkg} should have @typescript-eslint/eslint-plugin`).toBeDefined();
+      expect(pkgJson.devDependencies["@typescript-eslint/parser"], `${pkg} should have @typescript-eslint/parser`).toBeDefined();
+    }
+  });
+
+  // T26: F672 D-3 — api src/__tests__/app.test.ts 파일 출력 존재
+  it("T26: api should output src/__tests__/app.test.ts (D-3 fix)", async () => {
+    const outputDir = path.join(createTmpDir(), "test-api-proj");
+    await generateMonorepoScaffold({
+      projectName: "test-api-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "test-api-proj",
+      description: "API Test Fix",
+      outputDir,
+    });
+    const testFile = path.join(outputDir, "packages", "api", "src", "__tests__", "app.test.ts");
+    expect(fs.existsSync(testFile)).toBe(true);
+  });
+
+  // T27: F672 D-3 — app.test.ts 내용에 projectName 치환 및 smoke test 포함
+  it("T27: app.test.ts should contain projectName and smoke test assertion", async () => {
+    const outputDir = path.join(createTmpDir(), "smoke-proj");
+    await generateMonorepoScaffold({
+      projectName: "smoke-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "smoke-proj",
+      description: "Smoke Test Project",
+      outputDir,
+    });
+    const testContent = fs.readFileSync(
+      path.join(outputDir, "packages", "api", "src", "__tests__", "app.test.ts"),
+      "utf-8"
+    );
+    expect(testContent).toContain("smoke-proj");
+    expect(testContent).toContain("/health");
+    expect(testContent).toContain("toBeLessThan(500)");
+  });
 });
