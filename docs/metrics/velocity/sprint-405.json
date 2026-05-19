@@ -1,0 +1,12 @@
+{
+  "sprint": 405,
+  "f_items": "F671",
+  "title": "ax-harness-kit gate-x Dogfood",
+  "date": "2026-05-19",
+  "duration_minutes": 60,
+  "match_rate": 98,
+  "test_result": "pass",
+  "phase": 47,
+  "streak": 69,
+  "notes": "Dogfood sprint. 즉시 fix 1건 (--with-claude-hooks CLI wiring). PARTIAL 3건 → F672 권고. Phase 1~3 모두 PASS."
+}
