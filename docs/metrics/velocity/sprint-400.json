@@ -9,7 +9,7 @@
   "files_changed": 29,
   "lines_added": 719,
   "lines_removed": 1,
-  "pr_num": null,
+  "pr_num": 829,
   "session": "S365",
   "notes": "F666 ax-harness-kit Tier 1 — TDD T1~T6 PASS, generateMonorepoScaffold + 4-package templates + init-harness skill"
 }
