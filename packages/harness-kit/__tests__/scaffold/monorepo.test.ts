@@ -686,5 +686,6 @@ describe("generateMonorepoScaffold", () => {
     expect(testContent).toContain("smoke-proj");
     expect(testContent).toContain("/health");
     expect(testContent).toContain("toBeLessThan(500)");
+    expect(testContent).toContain('import { app }');
   });
 });
