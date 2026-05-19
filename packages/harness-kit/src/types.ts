@@ -46,4 +46,6 @@ export interface MonorepoScaffoldOptions {
   withBashrcPatch?: boolean; // M9: ~/.bashrc 13함수 패치 스크립트 생성
   withTmuxPatch?: boolean; // S3: tmux + resurrect 설치 스크립트 생성
   withScripts?: boolean; // M10: scripts/task/ + git-orphan 스크립트 생성
+  // F670 Phase 3 opt-in flag
+  withClaudeHooks?: boolean; // M7: .claude/settings.json hooks 4종 + hook scripts 생성
 }

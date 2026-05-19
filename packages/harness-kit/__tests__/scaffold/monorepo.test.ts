@@ -512,6 +512,95 @@ describe("generateMonorepoScaffold", () => {
     expect(fs.existsSync(path.join(outputDir, "scripts", "task", "task-daemon.sh"))).toBe(false);
   });
 
+  // T24: F670 — withClaudeHooks:true → .claude/settings.json 생성
+  it("T24: should generate .claude/settings.json when withClaudeHooks is true", async () => {
+    const outputDir = path.join(createTmpDir(), "hooks-proj");
+    await generateMonorepoScaffold({
+      projectName: "hooks-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "hooks-proj",
+      description: "Hooks Test",
+      withClaudeHooks: true,
+      outputDir,
+    });
+    expect(fs.existsSync(path.join(outputDir, ".claude", "settings.json"))).toBe(true);
+  });
+
+  // T25: F670 — settings.json에 4 hook 타입 모두 포함
+  it("T25: should include all 4 hook types in settings.json", async () => {
+    const outputDir = path.join(createTmpDir(), "hooks-types-proj");
+    await generateMonorepoScaffold({
+      projectName: "hooks-types-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "hooks-types-proj",
+      description: "Hooks Types Test",
+      withClaudeHooks: true,
+      outputDir,
+    });
+    const settings = JSON.parse(
+      fs.readFileSync(path.join(outputDir, ".claude", "settings.json"), "utf-8")
+    );
+    expect(settings.hooks).toBeDefined();
+    expect(settings.hooks.PreToolUse).toBeDefined();
+    expect(settings.hooks.PostToolUse).toBeDefined();
+    expect(settings.hooks.SessionStart).toBeDefined();
+    expect(settings.hooks.UserPromptSubmit).toBeDefined();
+  });
+
+  // T26: F670 — settings.json hook commands에 $CLAUDE_PROJECT_DIR 사용 (hardcoded path 없음)
+  it("T26: should use $CLAUDE_PROJECT_DIR in hook commands, not hardcoded paths", async () => {
+    const outputDir = path.join(createTmpDir(), "hooks-path-proj");
+    await generateMonorepoScaffold({
+      projectName: "hooks-path-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "hooks-path-proj",
+      description: "Hooks Path Test",
+      withClaudeHooks: true,
+      outputDir,
+    });
+    const content = fs.readFileSync(
+      path.join(outputDir, ".claude", "settings.json"),
+      "utf-8"
+    );
+    expect(content).toContain("$CLAUDE_PROJECT_DIR");
+    expect(content).not.toContain("/home/sinclair");
+    expect(content).not.toContain("foundry-x");
+    expect(content).not.toContain("Foundry-X");
+  });
+
+  // T27: F670 — withClaudeHooks 없으면 .claude/settings.json 미생성
+  it("T27: should not generate .claude/settings.json when withClaudeHooks is not set", async () => {
+    const outputDir = path.join(createTmpDir(), "no-hooks-proj");
+    await generateMonorepoScaffold({
+      projectName: "no-hooks-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "no-hooks-proj",
+      description: "No Hooks Test",
+      outputDir,
+    });
+    expect(fs.existsSync(path.join(outputDir, ".claude", "settings.json"))).toBe(false);
+  });
+
+  // T28: F670 — withClaudeHooks:true → .claude/hooks/ 스크립트 + heartbeat + drift check 생성
+  it("T28: should generate .claude/hooks/ scripts and heartbeat when withClaudeHooks is true", async () => {
+    const outputDir = path.join(createTmpDir(), "hooks-scripts-proj");
+    await generateMonorepoScaffold({
+      projectName: "hooks-scripts-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "hooks-scripts-proj",
+      description: "Hooks Scripts Test",
+      withClaudeHooks: true,
+      outputDir,
+    });
+    const hooksDir = path.join(outputDir, ".claude", "hooks");
+    expect(fs.existsSync(path.join(hooksDir, "pre-bash-guard.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(hooksDir, "post-edit-format.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(hooksDir, "post-edit-typecheck.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(hooksDir, "post-edit-test-warn.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(outputDir, "scripts", "task", "heartbeat-hook.sh"))).toBe(true);
+    expect(fs.existsSync(path.join(outputDir, "scripts", "setup", "check-harness-drift.sh"))).toBe(true);
+  });
+
   // T23: F669 — patch-bashrc.sh 실행 권한(0o755)
   it("T23: patch-bashrc.sh should be executable (chmod 755)", async () => {
     const outputDir = path.join(createTmpDir(), "chmod-proj");
