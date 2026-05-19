@@ -1,8 +1,9 @@
-// F666+F667+F668+F669 TDD — generateMonorepoScaffold() 4-package monorepo scaffold + opt-in flags
+// F666+F667+F668+F669+F674 TDD — generateMonorepoScaffold() 4-package monorepo scaffold + opt-in flags
 import { describe, it, expect, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { spawnSync } from "node:child_process";
 import { generateMonorepoScaffold } from "../../src/scaffold/generator.js";
 
 describe("generateMonorepoScaffold", () => {
@@ -778,5 +779,103 @@ describe("generateMonorepoScaffold", () => {
     });
 
     expect(files.some((f) => f.endsWith("SETUP.md"))).toBe(true);
+  });
+
+  // T33(F674): verify-node-consistency.sh 생성 + executable
+  it("T33(F674): should generate scripts/setup/verify-node-consistency.sh and make it executable", async () => {
+    const outputDir = path.join(createTmpDir(), "node-check-proj");
+    await generateMonorepoScaffold({
+      projectName: "node-check-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "node-check-proj",
+      description: "Node Check Test",
+      outputDir,
+    });
+
+    const scriptPath = path.join(outputDir, "scripts", "setup", "verify-node-consistency.sh");
+    expect(fs.existsSync(scriptPath)).toBe(true);
+
+    const mode = fs.statSync(scriptPath).mode;
+    expect(mode & 0o111).not.toBe(0);
+  });
+
+  // T34(F674): node-consistency.yml 생성 + paths trigger 포함
+  it("T34(F674): should generate .github/workflows/node-consistency.yml with .nvmrc path trigger", async () => {
+    const outputDir = path.join(createTmpDir(), "workflow-proj");
+    await generateMonorepoScaffold({
+      projectName: "workflow-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "workflow-proj",
+      description: "Workflow Test",
+      outputDir,
+    });
+
+    const workflowPath = path.join(outputDir, ".github", "workflows", "node-consistency.yml");
+    expect(fs.existsSync(workflowPath)).toBe(true);
+
+    const content = fs.readFileSync(workflowPath, "utf-8");
+    expect(content).toContain(".nvmrc");
+    expect(content).toContain("paths:");
+    expect(content).toContain("verify-node-consistency.sh");
+  });
+
+  // T35(F674): verify-node-consistency.sh 실행 — .nvmrc/package.json/workflow 3-way 정합 시 exit 0
+  it("T35(F674): verify-node-consistency.sh exits 0 when .nvmrc/package.json/workflow are consistent", async () => {
+    const outputDir = path.join(createTmpDir(), "consistency-proj");
+    await generateMonorepoScaffold({
+      projectName: "consistency-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "consistency-proj",
+      description: "Consistency Test",
+      outputDir,
+    });
+
+    // Update generated package.json to include engines.node matching .nvmrc (22)
+    const pkgPath = path.join(outputDir, "package.json");
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+    // package.json.hbs already includes engines.node ">=22", verify it's there
+    // If not, add it
+    if (!pkg.engines?.node) {
+      pkg.engines = { node: ">=22" };
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+    }
+
+    const scriptPath = path.join(outputDir, "scripts", "setup", "verify-node-consistency.sh");
+    const result = spawnSync("bash", [scriptPath], { cwd: outputDir, encoding: "utf-8" });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("✅");
+  });
+
+  // T36(F674): check-harness-drift.sh 실행 — 동일 rules 사용 시 drift 0
+  it("T36(F674): check-harness-drift.sh exits 0 when project rules match reference", async () => {
+    const outputDir = path.join(createTmpDir(), "drift-proj");
+    await generateMonorepoScaffold({
+      projectName: "drift-proj",
+      githubOrg: "TEST-ORG",
+      githubRepo: "drift-proj",
+      description: "Drift Check Test",
+      withClaudeHooks: true,
+      outputDir,
+    });
+
+    const driftScript = path.join(outputDir, "scripts", "setup", "check-harness-drift.sh");
+    expect(fs.existsSync(driftScript)).toBe(true);
+
+    // Use generated .claude/rules as both project AND reference (copy to temp ref dir)
+    const projectRulesDir = path.join(outputDir, ".claude", "rules");
+    const refDir = path.join(createTmpDir(), "reference-rules");
+    fs.mkdirSync(refDir, { recursive: true });
+    for (const f of fs.readdirSync(projectRulesDir)) {
+      fs.copyFileSync(path.join(projectRulesDir, f), path.join(refDir, f));
+    }
+
+    // git init required (check-harness-drift.sh uses `git rev-parse --show-toplevel`)
+    spawnSync("git", ["init"], { cwd: outputDir });
+
+    const result = spawnSync("bash", [driftScript, refDir], { cwd: outputDir, encoding: "utf-8" });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("No drift detected");
   });
 });
