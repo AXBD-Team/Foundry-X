@@ -12,6 +12,7 @@ export const initMonorepoCommand = new Command("init-monorepo")
   .option("--with-bashrc-patch", "M9: ~/.bashrc 13함수 패치 스크립트 생성 (옵트인)")
   .option("--with-tmux-patch", "S3: tmux + resurrect 설치 스크립트 생성 (옵트인)")
   .option("--with-scripts", "M10: scripts/task/ + git-orphan 스크립트 생성 (옵트인)")
+  .option("--with-claude-hooks", "P3: .claude/settings.json hooks 4종 opt-in (PreToolUse/PostToolUse/SessionStart/UserPromptSubmit)")
   .action(
     async (
       projectName: string,
@@ -32,6 +33,7 @@ export const initMonorepoCommand = new Command("init-monorepo")
         withBashrcPatch: opts.withBashrcPatch,
         withTmuxPatch: opts.withTmuxPatch,
         withScripts: opts.withScripts,
+        withClaudeHooks: opts.withClaudeHooks,
       });
       console.log(`Created ${files.length} files:`);
       files.forEach((f) => console.log(`  ${f}`));
