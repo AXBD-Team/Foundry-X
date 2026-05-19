@@ -6,7 +6,7 @@
  * 따라서 이 파일이 프로젝트 전체 SDK 호출의 SSOT 역할을 한다.
  *
  * ## 업그레이드 절차 (Anthropic이 새 minor release 공표 시)
- * 1. 이 파일의 버전 번호 1곳만 수정 (예: `claude-sonnet-4-6` → `claude-sonnet-4-7`)
+ * 1. 이 파일의 MODEL_* 상수 1곳만 수정 (minor 버전 +1, 예: 4-6 → 4-N)
  * 2. `pnpm typecheck` — import consumer 전파 확인
  * 3. `/ax:daily-check` "모델 버전 drift" 항목 통과 확인
  * 4. `.claude/MEMORY.md`의 "모델 업그레이드 절차" feedback 참조
