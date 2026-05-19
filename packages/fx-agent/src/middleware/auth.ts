@@ -1,6 +1,6 @@
 // F571: fx-agent auth middleware — harness-kit createAuthMiddleware 사용
-import { createAuthMiddleware } from "@foundry-x/harness-kit";
-import type { JwtPayload } from "@foundry-x/harness-kit";
+import { createAuthMiddleware } from "@ktds-axbd/harness-kit";
+import type { JwtPayload } from "@ktds-axbd/harness-kit";
 
 export type { JwtPayload };
 

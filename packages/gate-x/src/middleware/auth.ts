@@ -1,6 +1,6 @@
 import { jwt } from "hono/jwt";
 import type { MiddlewareHandler } from "hono";
-import type { HarnessConfig } from "@foundry-x/harness-kit";
+import type { HarnessConfig } from "@ktds-axbd/harness-kit";
 import type { GateEnv } from "../env.js";
 import type { TenantVariables } from "./tenant.js";
 import { createApiKeyMiddleware } from "./api-key.js";

@@ -1,5 +1,5 @@
 // F569 패턴: harness-kit createAuthMiddleware 적용
-import { createAuthMiddleware } from "@foundry-x/harness-kit";
+import { createAuthMiddleware } from "@ktds-axbd/harness-kit";
 
 export interface JwtPayload {
   sub: string;

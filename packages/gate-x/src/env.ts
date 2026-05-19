@@ -1,4 +1,4 @@
-import type { HarnessEnv } from "@foundry-x/harness-kit";
+import type { HarnessEnv } from "@ktds-axbd/harness-kit";
 import type { OgdQueueMessage } from "./workers/ogd-queue-worker.js";
 
 /** Gate-X Workers 환경 바인딩 */

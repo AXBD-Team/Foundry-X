@@ -17,9 +17,6 @@ importers:
 
   packages/api:
     dependencies:
-      '@foundry-x/harness-kit':
-        specifier: workspace:*
-        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
@@ -29,6 +26,9 @@ importers:
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.12.8)(zod@3.25.76)
+      '@ktds-axbd/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       drizzle-orm:
         specifier: ^0.33.0
         version: 0.33.0(@cloudflare/workers-types@4.20260316.1)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/react@18.3.28)(better-sqlite3@12.8.0)(react@18.3.1)
@@ -157,15 +157,15 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.36.3
         version: 0.36.3
-      '@foundry-x/harness-kit':
-        specifier: workspace:*
-        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.12.8)(zod@3.25.76)
+      '@ktds-axbd/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       drizzle-orm:
         specifier: ^0.33.0
         version: 0.33.0(@cloudflare/workers-types@4.20260316.1)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/react@18.3.28)(better-sqlite3@12.8.0)(react@18.3.1)
@@ -206,12 +206,12 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.36.3
         version: 0.36.3
-      '@foundry-x/harness-kit':
-        specifier: workspace:*
-        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
+      '@ktds-axbd/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       hono:
         specifier: ^4.0.0
         version: 4.12.8
@@ -259,9 +259,6 @@ importers:
 
   packages/fx-modules:
     dependencies:
-      '@foundry-x/harness-kit':
-        specifier: workspace:*
-        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
@@ -271,6 +268,9 @@ importers:
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.12.8)(zod@3.25.76)
+      '@ktds-axbd/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       drizzle-orm:
         specifier: ^0.31.2
         version: 0.31.4(@cloudflare/workers-types@4.20260316.1)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/react@18.3.28)(better-sqlite3@12.8.0)(react@18.3.1)
@@ -302,15 +302,15 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.36.3
         version: 0.36.3
-      '@foundry-x/harness-kit':
-        specifier: workspace:*
-        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.12.8)(zod@3.25.76)
+      '@ktds-axbd/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       hono:
         specifier: ^4.0.0
         version: 4.12.8
@@ -345,15 +345,15 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.36.3
         version: 0.36.3
-      '@foundry-x/harness-kit':
-        specifier: workspace:*
-        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.12.8)(zod@3.25.76)
+      '@ktds-axbd/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       hono:
         specifier: ^4.0.0
         version: 4.12.8
@@ -388,15 +388,15 @@ importers:
 
   packages/gate-x:
     dependencies:
-      '@foundry-x/harness-kit':
-        specifier: workspace:*
-        version: link:../harness-kit
       '@foundry-x/shared':
         specifier: workspace:*
         version: link:../shared
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.12.8)(zod@3.25.76)
+      '@ktds-axbd/harness-kit':
+        specifier: workspace:*
+        version: link:../harness-kit
       hono:
         specifier: ^4.0.0
         version: 4.12.8
@@ -492,14 +492,14 @@ importers:
         specifier: ^4.0.0
         version: 4.20260316.1
       '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.37
+        specifier: ^22.0.0
+        version: 22.19.15
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
         specifier: ^3.0.0
-        version: 3.2.4(@types/debug@4.1.13)(@types/node@20.19.37)(jiti@2.6.1)(jsdom@29.0.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.12.12(@types/node@20.19.37)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@22.19.15)(jiti@2.6.1)(jsdom@29.0.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.12.12(@types/node@22.19.15)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.4)
 
   packages/shared:
     dependencies:
@@ -2068,8 +2068,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
 
-  '@graphql-codegen/plugin-helpers@7.0.0':
-    resolution: {integrity: sha512-w7Oa8fH8B1ID9yFoV7qfmKdBxQtjfSHmHffJx6bOhgKyEbD6xVSplK+J6O2sefY5GUdCSx0F+tupBYQjJ7kyvg==}
+  '@graphql-codegen/plugin-helpers@7.0.1':
+    resolution: {integrity: sha512-S2X0YT3XQbP2haqhIeku8GOXo2j8QuBu7BrLsOEHz4UeMu78y3rja1Q4ri3oJ0jq4dMgaQlazoVHI/A+FAKMGw==}
     engines: {node: '>=16'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -10633,7 +10633,7 @@ snapshots:
       lodash: 4.17.23
       tslib: 2.6.3
 
-  '@graphql-codegen/plugin-helpers@7.0.0(graphql@15.8.0)':
+  '@graphql-codegen/plugin-helpers@7.0.1(graphql@15.8.0)':
     dependencies:
       '@graphql-tools/utils': 11.0.0(graphql@15.8.0)
       change-case-all: 2.1.0
@@ -12406,7 +12406,7 @@ snapshots:
   '@tinacms/cli@2.2.1(@codemirror/language@6.0.0)(@types/node@22.19.15)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(abstract-level@1.0.4)(immer@11.1.4)(lightningcss@1.32.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.59.0)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(sucrase@3.35.1)(tsx@4.21.0)(use-sync-external-store@1.6.0(react@18.3.1))(yaml@2.8.4)':
     dependencies:
       '@graphql-codegen/core': 2.6.8(graphql@15.8.0)
-      '@graphql-codegen/plugin-helpers': 7.0.0(graphql@15.8.0)
+      '@graphql-codegen/plugin-helpers': 7.0.1(graphql@15.8.0)
       '@graphql-codegen/typescript': 4.1.6(graphql@15.8.0)
       '@graphql-codegen/typescript-operations': 4.6.1(graphql@15.8.0)
       '@graphql-codegen/visitor-plugin-common': 4.1.2(graphql@15.8.0)

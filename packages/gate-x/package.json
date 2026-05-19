@@ -11,7 +11,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@foundry-x/harness-kit": "workspace:*",
+    "@ktds-axbd/harness-kit": "workspace:*",
     "@foundry-x/shared": "workspace:*",
     "@hono/zod-openapi": "^0.18.4",
     "hono": "^4.0.0",
