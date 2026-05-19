@@ -1,0 +1,16 @@
+{
+  "sprint": 403,
+  "f_items": "F669",
+  "title": "ax-harness-kit Tier 2-B — bashrc+tmux+scripts opt-in 3 플래그",
+  "status": "DONE",
+  "match_rate": 100,
+  "tests_passed": 84,
+  "tests_total": 84,
+  "files_created": 7,
+  "files_modified": 4,
+  "red_commit": "f9a5b714",
+  "green_commit": "f9a5b714",
+  "date": "2026-05-19",
+  "duration_minutes": 35,
+  "notes": "T15~T23 Green. Handlebars }}} CLOSE_UNESCAPED 충돌 → 중간변수 분리 fix. opt-in 3 subdirs: bashrc-patch/tmux-patch/scripts."
+}

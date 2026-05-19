@@ -7,6 +7,7 @@ import type { MonorepoScaffoldOptions, ScaffoldOptions } from "../types.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.join(__dirname, "templates");
 const MONOREPO_TEMPLATES_DIR = path.join(TEMPLATES_DIR, "monorepo");
+const OPT_IN_DIR = path.join(TEMPLATES_DIR, "opt-in");
 
 export async function generateScaffold(
   options: ScaffoldOptions,
@@ -44,6 +45,18 @@ export async function generateMonorepoScaffold(
   };
 
   await walkTemplates(MONOREPO_TEMPLATES_DIR, outputDir, context, createdFiles);
+
+  // F669 opt-in flags
+  if (options.withBashrcPatch) {
+    await walkTemplates(path.join(OPT_IN_DIR, "bashrc-patch"), outputDir, context, createdFiles);
+  }
+  if (options.withTmuxPatch) {
+    await walkTemplates(path.join(OPT_IN_DIR, "tmux-patch"), outputDir, context, createdFiles);
+  }
+  if (options.withScripts) {
+    await walkTemplates(path.join(OPT_IN_DIR, "scripts"), outputDir, context, createdFiles);
+  }
+
   return createdFiles;
 }
 
