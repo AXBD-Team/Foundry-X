@@ -2,10 +2,11 @@ import Handlebars from "handlebars";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { ScaffoldOptions } from "../types.js";
+import type { MonorepoScaffoldOptions, ScaffoldOptions } from "../types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.join(__dirname, "templates");
+const MONOREPO_TEMPLATES_DIR = path.join(TEMPLATES_DIR, "monorepo");
 
 export async function generateScaffold(
   options: ScaffoldOptions,
@@ -22,6 +23,27 @@ export async function generateScaffold(
   };
 
   await walkTemplates(TEMPLATES_DIR, outputDir, context, createdFiles);
+  return createdFiles;
+}
+
+// F666: 4-package monorepo scaffold
+export async function generateMonorepoScaffold(
+  options: MonorepoScaffoldOptions,
+): Promise<string[]> {
+  const outputDir =
+    options.outputDir ?? path.join(process.cwd(), options.projectName);
+  const createdFiles: string[] = [];
+  const context = {
+    projectName: options.projectName,
+    githubOrg: options.githubOrg,
+    githubOrgLower: options.githubOrg.toLowerCase(),
+    githubRepo: options.githubRepo,
+    description: options.description,
+    cloudflareAccount: options.cloudflareAccount ?? "<YOUR_CLOUDFLARE_ACCOUNT_ID>",
+    workerSubdomain: options.workerSubdomain ?? options.projectName,
+  };
+
+  await walkTemplates(MONOREPO_TEMPLATES_DIR, outputDir, context, createdFiles);
   return createdFiles;
 }
 
@@ -45,6 +67,12 @@ async function walkTemplates(
       const compiled = Handlebars.compile(templateSrc);
       fs.mkdirSync(path.dirname(destPath), { recursive: true });
       fs.writeFileSync(destPath, compiled(context));
+      createdFiles.push(destPath);
+    } else {
+      // plain file — copy as-is
+      const destPath = path.join(outputDir, entry.name);
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      fs.copyFileSync(srcPath, destPath);
       createdFiles.push(destPath);
     }
   }

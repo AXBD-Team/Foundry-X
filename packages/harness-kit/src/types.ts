@@ -32,3 +32,14 @@ export interface ScaffoldOptions {
   dbName?: string; // D1 database name
   outputDir?: string; // 출력 디렉토리
 }
+
+/** F666 monorepo scaffold 옵션 (4-package: api/web/cli/shared) */
+export interface MonorepoScaffoldOptions {
+  projectName: string; // kebab-case, 예: "proposal-tf-platform"
+  githubOrg: string; // GitHub org, 예: "KTDS-AXBD"
+  githubRepo: string; // GitHub repo 이름, 예: "proposal-tf-platform"
+  description: string; // 프로젝트 설명
+  cloudflareAccount?: string; // Cloudflare account ID
+  workerSubdomain?: string; // Workers sub-name (default: projectName)
+  outputDir?: string; // 출력 디렉토리 (default: cwd/{projectName})
+}

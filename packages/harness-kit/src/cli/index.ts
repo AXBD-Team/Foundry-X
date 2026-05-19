@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { createCommand } from "./create.js";
+import { initMonorepoCommand } from "./init-monorepo.js";
 
 const program = new Command()
   .name("harness")
@@ -8,4 +9,5 @@ const program = new Command()
   .version("0.1.0");
 
 program.addCommand(createCommand);
+program.addCommand(initMonorepoCommand);
 program.parse();
