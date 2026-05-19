@@ -1,0 +1,647 @@
+{
+  "generated": "2026-05-19T01:27:25.573Z",
+  "totalItems": 106,
+  "byType": {
+    "flaw": 11,
+    "gap": 41,
+    "risk": 51
+  },
+  "items": [
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**문제-해결 연결에서 현실성 언급 부족:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**“동등성” 정의가 일관적이지 않은 부분:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**성공기준 지표 단위 및 측정 방식:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**bashrc/tmux 자동 패치로 인한 사용자 환경 파괴:**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**외부 API 인증/권한 오류**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**템플릿/변수화 누락 및 drift**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**실제 smoke PASS 기준 불명확**",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "ChatGPT",
+      "text": "**테스트 커버리지 부족**",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**템플릿/코드 원본 관리, 버전정책 상세화 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 사용자 Onboarding 시나리오 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**Rollback/복구의 실질적 시나리오**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응 프로세스 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**보안성 검토 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**bashrc/tmux 자동 패치로 인한 사용자 환경 파괴:**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**외부 API 인증/권한 오류**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**템플릿/변수화 누락 및 drift**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**실제 smoke PASS 기준 불명확**",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "ChatGPT",
+      "text": "**테스트 커버리지 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**문제-해결 연결에서 현실성 언급 부족:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**“동등성” 정의가 일관적이지 않은 부분:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**성공기준 지표 단위 및 측정 방식:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**템플릿/코드 원본 관리, 버전정책 상세화 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 사용자 Onboarding 시나리오 부재**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**Rollback/복구의 실질적 시나리오**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**운영/장애 대응 프로세스 미흡**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**보안성 검토 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**bashrc/tmux 자동 패치로 인한 사용자 환경 파괴:**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 API 인증/권한 오류**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**템플릿/변수화 누락 및 drift**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실제 smoke PASS 기준 불명확**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**테스트 커버리지 부족**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**MVP 범위(M1~M5) 내에서 실행, 나머지는 반드시 후행 라운드로 분리**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**bashrc/tmux 자동 패치 등 시스템 파일 변경은 “명시적 사용자 동의/옵트인” 절차 추가**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**외부 인증/권한 사전 체크 로직 강화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**실행 전 smoke test/rollback 시나리오의 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "ChatGPT",
+      "text": "**템플릿 원본 drift 방지/동기화 정책 구체화**",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "ChatGPT",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**MVP 범위의 명확한 재정의 및 합의**: PRD 내에서 \"최소 MVP 범위: M1~M5까지만\"으로 명시했지만, \"Must Have\" 섹션에는 M1~M10이 여전히 P0로 표기되어 있어 혼란을 줄 수 있습니다. **PRD 상에서 공식적인 MVP 범위를 M1~M5로 명확히 재정의하고, M6~M10은 P1 또는 \"Phase 2\" 등으로 분류하여 일정 리스크",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**임박 프로젝트와의 긴밀한 연동 및 확정**: W20 내 임박 프로젝트에 적용하는 것이 목표의 핵심이므로, 해당 프로젝트의 요구사항, 실제 시동 일정, 그리고 `ax-harness-kit` 개발 완료가 그 프로젝트에 미칠 영향에 대한 **최종적인 합의와 확정**이 필요합니다. 만약 프로젝트 시동이 `ax-harness-kit` 완료를 기다릴 수 없다면, ",
+      "severity": "high"
+    },
+    {
+      "type": "flaw",
+      "source": "Gemini",
+      "text": "**Foundry-X-specific 변수화 범위에 대한 사전 분석 강화**: \"Foundry-X-specific 명칭 및 변수화 범위\"를 명확히 정의했지만, 구현 단계에서 예상치 못한 하드코딩 부분이 발견될 가능성이 있습니다. **구현 전, Foundry-X 코드 베이스에 대한 심층적인 `grep` 및 코드 리뷰를 통해 모든 변수화 대상을 미리 식별하고,",
+      "severity": "high"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"Foundry-X에서 ~59 sprint 연속 성공(S306~S360, F560~F665)을 통해 정착시킨 autopilot Sprint Cycle + Governance 규칙 + SDD Triangle 인프라\"의 실제 효과 및 측정 기준**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"신규 프로젝트마다 이를 재구축하면 누적 며칠~수십 시간 비용 발생\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"Foundry-X-specific 하드코딩 (ktds-axbd, AX BD팀, Foundry-X 명칭 등) → 단순 복사 불가\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"Cloudflare ktds-axbd 계정 sub-name 추가 비용 = 0원 (기존 무료 tier)\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"1주 내 전체(Must+Should) 구현은 현실적으로 과중\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**\"임박 프로젝트 1건이 W20(5/19~5/25) 내 시동 + 첫 Sprint autopilot cycle PR merge + smoke PASS 완결\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**AI 기반 개발 환경 셋업의 진화**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**멀티 클라우드/하이브리드 환경 지원**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**보안 및 컴플라이언스 강화**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**데이터 기반 최적화**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "Gemini",
+      "text": "**커뮤니티/오픈소스 전략 부재**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"Foundry-X에서 ~59 sprint 연속 성공(S306~S360, F560~F665)을 통해 정착시킨 autopilot Sprint Cycle + Governance 규칙 + SDD Triangle 인프라\"의 실제 효과 및 측정 기준**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"신규 프로젝트마다 이를 재구축하면 누적 며칠~수십 시간 비용 발생\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"Foundry-X-specific 하드코딩 (ktds-axbd, AX BD팀, Foundry-X 명칭 등) → 단순 복사 불가\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"Cloudflare ktds-axbd 계정 sub-name 추가 비용 = 0원 (기존 무료 tier)\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"1주 내 전체(Must+Should) 구현은 현실적으로 과중\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**\"임박 프로젝트 1건이 W20(5/19~5/25) 내 시동 + 첫 Sprint autopilot cycle PR merge + smoke PASS 완결\"**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Foundry-X 환경 종속성**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**초기 학습 곡선**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**멱등성 및 롤백에 대한 신뢰**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**AI (Claude Code) 연동의 복잡성**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**MVP 범위의 명확한 재정의 및 합의**: PRD 내에서 \"최소 MVP 범위: M1~M5까지만\"으로 명시했지만, \"Must Have\" 섹션에는 M1~M10이 여전히 P0로 표기되어 있어 혼란을 줄 수 있습니다. **PRD 상에서 공식적인 MVP 범위를 M1~M5로 명확히 재정의하고, M6~M10은 P1 또는 \"Phase 2\" 등으로 분류하여 일정 리스크",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**임박 프로젝트와의 긴밀한 연동 및 확정**: W20 내 임박 프로젝트에 적용하는 것이 목표의 핵심이므로, 해당 프로젝트의 요구사항, 실제 시동 일정, 그리고 `ax-harness-kit` 개발 완료가 그 프로젝트에 미칠 영향에 대한 **최종적인 합의와 확정**이 필요합니다. 만약 프로젝트 시동이 `ax-harness-kit` 완료를 기다릴 수 없다면, ",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "Gemini",
+      "text": "**Foundry-X-specific 변수화 범위에 대한 사전 분석 강화**: \"Foundry-X-specific 명칭 및 변수화 범위\"를 명확히 정의했지만, 구현 단계에서 예상치 못한 하드코딩 부분이 발견될 가능성이 있습니다. **구현 전, Foundry-X 코드 베이스에 대한 심층적인 `grep` 및 코드 리뷰를 통해 모든 변수화 대상을 미리 식별하고,",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "Gemini",
+      "text": "Conditional",
+      "severity": "info"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**긍정적 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**환경 차이 리스크**: WSL2/리눅스/맥 간 bashrc 경로, 권한 차이로 설치 실패 가능성 (예: `~/.bashrc` vs `~/.bash_profile`)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**외부 API 의존성**: GitHub/Cloudflare API rate limit이나 인증 실패 시 전체 설치 프로세스 중단 위험",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**멱등성 보장 난이도**: 파일 패치 시 marker 주입 실패나 중복 적용 가능성 (특히 `.bashrc` 수정 시)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**개선 필요 항목**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**설치 프로세스 분리**: 단일 install.sh보다 3단계(검증 → 설치 → 검증)로 분리해 안정성 확보 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**환경 격리 미흡**: 프로젝트별 의존성 충돌 가능성 (예: 전역 npm 패키지 vs 프로젝트별 버전)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**템플릿 관리**: 향후 업데이트 시 버전 충돌 방지를 위해 템플릿 버저닝 시스템 도입 권장",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**과소평가된 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**에지 케이스**: Cloudflare sub-domain 충돌, GitHub repo 중복 생성 등 예외 처리 누락",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**동시성 문제**: 여러 터미널에서 동시 설치 시 리소스 경쟁 가능성 (예: `.bashrc` 동시 수정)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**보안 검증 부재**: `wrangler secret put` 자동화 시 credential 노출 위험 (CI/CD pipeline과 통합 필요)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**최우선 리스크 TOP 3**:",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**환경 차이로 인한 설치 실패** (특히 맥OS에서의 bashrc 패치)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**외부 API 의존성** (GitHub/Cloudflare 장애 시 전체 설치 불가)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**멱등성 보장 실패** (2회 실행 시 시스템 상태 불일치)",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "MVP 범위를 M1-M5로 축소하고 나머지는 Phase 2로 이관",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "설치 프로세스를 검증 → 설치 → 검증 3단계로 재설계",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "주요 외부 API(GitHub/Cloudflare) 장애 시 fallback 메커니즘 추가",
+      "severity": "medium"
+    },
+    {
+      "type": "gap",
+      "source": "DeepSeek",
+      "text": "**추가 권고사항**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**긍정적 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**환경 차이 리스크**: WSL2/리눅스/맥 간 bashrc 경로, 권한 차이로 설치 실패 가능성 (예: `~/.bashrc` vs `~/.bash_profile`)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**외부 API 의존성**: GitHub/Cloudflare API rate limit이나 인증 실패 시 전체 설치 프로세스 중단 위험",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**멱등성 보장 난이도**: 파일 패치 시 marker 주입 실패나 중복 적용 가능성 (특히 `.bashrc` 수정 시)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**개선 필요 항목**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**설치 프로세스 분리**: 단일 install.sh보다 3단계(검증 → 설치 → 검증)로 분리해 안정성 확보 필요",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**환경 격리 미흡**: 프로젝트별 의존성 충돌 가능성 (예: 전역 npm 패키지 vs 프로젝트별 버전)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**템플릿 관리**: 향후 업데이트 시 버전 충돌 방지를 위해 템플릿 버저닝 시스템 도입 권장",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**과소평가된 요소**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**에지 케이스**: Cloudflare sub-domain 충돌, GitHub repo 중복 생성 등 예외 처리 누락",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**동시성 문제**: 여러 터미널에서 동시 설치 시 리소스 경쟁 가능성 (예: `.bashrc` 동시 수정)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**보안 검증 부재**: `wrangler secret put` 자동화 시 credential 노출 위험 (CI/CD pipeline과 통합 필요)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**최우선 리스크 TOP 3**:",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**환경 차이로 인한 설치 실패** (특히 맥OS에서의 bashrc 패치)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**외부 API 의존성** (GitHub/Cloudflare 장애 시 전체 설치 불가)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**멱등성 보장 실패** (2회 실행 시 시스템 상태 불일치)",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "MVP 범위를 M1-M5로 축소하고 나머지는 Phase 2로 이관",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "설치 프로세스를 검증 → 설치 → 검증 3단계로 재설계",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "주요 외부 API(GitHub/Cloudflare) 장애 시 fallback 메커니즘 추가",
+      "severity": "medium"
+    },
+    {
+      "type": "risk",
+      "source": "DeepSeek",
+      "text": "**추가 권고사항**:",
+      "severity": "medium"
+    },
+    {
+      "type": "verdict",
+      "source": "DeepSeek",
+      "text": "Conditional",
+      "severity": "info"
+    }
+  ]
+}
