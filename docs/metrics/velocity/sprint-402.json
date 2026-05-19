@@ -1,0 +1,16 @@
+{
+  "sprint": 402,
+  "f_items": "F668",
+  "title": "ax-harness-kit Tier 2-A — .claude/rules 9 파일 변수화 + SPEC.md 템플릿",
+  "status": "DONE",
+  "match_rate": 100,
+  "tests_passed": 75,
+  "tests_total": 75,
+  "files_created": 10,
+  "files_modified": 1,
+  "red_commit": "56e2b853",
+  "green_commit": "1f74b55c",
+  "date": "2026-05-19",
+  "duration_minutes": 40,
+  "notes": "T11~T14 Red→Green. 7 .hbs + 2 plain copy + SPEC.md.hbs. walkTemplates dot-directory 정상 탐색 확인."
+}
