@@ -1167,6 +1167,40 @@ phase_sprint_signals() {
       log "ℹ️  sprint-${sprint_num} — master pane rename skip (pane=${rename_master_pane:-none}, script=${rename_script})"
     fi
   done
+
+  # 10) MERGED grace cleanup (S312 자동 정리 2-layer L1)
+  # STATUS=MERGED + MERGED_AT 60s 경과 시 signal/flag/log + tmux session 자동 정리.
+  # Master Monitor가 STATUS=MERGED 인식 + 처리하도록 grace period(60s) 보장.
+  # 누락 시 L2 (session-start Phase 5e)가 fallback 정리.
+  for sig in "$SPRINT_SIGNAL_DIR"/*-*.signal; do
+    [ -f "$sig" ] || continue
+    local cleanup_status
+    cleanup_status=$(sprint_sig_get "$sig" "STATUS")
+    [ "$cleanup_status" = "MERGED" ] || continue
+    local cleanup_merged_at
+    cleanup_merged_at=$(sprint_sig_get "$sig" "MERGED_AT")
+    [ -z "$cleanup_merged_at" ] && continue
+    local cleanup_now cleanup_then cleanup_age
+    cleanup_now=$(date +%s)
+    cleanup_then=$(date -d "$cleanup_merged_at" +%s 2>/dev/null || echo "$cleanup_now")
+    cleanup_age=$(( cleanup_now - cleanup_then ))
+    [ "$cleanup_age" -lt 60 ] && continue
+
+    local cleanup_sprint cleanup_project
+    cleanup_sprint=$(sprint_sig_get "$sig" "SPRINT_NUM")
+    cleanup_project=$(sprint_sig_get "$sig" "PROJECT")
+
+    rm -f "$sig" \
+          "$SPRINT_SIGNAL_DIR/rename-fired-${cleanup_sprint}.flag" \
+          "$SPRINT_SIGNAL_DIR/tmux-rename-${cleanup_sprint}.log" \
+          "$SPRINT_SIGNAL_DIR/tmux-rename-${cleanup_sprint}-created.log"
+    if [ -n "$cleanup_project" ]; then
+      tmux kill-session -t "sprint-${cleanup_project}-${cleanup_sprint}" 2>/dev/null || true
+    fi
+
+    log "🧹 sprint-${cleanup_sprint} — auto cleanup (signal/flag/log/tmux session, age=${cleanup_age}s)"
+  done
+
   # nullglob 복원 — 누출 시 phase_signals의 ls glob이 빈 확장되어 cwd listing → source crash (S267)
   "$_prev_nullglob" || shopt -u nullglob
 }
