@@ -111,6 +111,18 @@ test.describe("HITL 5-state 머신 UI (F664)", () => {
   test("T2: transition trigger form → POST /api/hitl/transition 200", async ({
     authenticatedPage: page,
   }) => {
+    // Admin role 명시 주입 (auth fixture는 "admin" lowercase, HitlRole 타입은 PascalCase)
+    // RBAC 항상 차단되어 happy path 미실행 + dangling waitForRequest "Test ended" 노출 fix
+    await page.addInitScript(() => {
+      const payload = btoa(
+        JSON.stringify({
+          sub: "test-user",
+          role: "Admin",
+          exp: Math.floor(Date.now() / 1000) + 3600,
+        }),
+      );
+      localStorage.setItem("token", `header.${payload}.sig`);
+    });
     await setupMocks(page);
     await page.goto("/hitl-console");
     await page.waitForLoadState("networkidle", { timeout: 30000 });
@@ -127,9 +139,6 @@ test.describe("HITL 5-state 머신 UI (F664)", () => {
     const transitionForm = page.getByTestId("hitl-transition-form");
     await expect(transitionForm).toBeVisible({ timeout: 5000 });
 
-    // API 호출 감시
-    const transitionReq = page.waitForRequest("**/api/hitl/transition");
-
     // "전환" 버튼 클릭
     const submitBtn = transitionForm.getByRole("button", { name: "전환" });
     await expect(submitBtn).toBeVisible();
@@ -139,6 +148,8 @@ test.describe("HITL 5-state 머신 UI (F664)", () => {
     const isBlocked = (await rbacBlocked.count()) > 0;
 
     if (!isBlocked) {
+      // API 호출 감시 (RBAC unblocked branch 내부에서만 promise 생성 — dangling 차단)
+      const transitionReq = page.waitForRequest("**/api/hitl/transition");
       await submitBtn.click();
       const req = await transitionReq;
       const body = JSON.parse(req.postData() ?? "{}") as {
