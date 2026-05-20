@@ -38,7 +38,7 @@ export default function BmcListPage() {
   const fetchBmcs = useCallback(async () => {
     try {
       const data = await fetchApi<BmcListResponse>("/ax-bd/bmc");
-      setBmcs(data.items);
+      setBmcs(data.items ?? []);
     } catch {
       setBmcs([]);
     } finally {

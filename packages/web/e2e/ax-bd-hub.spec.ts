@@ -41,7 +41,7 @@ test.describe("AX BD Hub", () => {
 
   test("BMC 목록 페이지 렌더링", async ({ authenticatedPage: page }) => {
     await page.route("**/api/ax-bd/bmc*", (route) =>
-      route.fulfill({ json: [] }),
+      route.fulfill({ json: { items: [], total: 0, page: 1, limit: 20 } }),
     );
 
     await page.goto("/ax-bd/bmc");
